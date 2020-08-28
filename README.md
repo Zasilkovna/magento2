@@ -12,6 +12,7 @@ Installation and registration of the module is done by CLI utility, which is par
 
 - copy directory 'Packetery' to directory: `/app/code`
 - enable module using CLI utility: `bin/magento module:enable Packetery_Checkout --clear-static-content`
+- get tcpdf using composer `composer require tecnickcom/tcpdf`
 - registration of module: `bin/magento setup:upgrade`
 - re-deploy static content (not needed in dev mode): `bin/magento setup:static-content:deploy`
 - project recompiling: `bin/magento setup:di:compile`
@@ -27,6 +28,7 @@ and save the settings pressing the **Save config** button.
 #### Widget configuration
 
 - **API key** - you can find it in [client section](https://client.packeta.com/en/support/) » Client support
+- Create a config.json file in Checkout/Helper and add the key fron client section (use config.json.sample as referance for the file)
 
 #### Price rules
 
