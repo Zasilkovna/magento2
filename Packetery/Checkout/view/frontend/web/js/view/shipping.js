@@ -53,7 +53,7 @@ define(
 		'use strict';
 
 		var mixin = {
-
+			
 				setShippingInformation: function () {
 
 					if( !shippingSelected() ){
@@ -90,6 +90,7 @@ define(
 				return true;
 			},
 			getconfigValue: function () {
+				
 				var serviceUrl = url.build('packetery/config/storeconfig');
 
 				if( packeterySelected() ){

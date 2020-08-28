@@ -19,6 +19,7 @@ class PaymentMethod implements \Magento\Framework\Option\ArrayInterface
          * @var string                                 $code
          * @var \Magento\Payment\Model\MethodInterface $_method
          */
+        
         foreach ($activePaymentMethods as $code => $_method)
         {
             $_return[] = [
