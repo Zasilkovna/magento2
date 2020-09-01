@@ -33,17 +33,20 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     /** @var \\Magento\Framework\App\ResourceConnection */
     private $resourceConnection;
 
+    public $dataHelper;
 
     public function __construct(
         CheckoutSession $checkoutSession,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\App\ResourceConnection $resourceConnection
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
+        \Packetery\Checkout\Helper\DataHelper $dataHelper
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->resourceConnection = $resourceConnection;
+        $this->dataHelper = $dataHelper;
     }
 
     /**
@@ -72,7 +75,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         }
 
         // GET DATA
-        $streetMatches = [];
+        /* $streetMatches = [];
         $match = preg_match('/^(.*[^0-9]+) (([1-9][0-9]*)\/)?([1-9][0-9]*[a-cA-C]?)$/', $order->getShippingAddress()->getStreet()[0], $streetMatches);
 
         if (!$match) {
@@ -84,7 +87,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         } else {
             $houseNumber = (!empty($streetMatches[3])) ? $streetMatches[3] . "/" . $streetMatches[4] : $streetMatches[4];
             $street = $streetMatches[1];
-        }
+        } */
+        $street = $order->getShippingAddress()->getStreet();
 
         $weight = 0;
         foreach ($order->getAllItems() as $item)
@@ -126,13 +130,15 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             'point_id' => ($pointId ? $pointId : (isset($fictiveBranches[$country]) ? $fictiveBranches[$country]['id'] : self::CZ_FICTIVE_BRANCH['id'])),
             'point_name' => ($pointId ? $pointName : (isset($fictiveBranches[$country]) ? $fictiveBranches[$country]['name'] : self::CZ_FICTIVE_BRANCH['name'])),
             'sender_label' => $this->getLabel(),
-            'recipient_street' => $street,
-            'recipient_house_number' => $houseNumber,
+            'recipient_street' => implode(' ',$street),
+            'recipient_house_number' => null,
             'recipient_city' => $order->getShippingAddress()->getCity(),
             'recipient_zip' => $order->getShippingAddress()->getPostcode(),
             'exported' => 0,
+            'adult_content' => false
         ];
-
+        $return = $this->dataHelper->sendData($data);
+        $data['barcode'] = $return->barcodeText;
         $this->saveData($data);
 
     }
@@ -213,8 +219,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $connection= $this->resourceConnection->getConnection();
 
 		$query = "INSERT INTO packetery_order
-					(`order_number`, `recipient_firstname`, `recipient_lastname`, `recipient_phone`, `recipient_company`, `recipient_email`, `cod` ,`currency`,`value`, `weight`,`point_id`,`point_name`,`recipient_street`,`recipient_house_number`,`recipient_city`,`recipient_zip`, `sender_label`, `exported`)
-					VALUES (:order_number, :recipient_firstname, :recipient_lastname, :recipient_phone, :recipient_company,:recipient_email, :cod, :currency, :value, :weight, :point_id, :point_name, :recipient_street, :recipient_house_number, :recipient_city, :recipient_zip, :sender_label, :exported)";
+					(`order_number`, `recipient_firstname`, `recipient_lastname`, `recipient_phone`, `recipient_company`, `recipient_email`, `cod` ,`currency`,`value`, `weight`,`point_id`,`point_name`,`recipient_street`,`recipient_house_number`,`recipient_city`,`recipient_zip`, `sender_label`, `exported`, `adult_content`, `barcode`)
+					VALUES (:order_number, :recipient_firstname, :recipient_lastname, :recipient_phone, :recipient_company,:recipient_email, :cod, :currency, :value, :weight, :point_id, :point_name, :recipient_street, :recipient_house_number, :recipient_city, :recipient_zip, :sender_label, :exported, :adult_content, :barcode)";
 
 		$connection->query($query, $data);
 	}

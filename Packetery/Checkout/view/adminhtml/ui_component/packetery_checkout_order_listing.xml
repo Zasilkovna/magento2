@@ -378,6 +378,17 @@
                 </item>
             </argument>
         </column>
+        <!-- <column name="generate_pdf" component="Packetery\Checkout\Ui\Component\Listing\GeneratePDF">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="link" xsi:type="string">link</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Generate PDF</label>
+                <sortable>false</sortable>
+            </settings>
+        </column> -->
 
     </columns>
     <listingToolbar name="listing_top">
@@ -401,6 +412,11 @@
                             <item name="label" xsi:type="string" translate="true">Csv custom</item>
                             <item name="url" xsi:type="string">packetery/export/gridToCsvCustom</item>
                         </item>
+                       <!--  <item name="pdf" xsi:type="array">
+                            <item name="value" xsi:type="string">pdf</item>
+                            <item name="label" xsi:type="string" translate="true">Generate PDF</item>
+                            <item name="url" xsi:type="string">packetery/export/gridToPdf</item>
+                        </item> -->
                     </item>
                 </item>
             </argument>

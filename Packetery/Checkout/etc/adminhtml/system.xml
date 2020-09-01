@@ -17,6 +17,12 @@
                     <comment></comment>
                     <backend_model>Packetery\Checkout\Block\System\Config\Form\ApiKeyValidate</backend_model>
                 </field>
+                <field id="api_key_password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+                    <label>API key Password</label>
+                </field>
+                <field id="sender_name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+                    <label>eShop Name</label>
+                </field>
             </group>
         </section>
 

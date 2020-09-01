@@ -71,7 +71,7 @@ class Label {
 
         $pdf = new \TCPDF('L', PDF_UNIT, 'A4', true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Adam Schubert');
+        $pdf->SetAuthor('Anonim');
         $pdf->SetTitle(sprintf('Zasilkovna Label %s', implode(', ', $packageNumbers)));
         $pdf->SetSubject(sprintf('Zasilkovna Label %s', implode(', ', $packageNumbers)));
         $pdf->SetKeywords('Zasilkovna');
@@ -113,66 +113,15 @@ class Label {
      * @param PacketAttributes $packetAttributes
      * @return \TCPDF
      */
-    public function generateLabelFull(\TCPDF $pdf, PacketAttributes $packetAttributes)
-    {
+    public function generateLabelFull(\TCPDF $pdf, PacketAttributes $packetAttributes) {
+       // var_dump($packetAttributes->getEshop()); //'sansha.royalsoft.dev'
+      // var_dump($packetAttributes->getId());die;
         $returnRouting = $this->api->senderGetReturnRouting($packetAttributes->getEshop());
         $branch = $this->branch->find($packetAttributes->getAddressId());
 
-        /*
-        dump();
-        dump();
-        */
-        //$packetAttributes->getEshop()
-        //$packetAttributes->getNumber();
-
-        /*stdClass #ca63
-        routingSegment => array (2)
-        0 => "=A--0--085=depo=" (16)
-        1 => "+10N+>" (6)*/
-
-        /*id => "620" (3)
-name => "Litovel, Příčná" (19)
-nameStreet => "Litovel, Příčná 1348/5" (26)
-place => "Davcom" (6)
-street => "Příčná 1348/5" (17)
-city => "Litovel" (7)
-zip => "784 01" (6)
-country => "cz" (2)
-currency => "CZK" (3)
-directions => "<p>Pobočka se nachází přímo u velikého parkoviště naproti obchodu Billa.</p>" (84)
-wheelchairAccessible => "no" (2)
-latitude => "49.69901" (8)
-longitude => "17.07290" (8)
-url => "https://www.zasilkovna.cz/pobocky/litovel-pricna" (48)
-dressingRoom => "0"
-claimAssistant => "1"
-packetConsignment => "1"
-maxWeight => "10" (2)
-region => "Olomoucký kraj" (15)
-district => "Olomouc" (7)
-labelRouting => "M-M01-620" (9)
-labelName => "Litovel, Příčná" (19)
-photos => array (3)
-0 => array (2)
-thumbnail => "https://www.zasilkovna.cz/images/branch/thumb/IMG_20151012_153804.jpg" (69)
-normal => "https://www.zasilkovna.cz/images/branch/normal/IMG_20151012_153804.jpg" (70)
-1 => array (2)
-thumbnail => "https://www.zasilkovna.cz/images/branch/thumb/IMG_20151012_153822.jpg" (69)
-normal => "https://www.zasilkovna.cz/images/branch/normal/IMG_20151012_153822.jpg" (70)
-2 => array (2)
-thumbnail => "https://www.zasilkovna.cz/images/branch/thumb/IMG_20151012_153842.jpg" (69)
-normal => "https://www.zasilkovna.cz/images/branch/normal/IMG_20151012_153842.jpg" (70)
-openingHours => array (5)
-compactShort => "<strong>Po–Pá</strong> 08:00–12:30, 13:30–17:30<br /><strong style='color: red;'>28. 9.</strong> zavřeno" (112)
-compactLong => "<strong>Po–Pá</strong> 08:00–12:30, 13:30–17:30<br /><strong style='color: red;'>28. 9.</strong> zavřeno" (112)
-tableLong => "<table class='packetery-hours'><tr><th>Po</th><td>08:00–12:30</td><td>13:30–17:30</td></tr>
-<tr><th>Út</th><td>08:00–12:30</td><td>13:30–17:30</td></t ... " (493)
-regular => array (7)
-exceptions => array (1)
-exception => array (2) [ ... ]*/
-
         $x = 17;
-        $pdf->Image(__DIR__ . '/../logo.png', $x + 10, 120, 100, '', 'PNG');
+        
+        $pdf->Image(__DIR__ . '/logo.png', $x + 10, 120, 100, '', 'PNG');
 
         //Contact info
         $contactInfoX = $x + 10;
@@ -296,7 +245,7 @@ exception => array (2) [ ... ]*/
         $branch = $this->branch->find($packetAttributes->getAddressId());
 
         //Logo
-        $pdf->Image(__DIR__ . '/../logo.png', 3 + $xPositionOffset, 50 + $yPositionOffset, 60, '', 'PNG');
+        $pdf->Image(__DIR__ . '/logo.png', 3 + $xPositionOffset, 50 + $yPositionOffset, 60, '', 'PNG');
 
 
 

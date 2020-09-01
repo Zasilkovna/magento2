@@ -193,6 +193,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
 
 		$this->addExportType($this->getUrl('*/*/exportPacketeryCsv'), __('CSV - only not exported'));
 		$this->addExportType($this->getUrl('*/*/exportPacketeryCsvAll'), __('CSV - all records'));
+		$this->addExportType($this->getUrl('*/*/generatePdfAll'), __('Generate PDF'));
 
         return $this;
     }

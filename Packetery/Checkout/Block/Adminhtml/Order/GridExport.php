@@ -2,6 +2,8 @@
 
 namespace Packetery\Checkout\Block\Adminhtml\Order;
 
+use Packetery\Checkout\Helper\api\Model\PacketAttributes;
+
 class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 {
 
@@ -9,6 +11,8 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
      * @var \Learning\Test\Model\ResourceModel\Info\CollectionFactory
      */
     protected $_collectionFactory;
+
+    public $dataHelper;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
@@ -20,9 +24,11 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Backend\Helper\Data $backendHelper,
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory,
+        \Packetery\Checkout\Helper\DataHelper $dataHelper,
         array $data = []
     ) {
         $this->_collectionFactory = $collectionFactory;
+        $this->dataHelper = $dataHelper;
         parent::__construct($context, $backendHelper, $data);
     }
 
@@ -173,5 +179,53 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 		{
 			$collection->getSelect()->where("exported = 1");
 		}
-	}
+    }
+    
+    public function getPdf($orderIds = FALSE)
+    {
+        $col = $this->loadDataSelection();
+
+        if ($orderIds)
+        {
+            $orderIds = explode(",",$orderIds);
+            $col->getSelect()->where('id in (?)', $orderIds);
+        }
+        $collection = $col->load();
+        $data = [];
+
+        foreach ($collection as $row){
+            $order = $this->getPacketAttributesRow($row);
+            array_push($data,$order);
+        }
+        $this->dataHelper->generatePdf($data);
+        return;
+    }
+
+    public function getPacketAttributesRow($row){
+        return  new PacketAttributes( 
+            $row->getData('order_number'),
+            $row->getData('recipient_firstname'),
+            $row->getData('recipient_lastname'),
+            $row->getData('value'),
+            $row->getData('point_id'),
+            $row->getData('barcode'),//null, //paket darcode id
+            $row->getData('recipient_company'),
+            $row->getData('recipient_email'),
+            $row->getData('recipient_phone'),
+            $row->getData('currency'),
+            $row->getData('cod'),
+            $row->getData('weight'),
+            'SANSHA Praha',//@todo add backend sender name /* $row->getData('point_name'), */
+            $row->getData('adult_content'),
+            $row->getData('recipient_street'),
+            $row->getData('recipient_house_number'),
+            $row->getData('recipient_city'),
+            $row->getData('recipient_zip'),
+            $row->getData('carrier_point'),
+            null,
+            null,
+            null
+        );
+    }
+
 }

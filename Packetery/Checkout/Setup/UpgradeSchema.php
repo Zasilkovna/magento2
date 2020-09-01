@@ -17,8 +17,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
         SchemaSetupInterface $setup,
         ModuleContextInterface $context
     ) {
-        if (version_compare($context->getVersion(), "1.0.0", "<")) {
-            //Your upgrade script
+        $setup->startSetup();
+        if (version_compare($context->getVersion(), "2.1.0", "<")) {
+            $table = $setup->getTable('packetery_order');
+            if ($setup->getConnection()->isTableExists($table) == true) {
+
+                $connection = $setup->getConnection();
+                
+				$connection->addColumn(
+                    $table,
+                    'barcode',
+                    [
+						'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+						'length' => 120,
+						'nullable' => true,
+						'comment' => 'barcode',
+					]
+                    
+                );
+            }
         }
+        $setup->endSetup();
     }
 }

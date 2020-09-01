@@ -23,8 +23,8 @@ class View extends \Magento\Framework\View\Element\Template {
     }
 
     public function test(){
-        echo 'asd';
-        //$this->dataHelper->test();
+        //echo 'asd';
+        echo $this->dataHelper->test();
         return;
     }
 }
