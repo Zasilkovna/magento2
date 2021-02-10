@@ -23,12 +23,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), "2.0.3", "<")) {
             $sql = "
 ALTER TABLE `packetery_order`
-ADD COLUMN `is_carrier` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Is Point_id ID of external carrier?' AFTER `point_name`;";
-
-            $connection->query($sql);
-
-            $sql = "
-ALTER TABLE `packetery_order`
+ADD COLUMN `is_carrier` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Is Point_id ID of external carrier?' AFTER `point_name`,
 ADD COLUMN `carrier_pickup_point` VARCHAR(40) NULL COMMENT 'External carrier pickup point ID' AFTER `is_carrier`;";
 
             $connection->query($sql);

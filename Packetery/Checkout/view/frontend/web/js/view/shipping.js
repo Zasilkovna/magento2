@@ -231,7 +231,7 @@ function showSelectedPickupPoint(point)
             name: null,
             pickupPointType: null,
             carrierId: null,
-            carrierPickupPointId: null,
+            carrierPickupPointId: null
         };
     }
 }

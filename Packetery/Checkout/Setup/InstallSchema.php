@@ -134,7 +134,7 @@ class InstallSchema implements InstallSchemaInterface
         $setup->endSetup();
     }
 
-    private function table(&$setup)
+    private function table(SchemaSetupInterface &$setup)
     {
         $table = $setup->getConnection()->newTable(
             $setup->getTable('packetery_order')
@@ -147,16 +147,18 @@ class InstallSchema implements InstallSchemaInterface
         $setup->getConnection()->createTable($table);
     }
 
-    private function columns(&$table)
+    private function columns(Table &$table)
     {
         foreach ($this->schema as $name => $column) {
             $column['attr'] = (isset($column['attr'])) ? $column['attr'] : [];
             $column['size'] = (isset($column['size'])) ? $column['size'] : null;
+            $column['comment'] = (isset($column['comment'])) ? $column['comment'] : null;
             $table->addColumn(
                 $name,
                 $column['type'],
                 $column['size'],
-                $column['attr']
+                $column['attr'],
+                $column['comment']
             );
         }
     }

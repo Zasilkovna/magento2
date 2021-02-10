@@ -77,6 +77,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $pointId = NULL;
         $pointName = NULL;
         $point = NULL;
+        $isCarrier = false;
+        $carrierPickupPoint = null;
 
         if ($postData && !empty($postData->packetery))
         {
@@ -84,13 +86,19 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             $point = $postData->packetery->point;
             $pointId = $point->pointId;
             $pointName = $point->name;
+            $isCarrier = (bool)$point->carrierId;
+            $carrierPickupPoint = $point->carrierPickupPointId ?: null;
         }
         else
         {
             // creating/editing order from admin
             $packetery = $this->getRealOrderPacketery($order);
-            $pointId = $packetery['point_id'];
-            $pointName = $packetery['point_name'];
+            if (!empty($packetery)) {
+                $pointId = $packetery['point_id'];
+                $pointName = $packetery['point_name'];
+                $isCarrier = $packetery['is_carrier'];
+                $carrierPickupPoint = $packetery['carrier_pickup_point'];
+            }
         }
 
         if (empty($pointId)) {
@@ -112,8 +120,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             'weight' => $weight,
             'point_id' => $pointId,
             'point_name' => $pointName,
-            'is_carrier' => $point->carrierId ? 1 : 0,
-            'carrier_pickup_point' => $point->carrierPickupPointId ?: null,
+            'is_carrier' => $isCarrier ? 1 : 0,
+            'carrier_pickup_point' => $carrierPickupPoint,
             'sender_label' => $this->getLabel(),
             'recipient_street' => $street,
             'recipient_house_number' => $houseNumber,
@@ -128,19 +136,14 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
     private function getRealOrderPacketery($order)
     {
-        $null = [
-            'point_id'   => NULL,
-            'point_name' => NULL,
-        ];
-
         $orderIdOriginal = self::getRealOrderId($order->getIncrementId());
         if (!is_numeric($orderIdOriginal))
         {
-            return $null;
+            return null;
         }
 
         $query = "
-            SELECT `point_id`, `point_name`
+            SELECT `point_id`, `point_name`, `is_carrier`, `carrier_pickup_point`
             FROM `packetery_order`
             WHERE `order_number` = :order_number
         ";
@@ -150,7 +153,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
         if (empty($data))
         {
-            return $null;
+            return null;
         }
 
         return $data;

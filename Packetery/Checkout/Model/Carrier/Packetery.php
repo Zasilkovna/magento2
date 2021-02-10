@@ -73,12 +73,6 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
 
         $this->initProps($request);
 
-        // not allowed country, Packetery shipment is not displayed
-        if (!self::canUsePacketa($this->_scopeConfig, $this->_countryCode))
-        {
-           return FALSE;
-        }
-
         $_weightMax = $this->_scopeConfig->getValue(self::MODUL_CONF_MAX_WEIGHT, \Magento\Store\Model\ScopeInterface::SCOPE_STORES);
         $_freeShipping = $this->getFreeShipping();
 
@@ -169,7 +163,7 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
 
         if (!$this->getStoreConfig("{$this->_configPath}rules"))
         {
-            $this->_configPath = sprintf(self::MODUL_CONF, '');
+            $this->_configPath = sprintf(self::MODUL_CONF, ''); // todo check
         }
 
         $config = $this->getStoreConfig("{$this->_configPath}rules");
@@ -270,23 +264,5 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
         }
 
         return $countryCodes;
-    }
-
-    /**
-     * Is Packetery available for entered country?
-     *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param string                                             $countryCode
-     *
-     * @return bool
-     */
-    public static function canUsePacketa(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig, $countryCode)
-    {
-        if (!is_string($countryCode))
-        {
-            return FALSE;
-        }
-
-        return true;
     }
 }
