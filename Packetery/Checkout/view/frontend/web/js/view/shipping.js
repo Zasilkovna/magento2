@@ -98,6 +98,8 @@ define(
 					jQuery(".zas-box").hide();
 					jQuery("#packeta-branch-id").val("");
 					jQuery("#packeta-branch-name").val("");
+					jQuery("#packeta-branch-courier-id").val("");
+					jQuery("#packeta-branch-courier-pickup-point").val("");
 				}
 
 				//-------------------------
@@ -113,11 +115,6 @@ define(
 							packetaButton.attr('data-web-url', config.packetaOptions.webUrl);
 							packetaButton.attr('data-app-identity', config.packetaOptions.appIdentity);
 							packetaButton.attr('data-language', config.packetaOptions.language);
-
-							// ze session si vezmeme zemi, která byla vybraná ve formu a zkontrolujeme,
-							// jestli ji můžeme použít - pokud ne (nemělo by nastat, máme ošetřeno na BE),
-							// nastavíme první možnou zemi
-							countryCode = config.countryCodes.includes(countryCode) ? countryCode : config.countryCodes[0];
 							packetaButton.attr('data-country-code', countryCode);
 						}
 					}
@@ -171,28 +168,70 @@ function showSelectedPickupPoint(point)
 	var pickedDeliveryPlace = document.getElementById('picked-delivery-place');
 	var packetaBranchId = document.getElementById('packeta-branch-id');
 	var packetaBranchName = document.getElementById('packeta-branch-name');
+	var packetaBranchCarrierId = document.getElementById('packeta-branch-carrier-id');
+	var packetaBranchCarrierPickupPoint = document.getElementById('packeta-branch-carrier-pickup-point');
 
-	if(packetaBranchId && packetaBranchName && pickedDeliveryPlace)
-	{
-		packetaBranchId.value = null;
-		packetaBranchName.value = null;
-		pickedDeliveryPlace.innerText = "";
+    if(!packetaBranchCarrierId) {
+        console.error('element #packeta-branch-carrier-id not found');
+        return;
+    }
 
-		if(point)
-		{
-			pickedDeliveryPlace.innerText = (point ? point.name : "");
-			packetaBranchId.value = point.id;
-			packetaBranchName.value = point.name;
-			var inputMethod = document.querySelectorAll('input[value="packetery_packetery"]');
+    if(!packetaBranchCarrierPickupPoint) {
+        console.error('element #packeta-branch-carrier-pickup-point not found');
+        return;
+    }
 
-			if(inputMethod.length == 1)
-			{
-				inputMethod[0].checked = true;
-			}
+    if(!packetaBranchId) {
+        console.error('element #packeta-branch-id not found');
+        return;
+    }
 
-			// nastavíme, aby si pak pro založení objednávky převzal place-order.js, resp. OrderPlaceAfter.php
-			window.packetaPointId = point.id;
-			window.packetaPointName = point.name;
-		}
-	}
+    if(!packetaBranchName) {
+        console.error('element #packeta-branch-name not found');
+        return;
+    }
+
+    if(!pickedDeliveryPlace) {
+        console.error('element #picked-delivery-place not found');
+        return;
+    }
+
+    packetaBranchId.value = null;
+    packetaBranchName.value = null;
+    packetaBranchCarrierId.value = null;
+    packetaBranchCarrierPickupPoint.value = null;
+    pickedDeliveryPlace.innerText = "";
+
+    if(point)
+    {
+        var pointId = point.pickupPointType === 'external' ? point.carrierId : point.id;
+        pickedDeliveryPlace.innerText = (point ? point.name : "");
+        packetaBranchId.value = pointId;
+        packetaBranchName.value = point.name;
+        packetaBranchCarrierId.value = point.carrierId;
+        packetaBranchCarrierPickupPoint.value = point.carrierPickupPointId;
+        var inputMethod = document.querySelectorAll('input[value="packetery_packetery"]');
+
+        if(inputMethod.length == 1)
+        {
+            inputMethod[0].checked = true;
+        }
+
+        // nastavíme, aby si pak pro založení objednávky převzal place-order.js, resp. OrderPlaceAfter.php
+        window.packetaPoint = {
+            pointId: pointId ? pointId : null,
+            name: point.name ? point.name : null,
+            pickupPointType: point.pickupPointType ? point.pickupPointType : null,
+            carrierId: point.carrierId ? point.carrierId : null,
+            carrierPickupPointId: point.carrierPickupPointId ? point.carrierPickupPointId : null
+        };
+	} else {
+        window.packetaPoint = {
+            pointId: null,
+            name: null,
+            pickupPointType: null,
+            carrierId: null,
+            carrierPickupPointId: null,
+        };
+    }
 }

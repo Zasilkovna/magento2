@@ -164,6 +164,11 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
 
         if (!$this->getStoreConfig("{$this->_configPath}rules"))
         {
+            $this->_configPath = sprintf(self::MODUL_CONF, "rules_default");
+        }
+
+        if (!$this->getStoreConfig("{$this->_configPath}rules"))
+        {
             $this->_configPath = sprintf(self::MODUL_CONF, '');
         }
 
@@ -282,6 +287,6 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
             return FALSE;
         }
 
-        return in_array(strtolower($countryCode), self::getCountryCodes($scopeConfig));
+        return true;
     }
 }

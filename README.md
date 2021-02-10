@@ -4,7 +4,7 @@
 
 ### Download module
 
-[Current version 2.0.2](https://github.com/Zasilkovna/magento2/archive/v2.0.2.zip)
+[Current version 2.0.3](https://github.com/Zasilkovna/magento2/archive/v2.0.3.zip)
 
 ### Installation
 
@@ -13,6 +13,15 @@ Installation and registration of the module is done by CLI utility, which is par
 - copy directory 'Packetery' to directory: `/app/code`
 - enable module using CLI utility: `bin/magento module:enable Packetery_Checkout --clear-static-content`
 - registration of module: `bin/magento setup:upgrade`
+- re-deploy static content (not needed in dev mode): `bin/magento setup:static-content:deploy`
+- project recompiling: `bin/magento setup:di:compile`
+- clean cache: `bin/magento cache:clean`
+
+## Upgrading from 2.0.2 to 2.0.3
+
+- copy directory 'Packetery' to directory: `/app/code`
+- enable module using CLI utility: `bin/magento module:enable Packetery_Checkout --clear-static-content`
+- schema upgrade: `bin/magento setup:upgrade`
 - re-deploy static content (not needed in dev mode): `bin/magento setup:static-content:deploy`
 - project recompiling: `bin/magento setup:di:compile`
 - clean cache: `bin/magento cache:clean`
@@ -88,7 +97,7 @@ Multiple payment methods can be selected by holding the "Ctrl" button and clicki
 
 ### Stažení modulu
 
-[Aktuální verze 2.0.2](https://github.com/Zasilkovna/magento2/archive/v2.0.2.zip)
+[Aktuální verze 2.0.3](https://github.com/Zasilkovna/magento2/archive/v2.0.3.zip)
 
 ### Instalace
 
@@ -97,6 +106,15 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 - nakopírovat adresář 'Packetery' do adresáře: `/app/code`
 - povolení modulu pomocí CLI utility: `bin/magento module:enable Packetery_Checkout --clear-static-content`
 - registrace modulu: `bin/magento setup:upgrade`
+- re-deploy statického obsahu (není potřeba v dev módu): `bin/magento setup:static-content:deploy`
+- rekompilace projektu: `bin/magento setup:di:compile`
+- smazání cache: `bin/magento cache:clean`
+
+### Aktualizace modulu z verze 2.0.2 na 2.0.3
+
+- nakopírovat adresář 'Packetery' do adresáře: `/app/code`
+- povolení modulu pomocí CLI utility: `bin/magento module:enable Packetery_Checkout --clear-static-content`
+- aktualizace schématu: `bin/magento setup:upgrade`
 - re-deploy statického obsahu (není potřeba v dev módu): `bin/magento setup:static-content:deploy`
 - rekompilace projektu: `bin/magento setup:di:compile`
 - smazání cache: `bin/magento cache:clean`
