@@ -68,6 +68,24 @@ class InstallSchema implements InstallSchemaInterface
             "type" => Table::TYPE_TEXT,
             'size'    => '1024'
         ],
+        "is_carrier" => [
+            "type" => Table::TYPE_BOOLEAN,
+            'attr' => [
+                'nullable' => false,
+                'default' => 0,
+                'comment' => 'Is Point_id ID of external carrier?',
+                'after' => 'point_name'
+            ]
+        ],
+        "carrier_pickup_point" => [
+            "type" => Table::TYPE_TEXT,
+            'size' => '40',
+            'attr' => [
+                'nullable' => true,
+                'comment' => 'External carrier pickup point ID',
+                'after' => 'is_carrier'
+            ]
+        ],
         "sender_label" => [
             "type" => Table::TYPE_TEXT,
             'size'    => '64'

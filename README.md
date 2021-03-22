@@ -17,7 +17,7 @@ Installation and registration of the module is done by CLI utility, which is par
 - project recompiling: `bin/magento setup:di:compile`
 - clean cache: `bin/magento cache:clean`
 
-## Upgrading
+## Installation or upgrading
 
 Same as installation
 
@@ -105,7 +105,7 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 - rekompilace projektu: `bin/magento setup:di:compile`
 - smazání cache: `bin/magento cache:clean`
 
-### Aktualizace modulu
+### Instalace nebo aktualizace modulu
 
 Postup stejný jako při instalaci
 

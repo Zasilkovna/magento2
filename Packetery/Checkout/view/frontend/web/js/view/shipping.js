@@ -97,9 +97,6 @@ define(
 				}else{
 					jQuery(".zas-box").hide();
 					jQuery("#packeta-branch-id").val("");
-					jQuery("#packeta-branch-name").val("");
-					jQuery("#packeta-branch-courier-id").val("");
-					jQuery("#packeta-branch-courier-pickup-point").val("");
 				}
 
 				//-------------------------
@@ -167,39 +164,8 @@ function showSelectedPickupPoint(point)
 {
 	var pickedDeliveryPlace = document.getElementById('picked-delivery-place');
 	var packetaBranchId = document.getElementById('packeta-branch-id');
-	var packetaBranchName = document.getElementById('packeta-branch-name');
-	var packetaBranchCarrierId = document.getElementById('packeta-branch-carrier-id');
-	var packetaBranchCarrierPickupPoint = document.getElementById('packeta-branch-carrier-pickup-point');
-
-    if(!packetaBranchCarrierId) {
-        console.error('element #packeta-branch-carrier-id not found');
-        return;
-    }
-
-    if(!packetaBranchCarrierPickupPoint) {
-        console.error('element #packeta-branch-carrier-pickup-point not found');
-        return;
-    }
-
-    if(!packetaBranchId) {
-        console.error('element #packeta-branch-id not found');
-        return;
-    }
-
-    if(!packetaBranchName) {
-        console.error('element #packeta-branch-name not found');
-        return;
-    }
-
-    if(!pickedDeliveryPlace) {
-        console.error('element #picked-delivery-place not found');
-        return;
-    }
 
     packetaBranchId.value = null;
-    packetaBranchName.value = null;
-    packetaBranchCarrierId.value = null;
-    packetaBranchCarrierPickupPoint.value = null;
     pickedDeliveryPlace.innerText = "";
 
     if(point)
@@ -207,9 +173,6 @@ function showSelectedPickupPoint(point)
         var pointId = point.pickupPointType === 'external' ? point.carrierId : point.id;
         pickedDeliveryPlace.innerText = (point ? point.name : "");
         packetaBranchId.value = pointId;
-        packetaBranchName.value = point.name;
-        packetaBranchCarrierId.value = point.carrierId;
-        packetaBranchCarrierPickupPoint.value = point.carrierPickupPointId;
         var inputMethod = document.querySelectorAll('input[value="packetery_packetery"]');
 
         if(inputMethod.length == 1)

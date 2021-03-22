@@ -10,7 +10,7 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
     const MODUL_TITLE = 'title';
     const MODUL_METHOD_NAME = 'name';
     const MODUL_CONF = 'packetery_rules/%s/';
-    const MODUL_CONF_GLOBAL = 'packetery_rules/global/';
+    const MODUL_CONF_GLOBAL = 'packetery_rules/rules_global/';
     const MODUL_CONF_MAX_WEIGHT = 'packetery_rules/rules_global/max_weight';
 
     const MULTI_SHIPPING_MODULE_NAME = 'multishipping';
@@ -156,14 +156,10 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
 
         $this->_configPath = sprintf(self::MODUL_CONF, "rules_{$this->_countryCode}");
 
-        if (!$this->getStoreConfig("{$this->_configPath}rules"))
+        // if config for given country does not exist
+        if ($this->getStoreConfig("{$this->_configPath}rules") === null)
         {
-            $this->_configPath = sprintf(self::MODUL_CONF, "rules_default");
-        }
-
-        if (!$this->getStoreConfig("{$this->_configPath}rules"))
-        {
-            $this->_configPath = sprintf(self::MODUL_CONF, ''); // todo check
+            $this->_configPath = sprintf(self::MODUL_CONF, "rules_default"); // other countries
         }
 
         $config = $this->getStoreConfig("{$this->_configPath}rules");

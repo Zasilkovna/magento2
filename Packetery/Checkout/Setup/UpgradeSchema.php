@@ -17,18 +17,33 @@ class UpgradeSchema implements UpgradeSchemaInterface
         SchemaSetupInterface $setup,
         ModuleContextInterface $context
     ) {
-        $connection = $setup->getConnection();
-        $connection->startSetup();
+        $installer = $setup;
+        $installer->startSetup();
 
-        if (version_compare($context->getVersion(), "2.0.3", "<")) {
-            $sql = "
-ALTER TABLE `packetery_order`
-ADD COLUMN `is_carrier` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Is Point_id ID of external carrier?' AFTER `point_name`,
-ADD COLUMN `carrier_pickup_point` VARCHAR(40) NULL COMMENT 'External carrier pickup point ID' AFTER `is_carrier`;";
+        $installer->getConnection()->addColumn(
+            $installer->getTable('packetery_order'),
+            'is_carrier',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => 0,
+                'comment' => 'Is Point_id ID of external carrier?',
+                'after' => 'point_name'
+            ]
+        );
 
-            $connection->query($sql);
-        }
+        $installer->getConnection()->addColumn(
+            $installer->getTable('packetery_order'),
+            'carrier_pickup_point',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'nullable' => true,
+                'length' => 40,
+                'comment' => 'External carrier pickup point ID',
+                'after' => 'is_carrier'
+            ]
+        );
 
-        $connection->endSetup();
+        $installer->endSetup();
     }
 }

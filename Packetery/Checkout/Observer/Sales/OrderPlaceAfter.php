@@ -80,7 +80,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $isCarrier = false;
         $carrierPickupPoint = null;
 
-        if ($postData && !empty($postData->packetery))
+        if ($postData)
         {
             // new order from frontend
             $point = $postData->packetery->point;
@@ -91,18 +91,14 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         }
         else
         {
-            // creating/editing order from admin
+            // creating order from admin
             $packetery = $this->getRealOrderPacketery($order);
             if (!empty($packetery)) {
                 $pointId = $packetery['point_id'];
                 $pointName = $packetery['point_name'];
-                $isCarrier = $packetery['is_carrier'];
+                $isCarrier = (bool)$packetery['is_carrier'];
                 $carrierPickupPoint = $packetery['carrier_pickup_point'];
             }
-        }
-
-        if (empty($pointId)) {
-            throw new \Magento\Checkout\Exception(new Phrase('pointIdMustNotBeEmpty'));
         }
 
 		$paymentMethod = $order->getPayment()->getMethod();
@@ -120,7 +116,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             'weight' => $weight,
             'point_id' => $pointId,
             'point_name' => $pointName,
-            'is_carrier' => $isCarrier ? 1 : 0,
+            'is_carrier' => $isCarrier,
             'carrier_pickup_point' => $carrierPickupPoint,
             'sender_label' => $this->getLabel(),
             'recipient_street' => $street,
