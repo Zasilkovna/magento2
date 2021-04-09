@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier;
 
+use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
+
 class PacketeryConfig
 {
     /** @var \Packetery\Checkout\Model\Carrier\Packetery  */
@@ -33,14 +35,6 @@ class PacketeryConfig
     public function getTitle()
     {
         return $this->packeteryCarrier->getConfigData('title') ?: __("Packeta");
-    }
-
-    /**
-     * @return false|\Magento\Framework\Phrase|string
-     */
-    public function getName()
-    {
-        return $this->packeteryCarrier->getConfigData('name') ?: __("Z-Point");
     }
 
     /**
@@ -94,13 +88,16 @@ class PacketeryConfig
 
     /** 1 => Specific countries
      *  0 => All countries
-     *  null => unspecified (most likely system specific value)
      * @return int|null
      */
-    public function getApplicableCountries(): ?int
+    public function getApplicableCountries(): int
     {
-        $value = $this->packeteryCarrier->getConfigData('sallowspecific');
-        return is_numeric($value) ? (int)$value : null;
+        $value = $this->packeteryCarrier->getConfigData('sallowspecific'); // "Use system value" resolves in 0
+        if (is_numeric($value)) {
+            return (int)$value;
+        }
+
+        throw new \Exception('sallowspecific config value was not restored');
     }
 
     /** Collection of allowed countries
@@ -110,5 +107,33 @@ class PacketeryConfig
     {
         $value = $this->packeteryCarrier->getConfigData('specificcountry');
         return is_string($value) ? explode(',', $value) : [];
+    }
+
+    /**
+     * @return \Packetery\Checkout\Model\Carrier\Config\AllowedMethods
+     */
+    public function getAllowedMethods(): AllowedMethods
+    {
+        $value = $this->packeteryCarrier->getConfigData('allowedMethods');
+        $methods = is_string($value) ? explode(',', $value) : [];
+        return new AllowedMethods($methods);
+    }
+
+    /**
+     * @param string $countryId
+     * @return bool
+     */
+    public function hasSpecificCountryAllowed(string $countryId): bool
+    {
+        if ($this->getApplicableCountries() === 1) {
+            $countries = $this->getSpecificCountries();
+            return empty($countries) || in_array($countryId, $countries);
+        }
+
+        if ($this->getApplicableCountries() === 0) {
+            return true;
+        }
+
+        throw new \Exception('Unrecognized getApplicableCountries return value');
     }
 }

@@ -49,7 +49,16 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
      */
     public function getCountryId(): ?string
     {
-        $value = $this->getData('free_shipment') ?: null;
+        $value = $this->getData('country_id') ?: null;
+        return $value === null ? null : (string)$value;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMethod(): ?string
+    {
+        $value = $this->getData('method') ?: null;
         return $value === null ? null : (string)$value;
     }
 }

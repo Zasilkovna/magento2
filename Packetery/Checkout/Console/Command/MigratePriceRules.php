@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Console\Command;
 
+use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Packetery\Checkout\Model\Pricing;
 
 class MigratePriceRules extends Command
 {
@@ -106,7 +106,16 @@ class MigratePriceRules extends Command
             $pricingRule = [
                 'free_shipment' => is_numeric($countryFreeShipping) ? (float)$countryFreeShipping : null,
                 'country_id' => strtoupper($country),
+                'method' => AllowedMethods::PICKUP_POINT_DELIVERY,
             ];
+
+            usort($countryRules, function ($countryRuleA, $countryRuleB) {
+                if ($countryRuleA['from'] === $countryRuleB['from']) {
+                    return 0;
+                }
+
+                return $countryRuleA['from'] > $countryRuleB['from'] ? 1 : -1;
+            });
 
             $previousCountryRule = null;
             foreach ($countryRules as $countryRule) {
@@ -121,6 +130,10 @@ class MigratePriceRules extends Command
                 $previousTo = $previousTo ? str_replace(',', '.', (string)$previousTo) : null;
 
                 if (!is_numeric($countryRuleFrom) || !is_numeric($countryRuleTo) || !is_numeric($countryRulePrice)) {
+                    continue;
+                }
+
+                if (empty($countryRuleTo)) {
                     continue;
                 }
 

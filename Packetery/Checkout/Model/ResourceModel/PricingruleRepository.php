@@ -48,6 +48,7 @@ class PricingruleRepository
         /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection $validation */
         $validation = $this->pricingRuleCollectionFactory->create();
         $validation->addFilter('country_id', $postData['country_id']);
+        $validation->addFilter('method', $postData['method']);
 
         if (isset($postData['id'])) {
             $validation->addFieldToFilter('id', ['nin' => [$postData['id']]]);

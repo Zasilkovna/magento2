@@ -199,10 +199,19 @@ class InstallSchema implements InstallSchemaInterface
             "country_id" => [
                 "type" => Table::TYPE_TEXT,
                 'attr' => [
-                    'nullable' => true,
+                    'nullable' => false,
                     'length' => '2',
                     'comment' => 'Country that relates to specified price',
-                    'after' => 'max_weight'
+                    'after' => 'free_shipment'
+                ]
+            ],
+            "method" => [
+                "type" => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => false,
+                    'length' => '64',
+                    'comment' => 'Related delivery method',
+                    'after' => 'country_id'
                 ]
             ]
         ]);

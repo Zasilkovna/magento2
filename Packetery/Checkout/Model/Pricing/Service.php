@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Pricing;
 
 use Magento\Shipping\Model\Rate\Result;
+use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Packetery\Checkout\Model\Pricingrule;
 
+/**
+ * Do not inject PacketeryConfig or Carrier\Packetery due to dependency circulation
+ */
 class Service
 {
     /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory  */
@@ -61,30 +65,74 @@ class Service
     public function collectRates(Request $pricingRequest): ?Result
     {
         $request = $pricingRequest->getRateRequest();
-        $weightTotal = $request->getPackageWeight(); // custom unit
-        $weightMax = $pricingRequest->getCarrierConfig()->getMaxWeight();
+        $result = $this->rateResultFactory->create();
+        $allowedMethods = $pricingRequest->getCarrierConfig()->getAllowedMethods();
 
-        if (!empty($weightMax) && $weightTotal > $weightMax) {
-            return null; // Package is over maximum allowed weight
+        if ($this->hasValidWeight($pricingRequest) === false) {
+            return null;
         }
 
-        $pricingRule = $this->resolvePricingRule($pricingRequest);
+        if ($allowedMethods->hasPickupPointAllowed()) {
+            // Package is not over maximum allowed weight
+            $pricingRule = $this->resolvePricingRule(AllowedMethods::PICKUP_POINT_DELIVERY, $pricingRequest);
+            $resolvedPrice = $this->resolvePrice($pricingRequest, $pricingRule);
+            $result->append($this->createPickupPointRateMethod($pricingRequest, $resolvedPrice));
+        }
 
-        $result = $this->rateResultFactory->create();
-        $resolvedPrice = $this->resolvePrice($pricingRequest, $pricingRule);
-        $result->append($this->createRateMethod($pricingRequest, $resolvedPrice));
+        $branchId = $this->resolveAddressDeliveryBranchId($request->getDestCountryId());
+        if ($branchId !== null && $allowedMethods->hasAddressDeliveryAllowed()) {
+            $pricingRule = $this->resolvePricingRule(AllowedMethods::ADDRESS_DELIVERY, $pricingRequest);
+            $price = $this->resolvePrice($pricingRequest, $pricingRule);
+            $method = $this->createAddressDeliveryRateMethod($pricingRequest, $price);
+            $result->append($method);
+        }
 
         return $result;
     }
 
     /**
      * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
+     * @return bool
+     */
+    private function hasValidWeight(Request $pricingRequest): bool
+    {
+        $weightTotal = $pricingRequest->getRateRequest()->getPackageWeight(); // custom unit
+        $weightMax = $pricingRequest->getCarrierConfig()->getMaxWeight();
+        return is_numeric($weightMax) && $weightTotal <= $weightMax;
+    }
+
+    /**
+     * @param string $countryId
+     * @return int|null
+     */
+    public function resolveAddressDeliveryBranchId(string $countryId): ?int
+    {
+        $data = [
+            'CZ' => 106,
+            'SK' => 131,
+            'HU' => 4159,
+            'RO' => 4161,
+            'PL' => 4162,
+        ];
+
+        return $data[$countryId] ?? null;
+    }
+
+    /**
+     * @param string $method
+     * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
      * @return \Packetery\Checkout\Model\Pricingrule|null
      */
-    public function resolvePricingRule(Request $pricingRequest): ?Pricingrule
+    public function resolvePricingRule(string $method, Request $pricingRequest): ?Pricingrule
     {
         $destCountryId = $pricingRequest->getRateRequest()->getDestCountryId() ?: null;
-        return $this->getPricingRuleByCountryId($destCountryId);
+
+        $pricingRuleCollection = $this->pricingRuleCollectionFactory->create();
+        $pricingRuleCollection->addFilter('method', $method);
+        $pricingRuleCollection->addFilter('country_id', $destCountryId); // iso 2
+        $first = $pricingRuleCollection->getFirstRecord() ?: null;
+
+        return $first;
     }
 
     /**
@@ -158,7 +206,7 @@ class Service
      * @param float $price
      * @return \Magento\Quote\Model\Quote\Address\RateResult\Method
      */
-    protected function createRateMethod(Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
+    protected function createPickupPointRateMethod(Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
     {
         $method = $this->rateMethodFactory->create();
         $method->setCarrier($request->getCarrierCode());
@@ -167,10 +215,10 @@ class Service
             $method->setCarrierTitle($request->getCarrierConfig()->getTitle());
         }
 
-        $method->setMethod($request->getCarrierCode());
+        $method->setMethod(AllowedMethods::PICKUP_POINT_DELIVERY);
 
         if (empty($method->getMethodTitle())) {
-            $method->setMethodTitle($request->getCarrierConfig()->getName());
+            $method->setMethodTitle(__("Pickup Point Delivery Method"));
         }
 
         $method->setCost($price);
@@ -180,15 +228,29 @@ class Service
     }
 
     /**
-     * @param string|null $countryId
-     * @return \Packetery\Checkout\Model\Pricingrule|null
+     * @param \Packetery\Checkout\Model\Pricing\Request $request
+     * @param float $price
+     * @return \Magento\Quote\Model\Quote\Address\RateResult\Method
      */
-    protected function getPricingRuleByCountryId(?string $countryId): ?Pricingrule
+    protected function createAddressDeliveryRateMethod(Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
     {
-        $pricingRuleCollection = $this->pricingRuleCollectionFactory->create();
-        $pricingRuleCollection->addFilter('country_id', $countryId); // iso 2
-        $first = $pricingRuleCollection->getFirstRecord() ?: null;
-        return $first;
+        $method = $this->rateMethodFactory->create();
+        $method->setCarrier($request->getCarrierCode());
+
+        if (empty($method->getCarrierTitle())) {
+            $method->setCarrierTitle($request->getCarrierConfig()->getTitle());
+        }
+
+        $method->setMethod(AllowedMethods::ADDRESS_DELIVERY);
+
+        if (empty($method->getMethodTitle())) {
+            $method->setMethodTitle(__('Address Delivery Method'));
+        }
+
+        $method->setCost($price);
+        $method->setPrice($price);
+
+        return $method;
     }
 
     /**
@@ -211,9 +273,9 @@ class Service
     {
         $countryFreeShipping = $pricingrule ? $pricingrule->getFreeShipment() : null;
 
-        if (!empty($countryFreeShipping)) {
+        if (is_numeric($countryFreeShipping)) {
             $freeShipping = $countryFreeShipping;
-        } elseif (!empty($globalFreeShipping)) {
+        } elseif (is_numeric($globalFreeShipping)) {
             $freeShipping = $globalFreeShipping;
         } else {
             $freeShipping = null; // disabled

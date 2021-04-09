@@ -9,6 +9,7 @@ use Magento\Quote\Model\Quote\Address\RateResult\Method;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Rate\ResultFactory;
+use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Packetery\Checkout\Model\Pricing;
 use Packetery\Checkout\Model\Pricingrule;
 use Packetery\Checkout\Model\Weightrule;
@@ -88,7 +89,7 @@ class PricingServiceTest extends BaseTest
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(null);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getName')->willReturn('name');
+        $config->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
 
         $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
         $this->assertNotNull($result);
@@ -99,9 +100,8 @@ class PricingServiceTest extends BaseTest
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
         $method = array_shift($rates);
 
-        $this->assertEquals('name', $method->getData('method_title'));
         $this->assertEquals('title', $method->getData('carrier_title'));
-        $this->assertEquals('packetery', $method->getData('method'));
+        $this->assertEquals('pickupPointDelivery', $method->getData('method'));
         $this->assertEquals('packetery', $method->getData('carrier'));
         $this->assertEquals(58, $method->getData('cost'));
 
@@ -158,7 +158,7 @@ class PricingServiceTest extends BaseTest
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(333.58);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getName')->willReturn('name');
+        $config->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
 
         $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
         $this->assertNotNull($result);

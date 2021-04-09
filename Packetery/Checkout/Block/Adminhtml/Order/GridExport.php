@@ -71,15 +71,8 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 
         $collection = $col->load();
 
-        $contents = $this->getCsvHeader();
-
-        foreach ($collection as $row)
-        {
-            $order = $this->getExportRow($row);
-            $contents .= "," . implode(',', $order) . PHP_EOL;
-        }
-
-        return $contents;
+        $contents = $this->createCsvContent($collection);
+        return $contents ?: '';
     }
 
     public function getCsvAllFileContents($onlyNotExported = FALSE)
@@ -91,15 +84,9 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
             $col->getSelect()->where('exported = ?', 0);
         }
         $collection = $col->load();
-        $contents = $this->getCsvHeader();
 
-        foreach ($collection as $row)
-        {
-            $order = $this->getExportRow($row);
-            $contents .= "," . implode(',', $order) . PHP_EOL;
-        }
-
-        return $contents;
+        $contents = $this->createCsvContent($collection);
+        return $contents ?: '';
     }
 
     /**
@@ -175,4 +162,25 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 			$collection->getSelect()->where("exported = 1");
 		}
 	}
+
+    /**
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\Collection|\Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult $collection
+     * @return array
+     */
+    private function createCsvContent(iterable $collection): ?string
+    {
+        // Write to memory (unless buffer exceeds limit then it will write to /tmp)
+        $fp = fopen('php://temp', 'w+');
+        fputcsv($fp, ['version 5']);
+        fputcsv($fp, []);
+        foreach ($collection as $row) {
+            $fields = $this->getExportRow($row);
+            array_unshift($fields, '');
+            fputcsv($fp, $fields);
+        }
+        rewind($fp); // Set the pointer back to the start
+        $contents = stream_get_contents($fp); // Fetch the contents of our CSV
+        fclose($fp);
+        return $contents ?: null; // Close our pointer and free up memory and /tmp space
+    }
 }

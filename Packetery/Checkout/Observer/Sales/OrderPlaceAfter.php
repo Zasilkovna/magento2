@@ -3,7 +3,7 @@
 namespace Packetery\Checkout\Observer\Sales;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\Phrase;
+use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 
 class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -21,16 +21,30 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
     private $packeteryConfig;
 
+    /** @var \Packetery\Checkout\Model\Pricing\Service */
+    private $pricingService;
+
     public function __construct(
         CheckoutSession $checkoutSession,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
-        \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
+        \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
         $this->resourceConnection = $resourceConnection;
         $this->packeteryConfig = $packeteryConfig;
+        $this->pricingService = $pricingService;
+    }
+
+    /**
+     * @param string $shippingMethod
+     * @return bool
+     */
+    private function isAddressDeliveryMethod(string $shippingMethod): bool
+    {
+        return strpos($shippingMethod, AllowedMethods::ADDRESS_DELIVERY) !== false;
     }
 
     /**
@@ -42,8 +56,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     public function execute(
         \Magento\Framework\Event\Observer $observer
     ) {
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $observer->getEvent()->getOrder();
-        $country = strtolower($order->getShippingAddress()->getCountryId());
 
         // IF PACKETERY SHIPPING IS NOT SELECTED, RETURN
         if (strpos($order->getShippingMethod(), self::SHIPPING_CODE) === false)
@@ -82,11 +96,17 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         if ($postData)
         {
             // new order from frontend
-            $point = $postData->packetery->point;
-            $pointId = $point->pointId;
-            $pointName = $point->name;
-            $isCarrier = (bool)$point->carrierId;
-            $carrierPickupPoint = $point->carrierPickupPointId ?: null;
+            if ($this->isAddressDeliveryMethod($order->getShippingMethod())) {
+                $pointId = $this->pricingService->resolveAddressDeliveryBranchId($order->getShippingAddress()->getCountryId());
+                $pointName = implode(', ', $order->getShippingAddress()->getStreet());
+            } else {
+                // pickup point delivery
+                $point = $postData->packetery->point;
+                $pointId = $point->pointId;
+                $pointName = $point->name;
+                $isCarrier = (bool)$point->carrierId;
+                $carrierPickupPoint = $point->carrierPickupPointId ?: null;
+            }
         }
         else
         {
