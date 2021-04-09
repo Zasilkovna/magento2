@@ -24,6 +24,15 @@ class Storeconfig implements HttpGetActionInterface
     /** @var \Magento\Framework\Message\ManagerInterface */
     protected $messageManager;
 
+    /**
+     * Storeconfig constructor.
+     *
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Packetery\Checkout\Helper\Data $helperData
+     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,

@@ -37,6 +37,18 @@ class Save extends Action implements HttpPostActionInterface
     /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
     private $packeteryConfig;
 
+    /**
+     * Save constructor.
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory
+     * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
+     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
+     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
+     */
     public function __construct(
         Context $context,
         \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory,

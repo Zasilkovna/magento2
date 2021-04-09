@@ -12,8 +12,10 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
     const MODUL_METHOD_NAME = 'name';
     const MULTI_SHIPPING_MODULE_NAME = 'multishipping';
 
+    /** @var string  */
     protected $_code = 'packetery';
 
+    /** @var bool  */
     protected $_isFixed = true;
 
     /** @var \Magento\Framework\App\Request\Http */

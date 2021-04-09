@@ -27,6 +27,14 @@ class MassDelete extends Action implements HttpPostActionInterface
      */
     protected $filter;
 
+    /**
+     * MassDelete constructor.
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Ui\Component\MassAction\Filter $filter
+     * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $collectionFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
+     */
     public function __construct(
         Context $context,
         Filter $filter,

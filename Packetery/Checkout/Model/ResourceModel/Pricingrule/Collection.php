@@ -3,8 +3,13 @@ namespace Packetery\Checkout\Model\ResourceModel\Pricingrule;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
+    /** @var string  */
     protected $_idFieldName = 'id';
+
+    /** @var string  */
     protected $_eventPrefix = 'packetery_checkout_pricingrule_collection';
+
+    /** @var string  */
     protected $_eventObject = 'pricingrule_collection';
 
     /**
@@ -25,6 +30,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         return parent::getItems();
     }
 
+    /**
+     * @return \Packetery\Checkout\Model\Pricingrule|null
+     */
     public function getFirstRecord(): ?\Packetery\Checkout\Model\Pricingrule
     {
         $this->load();

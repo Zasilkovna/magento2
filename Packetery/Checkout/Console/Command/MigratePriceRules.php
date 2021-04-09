@@ -17,6 +17,12 @@ class MigratePriceRules extends Command
     /** @var \Magento\Config\Model\Config\Factory */
     private $configFactory;
 
+    /**
+     * MigratePriceRules constructor.
+     *
+     * @param \Magento\Config\Model\Config\Factory $configFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
+     */
     public function __construct(\Magento\Config\Model\Config\Factory $configFactory, \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository)
     {
         parent::__construct();
@@ -24,6 +30,9 @@ class MigratePriceRules extends Command
         $this->pricingruleRepository = $pricingruleRepository;
     }
 
+    /**
+     *  Command general configuration
+     */
     protected function configure(): void
     {
         $this->setName('packetery:migrate-price-rules');

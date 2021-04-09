@@ -14,6 +14,15 @@ class Country extends Column
     /** @var \Magento\Directory\Model\CountryFactory  */
     protected $_countryFactory;
 
+    /**
+     * Country constructor.
+     *
+     * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
+     * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
+     * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
