@@ -12,6 +12,9 @@ class Weightrule extends \Magento\Framework\Model\AbstractModel implements \Mage
 
     protected $_eventPrefix = 'packetery_checkout_weightrule';
 
+    /**
+     *  init
+     */
     protected function _construct()
     {
         $this->_init('Packetery\Checkout\Model\ResourceModel\Weightrule');

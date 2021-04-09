@@ -9,6 +9,9 @@ use Packetery\Checkout\Model\ResourceModel\PricingruleRepository;
 
 class ValidationTest extends \Packetery\Checkout\Test\BaseTest
 {
+    /**
+     *  tests max weight validator used in entity repository
+     */
     public function testMaxWeight()
     {
         $packeteryConfig = $this->createMock(PacketeryConfig::class);

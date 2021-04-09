@@ -9,6 +9,7 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 
 class InstallSchema implements InstallSchemaInterface
 {
+    /** @var array[]  */
     private $orderTableSchema = [
         "id" => [
             "type" => Table::TYPE_INTEGER,

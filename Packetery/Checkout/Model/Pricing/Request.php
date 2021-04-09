@@ -18,6 +18,13 @@ class Request
     /** @var string  */
     private $carrierCode;
 
+    /**
+     * Request constructor.
+     *
+     * @param \Magento\Quote\Model\Quote\Address\RateRequest $rateRequest
+     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $carrierConfig
+     * @param string $carrierCode
+     */
     public function __construct(RateRequest $rateRequest, PacketeryConfig $carrierConfig, string $carrierCode)
     {
         $this->rateRequest = $rateRequest;
@@ -25,16 +32,25 @@ class Request
         $this->carrierCode = $carrierCode;
     }
 
+    /**
+     * @return \Magento\Quote\Model\Quote\Address\RateRequest
+     */
     public function getRateRequest(): RateRequest
     {
         return $this->rateRequest;
     }
 
+    /**
+     * @return \Packetery\Checkout\Model\Carrier\PacketeryConfig
+     */
     public function getCarrierConfig(): PacketeryConfig
     {
         return $this->carrierConfig;
     }
 
+    /**
+     * @return string
+     */
     public function getCarrierCode(): string
     {
         return $this->carrierCode;

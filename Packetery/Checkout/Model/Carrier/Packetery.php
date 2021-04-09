@@ -25,6 +25,16 @@ class Packetery extends \Magento\Shipping\Model\Carrier\AbstractCarrier implemen
     /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
     private $packeteryConfig;
 
+    /**
+     * Packetery constructor.
+     *
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\App\Request\Http $httpRequest
+     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param array $data
+     */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory,

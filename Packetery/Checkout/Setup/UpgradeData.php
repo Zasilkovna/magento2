@@ -12,6 +12,11 @@ class UpgradeData implements UpgradeDataInterface
     /** @var \Magento\Config\Model\Config\Factory */
     private $configFactory;
 
+    /**
+     * UpgradeData constructor.
+     *
+     * @param \Magento\Config\Model\Config\Factory $configFactory
+     */
     public function __construct(\Magento\Config\Model\Config\Factory $configFactory)
     {
         $this->configFactory = $configFactory;

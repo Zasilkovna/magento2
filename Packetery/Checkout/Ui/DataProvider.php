@@ -11,8 +11,20 @@ class DataProvider extends AbstractDataProvider
     /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection */
     protected $collection;
 
+    /** @var \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory */
     protected $weightRuleCollectionFactory;
 
+    /**
+     * DataProvider constructor.
+     *
+     * @param $name
+     * @param $primaryFieldName
+     * @param $requestFieldName
+     * @param $collectionFactory
+     * @param $weightRuleCollectionFactory
+     * @param array $meta
+     * @param array $data
+     */
     public function __construct(
         $name,
         $primaryFieldName,

@@ -9,11 +9,19 @@ class PacketeryConfig
     /** @var \Packetery\Checkout\Model\Carrier\Packetery  */
     private $packeteryCarrier;
 
+    /**
+     * PacketeryConfig constructor.
+     *
+     * @param \Packetery\Checkout\Model\Carrier\Packetery $packeteryCarrier
+     */
     public function __construct(Packetery $packeteryCarrier)
     {
         $this->packeteryCarrier = $packeteryCarrier;
     }
 
+    /**
+     * @return string|null
+     */
     public function getApiKey(): ?string
     {
         return $this->packeteryCarrier->getConfigData('api_key') ?: null;
@@ -44,6 +52,9 @@ class PacketeryConfig
         return is_string($value) ? explode(',', $value) : [];
     }
 
+    /**
+     * @return float|null
+     */
     public function getDefaultPrice(): ?float
     {
         $value = $this->packeteryCarrier->getConfigData('default_price');
@@ -59,6 +70,9 @@ class PacketeryConfig
         return is_numeric($value) ? (float)$value : null;
     }
 
+    /**
+     * @return int|null
+     */
     private function getFreeShippingEnable(): ?int
     {
         $value = $this->packeteryCarrier->getConfigData('free_shipping_enable');

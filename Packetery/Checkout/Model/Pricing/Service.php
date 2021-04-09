@@ -27,6 +27,16 @@ class Service
     /** @var \Magento\Shipping\Model\Rate\ResultFactory  */
     private $rateResultFactory;
 
+    /**
+     * Service constructor.
+     *
+     * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
+     * @param \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
+     * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
+     * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
+     * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+     */
     public function __construct
     (
         \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory,

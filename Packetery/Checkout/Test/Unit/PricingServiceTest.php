@@ -17,6 +17,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class PricingServiceTest extends BaseTest
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testService()
     {
         $service = $this->createService(100, 10, null);
@@ -51,6 +54,9 @@ class PricingServiceTest extends BaseTest
         $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, -2]));
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testRateCollection()
     {
         $pricingRule = $this->createPricingRule(20000, 'CZ');
@@ -165,12 +171,22 @@ class PricingServiceTest extends BaseTest
         $this->assertEquals(100, $method->getData('cost'));
     }
 
+    /**
+     * @param $defaultPrice
+     * @param $maxWeight
+     * @param $freeShipment
+     * @return \Packetery\Checkout\Model\Pricing\Service|\PHPUnit\Framework\MockObject\MockObject
+     */
     protected function createService($defaultPrice, $maxWeight, $freeShipment)
     {
         $service = $this->createMock(Pricing\Service::class);
         return $service;
     }
 
+    /**
+     * @param array $methods
+     * @return \stdClass
+     */
     protected function createObject($methods = [])
     {
         $object = new \stdClass();
@@ -182,11 +198,20 @@ class PricingServiceTest extends BaseTest
         return $object;
     }
 
+    /**
+     * @param array $methods
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     protected function createFactoryWithObject($methods = [])
     {
         return $this->createFactoryMock($this->createObject($methods));
     }
 
+    /**
+     * @param $willCreate
+     * @param null $classsName
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     protected function createFactoryMock($willCreate, $classsName = null)
     {
         $factory = $this->getMockBuilder($classsName ?: \stdClass::class)
@@ -205,6 +230,11 @@ class PricingServiceTest extends BaseTest
         return $factory;
     }
 
+    /**
+     * @param float|null $freeShipment
+     * @param string|null $countryId
+     * @return \Packetery\Checkout\Model\Pricingrule|\PHPUnit\Framework\MockObject\MockObject
+     */
     protected function createPricingRule(?float $freeShipment, ?string $countryId)
     {
         $weightRule = $this->createMock(Pricingrule::class);
@@ -213,6 +243,11 @@ class PricingServiceTest extends BaseTest
         return $weightRule;
     }
 
+    /**
+     * @param float $price
+     * @param float $maxWeightKg
+     * @return \Packetery\Checkout\Model\Weightrule|\PHPUnit\Framework\MockObject\MockObject
+     */
     protected function createWeightRule(float $price, float $maxWeightKg)
     {
         $weightRule = $this->createMock(Weightrule::class);

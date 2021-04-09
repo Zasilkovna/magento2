@@ -14,6 +14,15 @@ class MaxWeight extends Column
     /** @var \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory  */
     protected $weightRuleCollectionFactory;
 
+    /**
+     * MaxWeight constructor.
+     *
+     * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
+     * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
