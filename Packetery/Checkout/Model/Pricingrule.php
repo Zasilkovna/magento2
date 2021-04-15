@@ -12,6 +12,9 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
 
     protected $_eventPrefix = 'packetery_checkout_pricingrule';
 
+    /**
+     *
+     */
     protected function _construct()
     {
         $this->_init('Packetery\Checkout\Model\ResourceModel\Pricingrule');

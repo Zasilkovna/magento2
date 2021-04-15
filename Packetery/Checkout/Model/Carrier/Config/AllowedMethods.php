@@ -38,6 +38,10 @@ class AllowedMethods
         return $this->hasAllowed(self::ADDRESS_DELIVERY);
     }
 
+    /**
+     * @param string $method
+     * @return bool
+     */
     public function hasAllowed(string $method)
     {
         return empty($this->allowedMethods) || in_array($method, $this->allowedMethods);
