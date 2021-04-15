@@ -51,7 +51,7 @@ class FreeShipment extends Column
                 if (is_numeric($item["free_shipment"])) {
                     $item[$this->getData('name')] = $item["free_shipment"];
                 } else {
-                    $item[$this->getData('name')] = $this->packeteryConfig->getFreeShippingThreshold() ?? '';
+                    $item[$this->getData('name')] = ($this->packeteryConfig->getFreeShippingThreshold() ?? '');
                 }
             }
         }

@@ -72,7 +72,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         $collection = $col->load();
 
         $contents = $this->createCsvContent($collection);
-        return $contents ?: '';
+        return ($contents ?: '');
     }
 
     public function getCsvAllFileContents($onlyNotExported = FALSE)
@@ -86,7 +86,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         $collection = $col->load();
 
         $contents = $this->createCsvContent($collection);
-        return $contents ?: '';
+        return ($contents ?: '');
     }
 
     /**
@@ -181,6 +181,6 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         rewind($fp); // Set the pointer back to the start
         $contents = stream_get_contents($fp); // Fetch the contents of our CSV
         fclose($fp);
-        return $contents ?: null; // Close our pointer and free up memory and /tmp space
+        return ($contents ?: null); // Close our pointer and free up memory and /tmp space
     }
 }

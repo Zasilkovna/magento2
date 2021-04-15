@@ -26,7 +26,7 @@ class PacketeryConfig
      */
     public function getApiKey(): ?string
     {
-        return $this->packeteryCarrier->getConfigData('api_key') ?: null;
+        return ($this->packeteryCarrier->getConfigData('api_key') ?: null);
     }
 
     /**
@@ -34,7 +34,7 @@ class PacketeryConfig
      */
     public function getTitle()
     {
-        return $this->packeteryCarrier->getConfigData('title') ?: __("Packeta");
+        return ($this->packeteryCarrier->getConfigData('title') ?: __("Packeta"));
     }
 
     /**
@@ -43,7 +43,7 @@ class PacketeryConfig
     public function getCodMethods(): array
     {
         $value = $this->packeteryCarrier->getConfigData('cod_methods');
-        return is_string($value) ? explode(',', $value) : [];
+        return (is_string($value) ? explode(',', $value) : []);
     }
 
     /**
@@ -52,7 +52,7 @@ class PacketeryConfig
     public function getDefaultPrice(): ?float
     {
         $value = $this->packeteryCarrier->getConfigData('default_price');
-        return is_numeric($value) ? (float)$value : null;
+        return (is_numeric($value) ? (float)$value : null);
     }
 
     /** kilos
@@ -61,7 +61,7 @@ class PacketeryConfig
     public function getMaxWeight(): ?float
     {
         $value = $this->packeteryCarrier->getConfigData('max_weight');
-        return is_numeric($value) ? (float)$value : null;
+        return (is_numeric($value) ? (float)$value : null);
     }
 
     /**
@@ -70,7 +70,7 @@ class PacketeryConfig
     private function getFreeShippingEnable(): ?int
     {
         $value = $this->packeteryCarrier->getConfigData('free_shipping_enable');
-        return is_numeric($value) ? (int)$value : null;
+        return (is_numeric($value) ? (int)$value : null);
     }
 
     /** Order value threshold
@@ -80,7 +80,7 @@ class PacketeryConfig
     {
         if ($this->getFreeShippingEnable() === 1) {
             $value = $this->packeteryCarrier->getConfigData('free_shipping_subtotal');
-            return is_numeric($value) ? (float)$value : null;
+            return (is_numeric($value) ? (float)$value : null);
         }
 
         return null;
@@ -106,7 +106,7 @@ class PacketeryConfig
     public function getSpecificCountries(): array
     {
         $value = $this->packeteryCarrier->getConfigData('specificcountry');
-        return is_string($value) ? explode(',', $value) : [];
+        return (is_string($value) ? explode(',', $value) : []);
     }
 
     /**
@@ -115,7 +115,7 @@ class PacketeryConfig
     public function getAllowedMethods(): AllowedMethods
     {
         $value = $this->packeteryCarrier->getConfigData('allowedMethods');
-        $methods = is_string($value) ? explode(',', $value) : [];
+        $methods = (is_string($value) ? explode(',', $value) : []);
         return new AllowedMethods($methods);
     }
 

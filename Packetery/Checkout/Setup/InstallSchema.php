@@ -278,14 +278,14 @@ class InstallSchema implements InstallSchemaInterface
     private function columns(Table &$table, $schema): void
     {
         foreach ($schema as $name => $column) {
-            $column['attr'] = (isset($column['attr'])) ? $column['attr'] : [];
-            $column['attr']['comment'] = (isset($column['attr']['comment'])) ? $column['attr']['comment'] : null;
-            $column['attr']['length'] = (isset($column['attr']['length'])) ? $column['attr']['length'] : null;
-            $column['size'] = (isset($column['size'])) ? $column['size'] : null;
+            $column['attr'] = (isset($column['attr']) ? $column['attr'] : []);
+            $column['attr']['comment'] = (isset($column['attr']['comment']) ? $column['attr']['comment'] : null);
+            $column['attr']['length'] = (isset($column['attr']['length']) ? $column['attr']['length'] : null);
+            $column['size'] = (isset($column['size']) ? $column['size'] : null);
             $table->addColumn(
                 $name,
                 $column['type'],
-                $column['size'] ?: $column['attr']['length'],
+                ($column['size'] ?: $column['attr']['length']),
                 $column['attr'],
                 $column['attr']['comment']
             );

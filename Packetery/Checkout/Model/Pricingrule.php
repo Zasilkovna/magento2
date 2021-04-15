@@ -40,8 +40,8 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
      */
     public function getFreeShipment(): ?float
     {
-        $value = $this->getData('free_shipment') ?: null;
-        return $value === null ? null : (float)$value;
+        $value = ($this->getData('free_shipment') ?: null);
+        return ($value === null ? null : (float)$value);
     }
 
     /**
@@ -49,8 +49,8 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
      */
     public function getCountryId(): ?string
     {
-        $value = $this->getData('country_id') ?: null;
-        return $value === null ? null : (string)$value;
+        $value = ($this->getData('country_id') ?: null);
+        return ($value === null ? null : (string)$value);
     }
 
     /**
@@ -58,7 +58,7 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
      */
     public function getMethod(): ?string
     {
-        $value = $this->getData('method') ?: null;
-        return $value === null ? null : (string)$value;
+        $value = ($this->getData('method') ?: null);
+        return ($value === null ? null : (string)$value);
     }
 }

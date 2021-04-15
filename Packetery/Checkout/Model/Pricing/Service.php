@@ -115,7 +115,7 @@ class Service
             'PL' => 4162,
         ];
 
-        return $data[$countryId] ?? null;
+        return ($data[$countryId] ?? null);
     }
 
     /**
@@ -125,12 +125,12 @@ class Service
      */
     public function resolvePricingRule(string $method, Request $pricingRequest): ?Pricingrule
     {
-        $destCountryId = $pricingRequest->getRateRequest()->getDestCountryId() ?: null;
+        $destCountryId = ($pricingRequest->getRateRequest()->getDestCountryId() ?: null);
 
         $pricingRuleCollection = $this->pricingRuleCollectionFactory->create();
         $pricingRuleCollection->addFilter('method', $method);
         $pricingRuleCollection->addFilter('country_id', $destCountryId); // iso 2
-        $first = $pricingRuleCollection->getFirstRecord() ?: null;
+        $first = ($pricingRuleCollection->getFirstRecord() ?: null);
 
         return $first;
     }
@@ -271,7 +271,7 @@ class Service
      */
     protected function getFreeShippingThreshold(?Pricingrule $pricingrule, ?float $globalFreeShipping): ?float
     {
-        $countryFreeShipping = $pricingrule ? $pricingrule->getFreeShipment() : null;
+        $countryFreeShipping = ($pricingrule ? $pricingrule->getFreeShipment() : null);
 
         if (is_numeric($countryFreeShipping)) {
             $freeShipping = $countryFreeShipping;
@@ -281,6 +281,6 @@ class Service
             $freeShipping = null; // disabled
         }
 
-        return $freeShipping === null ? null : (float)$freeShipping;
+        return ($freeShipping === null ? null : (float)$freeShipping);
     }
 }

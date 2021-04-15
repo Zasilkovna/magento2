@@ -56,7 +56,7 @@ class MaxWeight extends Column
                 $collection->addExpressionFieldToSelect('maxMaxWeight', 'MAX(max_weight)', []);
                 $collection->load();
                 $data = $collection->toArray();
-                $row = isset($data['items']) ? array_shift($data['items']) : null;
+                $row = (isset($data['items']) ? array_shift($data['items']) : null);
 
                 if (!$row || empty($row['maxMaxWeight'])) {
                     $item[$this->getData('name')] = $this->packeteryConfig->getMaxWeight();

@@ -72,7 +72,7 @@ class PricingRuleEnabled extends Column
                         break;
                 }
 
-                $item[$this->getData('name')] = $phrase !== null ? $phrase : $item["method"];
+                $item[$this->getData('name')] = ($phrase !== null ? $phrase : $item["method"]);
             }
         }
 
