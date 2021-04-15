@@ -97,8 +97,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         {
             // new order from frontend
             if ($this->isAddressDeliveryMethod($order->getShippingMethod())) {
-                $pointId = $this->pricingService->resolveAddressDeliveryBranchId($order->getShippingAddress()->getCountryId());
-                $pointName = implode(', ', $order->getShippingAddress()->getStreet());
+                $pointId = $this->pricingService->resolveAddressDeliveryPointId($order->getShippingAddress()->getCountryId());
+                $pointName = __('Address Delivery Method'); // translated on demand
             } else {
                 // pickup point delivery
                 $point = $postData->packetery->point;

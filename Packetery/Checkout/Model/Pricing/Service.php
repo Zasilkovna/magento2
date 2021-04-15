@@ -79,7 +79,7 @@ class Service
             $result->append($this->createPickupPointRateMethod($pricingRequest, $resolvedPrice));
         }
 
-        $branchId = $this->resolveAddressDeliveryBranchId($request->getDestCountryId());
+        $branchId = $this->resolveAddressDeliveryPointId($request->getDestCountryId());
         if ($branchId !== null && $allowedMethods->hasAddressDeliveryAllowed()) {
             $pricingRule = $this->resolvePricingRule(AllowedMethods::ADDRESS_DELIVERY, $pricingRequest);
             $price = $this->resolvePrice($pricingRequest, $pricingRule);
@@ -101,21 +101,37 @@ class Service
         return is_numeric($weightMax) && $weightTotal <= $weightMax;
     }
 
-    /**
-     * @param string $countryId
-     * @return int|null
+    /** Returns data that are used to figure out destination point id
+     * @return int[]
      */
-    public function resolveAddressDeliveryBranchId(string $countryId): ?int
+    private function getResolvableDestinationData(): array
     {
-        $data = [
+        return [
             'CZ' => 106,
             'SK' => 131,
             'HU' => 4159,
             'RO' => 4161,
             'PL' => 4162,
         ];
+    }
 
+    /**
+     * @param string $countryId
+     * @return int|null
+     */
+    public function resolveAddressDeliveryPointId(string $countryId): ?int
+    {
+        $data = $this->getResolvableDestinationData();
         return ($data[$countryId] ?? null);
+    }
+
+    /**
+     * @param int $pointId
+     * @return bool
+     */
+    public function isResolvablePointId(int $pointId): bool
+    {
+        return array_search($pointId, $this->getResolvableDestinationData()) !== false;
     }
 
     /**

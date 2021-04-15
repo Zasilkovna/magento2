@@ -60,10 +60,9 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 
     /**
      * @param string $orderIds
-     *
-     * @return string
+     * @return string|null
      */
-    public function getCsvMassFileContents($orderIds)
+    public function getCsvMassFileContents($orderIds): ?string
     {
         $col = $this->loadDataSelection();
 
@@ -71,11 +70,14 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 
         $collection = $col->load();
 
-        $contents = $this->createCsvContent($collection);
-        return ($contents ?: '');
+        return $this->createCsvContent($collection);
     }
 
-    public function getCsvAllFileContents($onlyNotExported = FALSE)
+    /**
+     * @param false $onlyNotExported
+     * @return string|null
+     */
+    public function getCsvAllFileContents($onlyNotExported = FALSE): ?string
     {
         $col = $this->loadDataSelection();
 
@@ -85,16 +87,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         }
         $collection = $col->load();
 
-        $contents = $this->createCsvContent($collection);
-        return ($contents ?: '');
-    }
-
-    /**
-     * Header for CSV file
-     */
-    protected function getCsvHeader()
-    {
-        return '"version 5"' . PHP_EOL . PHP_EOL;
+        return $this->createCsvContent($collection);
     }
 
     /**
@@ -116,6 +109,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     protected function getExportRow($row)
     {
         return [
+            '',
             $row->getData('order_number'),
             $row->getData('recipient_firstname'),
             $row->getData('recipient_lastname'),
@@ -164,8 +158,8 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 	}
 
     /**
-     * @param \Packetery\Checkout\Model\ResourceModel\Order\Collection|\Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult $collection
-     * @return array
+     * @param iterable $collection
+     * @return string|null
      */
     private function createCsvContent(iterable $collection): ?string
     {
@@ -175,7 +169,6 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         fputcsv($fp, []);
         foreach ($collection as $row) {
             $fields = $this->getExportRow($row);
-            array_unshift($fields, '');
             fputcsv($fp, $fields);
         }
         rewind($fp); // Set the pointer back to the start
