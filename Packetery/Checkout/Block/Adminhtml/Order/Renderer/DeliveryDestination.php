@@ -11,16 +11,20 @@ class DeliveryDestination extends \Magento\Backend\Block\Widget\Grid\Column\Rend
     /** @var Pricing\Service */
     private $pricingService;
 
+    /** @var \Packetery\Checkout\Model\Config\Source\MethodSelect */
+    private $methodSelect;
+
     /**
      * @param Context $context
      * @param Pricing\Service $pricingService
+     * @param \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
      * @param array $data
      */
-    public function __construct(Context $context, Pricing\Service $pricingService, array $data = [])
+    public function __construct(Context $context, Pricing\Service $pricingService, \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect, array $data = [])
     {
-        $this->_authorization = $context->getAuthorization();
-        $this->pricingService = $pricingService;
         parent::__construct($context, $data);
+        $this->pricingService = $pricingService;
+        $this->methodSelect = $methodSelect;
     }
 
     /**
@@ -34,7 +38,7 @@ class DeliveryDestination extends \Magento\Backend\Block\Widget\Grid\Column\Rend
         $branchId = $row->getData('point_id');
 
         if ($this->pricingService->isResolvablePointId((int)$branchId)) {
-            return __($branchName);
+            return ($this->methodSelect->getLabelByValue((string)$branchName) ?: $branchName);
         }
 
         return sprintf("%s (%s)", $branchName, $branchId);

@@ -37,4 +37,21 @@ class MethodSelect implements \Magento\Framework\Option\ArrayInterface
 
         return $options;
     }
+
+    /**
+     * @param string $value
+     * @return \Magento\Framework\Phrase|null
+     */
+    public function getLabelByValue(string $value): ?\Magento\Framework\Phrase
+    {
+        $options = $this->toOptionArray();
+
+        foreach ($options as $option) {
+            if ($option['value'] === $value) {
+                return $option['label'];
+            }
+        }
+
+        return null;
+    }
 }

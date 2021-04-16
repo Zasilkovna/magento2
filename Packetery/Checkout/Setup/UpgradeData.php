@@ -32,7 +32,7 @@ class UpgradeData implements UpgradeDataInterface
         ModuleDataSetupInterface $setup,
         ModuleContextInterface $context
     ): void {
-        if (version_compare($context->getVersion(), "2.0.2", ">=") && version_compare($context->getVersion(), "2.0.4", "<")) {
+        if (version_compare($context->getVersion(), "2.0.2", ">=") && version_compare($context->getVersion(), "2.0.3", "<")) { // todo alow 2.0.1
             $this->migratePriceRulesCommand->run(new ArrayInput([]), new NullOutput());
         }
     }
