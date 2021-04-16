@@ -36,7 +36,7 @@ class MigratePriceRules extends Command
     protected function configure(): void
     {
         $this->setName('packetery:migrate-price-rules');
-        $this->setDescription('Migrates price rules to 2.0.3 data structure'); // todo allow 2.0.1
+        $this->setDescription('Migrates price rules to 2.0.3 data structure');
 
         parent::configure();
     }
