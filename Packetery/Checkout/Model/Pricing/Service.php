@@ -31,6 +31,9 @@ class Service
     /** @var \Magento\Shipping\Model\Rate\ResultFactory  */
     private $rateResultFactory;
 
+    /** @var \Packetery\Checkout\Model\Config\Source\MethodSelect */
+    private $methodSelect;
+
     /**
      * Service constructor.
      *
@@ -40,6 +43,7 @@ class Service
      * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
      * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+     * @param \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
      */
     public function __construct
     (
@@ -48,7 +52,8 @@ class Service
         \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory,
         \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
-        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
+        \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
     ) {
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
         $this->pricingruleFactory = $pricingruleFactory;
@@ -56,6 +61,7 @@ class Service
         $this->weightruleFactory = $weightruleFactory;
         $this->rateMethodFactory = $rateMethodFactory;
         $this->rateResultFactory = $rateResultFactory;
+        $this->methodSelect = $methodSelect;
     }
 
     /**
@@ -72,18 +78,22 @@ class Service
             return null;
         }
 
-        if ($allowedMethods->hasPickupPointAllowed()) {
-            // Package is not over maximum allowed weight
-            $pricingRule = $this->resolvePricingRule(AllowedMethods::PICKUP_POINT_DELIVERY, $pricingRequest);
-            $resolvedPrice = $this->resolvePrice($pricingRequest, $pricingRule);
-            $result->append($this->createPickupPointRateMethod($pricingRequest, $resolvedPrice));
+        $methods = $allowedMethods->toArray();
+        if (empty($methods)) {
+            $methods = $this->methodSelect->getMethods();
         }
 
-        $branchId = $this->resolveAddressDeliveryPointId($request->getDestCountryId());
-        if ($branchId !== null && $allowedMethods->hasAddressDeliveryAllowed()) {
-            $pricingRule = $this->resolvePricingRule(AllowedMethods::ADDRESS_DELIVERY, $pricingRequest);
+        foreach ($methods as $allowedMethod) {
+            if ($allowedMethod !== AllowedMethods::PICKUP_POINT_DELIVERY) {
+                $branchId = $this->resolvePointId($allowedMethod, $request->getDestCountryId());
+                if ($branchId === null) {
+                    continue;
+                }
+            }
+
+            $pricingRule = $this->resolvePricingRule($allowedMethod, $pricingRequest);
             $price = $this->resolvePrice($pricingRequest, $pricingRule);
-            $method = $this->createAddressDeliveryRateMethod($pricingRequest, $price);
+            $method = $this->createRateMethod($allowedMethod, $pricingRequest, $price);
             $result->append($method);
         }
 
@@ -107,11 +117,15 @@ class Service
     private function getResolvableDestinationData(): array
     {
         return [
-            'CZ' => 106,
-            'SK' => 131,
-            'HU' => 4159,
-            'RO' => 4161,
-            'PL' => 4162,
+            AllowedMethods::ADDRESS_DELIVERY => [
+                'countryBranchIds' => [
+                    'CZ' => 106,
+                    'SK' => 131,
+                    'HU' => 4159,
+                    'RO' => 4161,
+                    'PL' => 4162,
+                ]
+            ]
         ];
     }
 
@@ -119,19 +133,10 @@ class Service
      * @param string $countryId
      * @return int|null
      */
-    public function resolveAddressDeliveryPointId(string $countryId): ?int
+    public function resolvePointId(string $method, string $countryId): ?int
     {
         $data = $this->getResolvableDestinationData();
-        return ($data[$countryId] ?? null);
-    }
-
-    /**
-     * @param int $pointId
-     * @return bool
-     */
-    public function isResolvablePointId(int $pointId): bool
-    {
-        return array_search($pointId, $this->getResolvableDestinationData()) !== false;
+        return ($data[$method]['countryBranchIds'][$countryId] ?? null);
     }
 
     /**
@@ -218,11 +223,12 @@ class Service
     }
 
     /**
+     * @param string $packeteryMethod
      * @param \Packetery\Checkout\Model\Pricing\Request $request
      * @param float $price
      * @return \Magento\Quote\Model\Quote\Address\RateResult\Method
      */
-    protected function createPickupPointRateMethod(Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
+    protected function createRateMethod(string $packeteryMethod, Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
     {
         $method = $this->rateMethodFactory->create();
         $method->setCarrier($request->getCarrierCode());
@@ -231,36 +237,10 @@ class Service
             $method->setCarrierTitle($request->getCarrierConfig()->getTitle());
         }
 
-        $method->setMethod(AllowedMethods::PICKUP_POINT_DELIVERY);
+        $method->setMethod($packeteryMethod);
 
         if (empty($method->getMethodTitle())) {
-            $method->setMethodTitle(__("Pickup Point Delivery Method"));
-        }
-
-        $method->setCost($price);
-        $method->setPrice($price);
-
-        return $method;
-    }
-
-    /**
-     * @param \Packetery\Checkout\Model\Pricing\Request $request
-     * @param float $price
-     * @return \Magento\Quote\Model\Quote\Address\RateResult\Method
-     */
-    protected function createAddressDeliveryRateMethod(Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
-    {
-        $method = $this->rateMethodFactory->create();
-        $method->setCarrier($request->getCarrierCode());
-
-        if (empty($method->getCarrierTitle())) {
-            $method->setCarrierTitle($request->getCarrierConfig()->getTitle());
-        }
-
-        $method->setMethod(AllowedMethods::ADDRESS_DELIVERY);
-
-        if (empty($method->getMethodTitle())) {
-            $method->setMethodTitle(__('Address Delivery Method'));
+            $method->setMethodTitle($this->methodSelect->getLabelByValue($packeteryMethod));
         }
 
         $method->setCost($price);

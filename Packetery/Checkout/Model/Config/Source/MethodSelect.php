@@ -39,6 +39,19 @@ class MethodSelect implements \Magento\Framework\Option\ArrayInterface
     }
 
     /**
+     * @return array
+     */
+    public function getMethods(): array
+    {
+        return array_map(
+            function (array $option) {
+                return $option['value'];
+            },
+            $this->toOptionArray(true)
+        );
+    }
+
+    /**
      * @param string $value
      * @return \Magento\Framework\Phrase|null
      */

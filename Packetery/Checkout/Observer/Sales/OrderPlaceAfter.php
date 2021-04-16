@@ -40,11 +40,12 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
     /**
      * @param string $shippingMethod
-     * @return bool
+     * @return string
      */
-    private function isAddressDeliveryMethod(string $shippingMethod): bool
+    private function getDeliveryMethod(string $shippingMethod): string
     {
-        return strpos($shippingMethod, AllowedMethods::ADDRESS_DELIVERY) !== false;
+        $parts = explode('_', $shippingMethod);
+        return array_pop($parts);
     }
 
     /**
@@ -96,16 +97,17 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         if ($postData)
         {
             // new order from frontend
-            if ($this->isAddressDeliveryMethod($order->getShippingMethod())) {
-                $pointId = $this->pricingService->resolveAddressDeliveryPointId($order->getShippingAddress()->getCountryId());
-                $pointName = AllowedMethods::ADDRESS_DELIVERY; // translated on demand
-            } else {
+            $deliveryMethod = $this->getDeliveryMethod($order->getShippingMethod());
+            if ($deliveryMethod === AllowedMethods::PICKUP_POINT_DELIVERY) {
                 // pickup point delivery
                 $point = $postData->packetery->point;
                 $pointId = $point->pointId;
                 $pointName = $point->name;
                 $isCarrier = (bool)$point->carrierId;
                 $carrierPickupPoint = ($point->carrierPickupPointId ?: null);
+            } else {
+                $pointId = $this->pricingService->resolvePointId($deliveryMethod, $order->getShippingAddress()->getCountryId());
+                $pointName = $deliveryMethod; // translated on demand
             }
         }
         else

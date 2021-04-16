@@ -23,27 +23,19 @@ class AllowedMethods
     }
 
     /**
-     * @return bool
-     */
-    public function hasPickupPointAllowed(): bool
-    {
-        return $this->hasAllowed(self::PICKUP_POINT_DELIVERY);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasAddressDeliveryAllowed(): bool
-    {
-        return $this->hasAllowed(self::ADDRESS_DELIVERY);
-    }
-
-    /**
      * @param string $method
      * @return bool
      */
-    public function hasAllowed(string $method)
+    public function hasAllowed(string $method): bool
     {
         return empty($this->allowedMethods) || in_array($method, $this->allowedMethods);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function toArray(): array
+    {
+        return $this->allowedMethods;
     }
 }

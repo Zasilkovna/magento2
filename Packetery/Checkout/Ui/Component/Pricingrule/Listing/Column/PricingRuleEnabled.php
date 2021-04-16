@@ -14,12 +14,16 @@ class PricingRuleEnabled extends Column
     /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
     protected $packeteryConfig;
 
+    /** @var \Packetery\Checkout\Model\Pricing\Service */
+    private $pricingService;
+
     /**
      * MaxWeight constructor.
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
      * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
+     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param array $components
      * @param array $data
      */
@@ -27,30 +31,38 @@ class PricingRuleEnabled extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
         array $components = [],
         array $data = []
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
         $this->packeteryConfig = $packeteryConfig;
+        $this->pricingService = $pricingService;
     }
 
     /**
      * @param string $method
-     * @return \Magento\Framework\Phrase|null
+     * @return \Magento\Framework\Phrase
      */
-    private function createCellContent(string $method, string $countryId): ?\Magento\Framework\Phrase
+    private function createCellContent(string $method, string $countryId): \Magento\Framework\Phrase
     {
         $methodAllowed = $this->packeteryConfig->getAllowedMethods()->hasAllowed($method);
-        $countryAllowed = $this->packeteryConfig->hasSpecificCountryAllowed($countryId);
 
-        $suffix = null;
-        if ($countryAllowed && $methodAllowed) {
-            $suffix = __('Enabled');
+        if ($method === AllowedMethods::PICKUP_POINT_DELIVERY) {
+            $pointIdResolves = true;
         } else {
-            $suffix = __('Disabled');
+            $pointIdResolves = $this->pricingService->resolvePointId($method, $countryId);
         }
 
-        return $suffix;
+        $countryAllowed = $this->packeteryConfig->hasSpecificCountryAllowed($countryId);
+
+        if ($countryAllowed && $methodAllowed && $pointIdResolves) {
+            $result = __('Enabled');
+        } else {
+            $result = __('Disabled');
+        }
+
+        return $result;
     }
 
     /**
@@ -61,18 +73,7 @@ class PricingRuleEnabled extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-
-                $phrase = null;
-                switch ($item["method"]) {
-                    case AllowedMethods::PICKUP_POINT_DELIVERY:
-                        $phrase = $this->createCellContent(AllowedMethods::PICKUP_POINT_DELIVERY, $item["country_id"]);
-                        break;
-                    case AllowedMethods::ADDRESS_DELIVERY:
-                        $phrase = $this->createCellContent(AllowedMethods::ADDRESS_DELIVERY, $item["country_id"]);
-                        break;
-                }
-
-                $item[$this->getData('name')] = ($phrase !== null ? $phrase : $item["method"]);
+                $item[$this->getData('name')] = $this->createCellContent($item["method"], $item["country_id"]);
             }
         }
 
