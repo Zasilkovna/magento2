@@ -161,10 +161,10 @@ class MigratePriceRules extends Command
 
             try {
                 $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
-            } catch (\Packetery\Checkout\Model\Exception\DuplicateCountryValidationException $e) {
+            } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
                 $output->writeln("Price rule for $country already exists. Skipping.");
                 continue;
-            } catch (\Packetery\Checkout\Model\Exception\MaxWeightValidationException $e) {
+            } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
                 $output->writeln("Max weight for $country exceed maximum allowed. Skipping.");
                 continue;
             }

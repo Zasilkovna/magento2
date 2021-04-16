@@ -90,10 +90,10 @@ class Save extends Action implements HttpPostActionInterface
 
         try {
             $item = $this->pricingruleRepository->savePricingRule($postData, $weightRules);
-        } catch (\Packetery\Checkout\Model\Exception\DuplicateCountryValidationException $e) {
+        } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
             $this->messageManager->addErrorMessage(__('Price rule for specified country already exists'));
             return $this->createPricingRuleDetailRedirect((isset($postData['id']) ? $postData['id'] : null));
-        } catch (\Packetery\Checkout\Model\Exception\MaxWeightValidationException $e) {
+        } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
             $this->messageManager->addErrorMessage(__('The weight is invalid', $this->packeteryConfig->getMaxWeight()));
             return $this->createPricingRuleDetailRedirect((isset($postData['id']) ? $postData['id'] : null));
         } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
