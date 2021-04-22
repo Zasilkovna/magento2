@@ -1,0 +1,7 @@
+2.0.3 - Updated: widget v6 integration allows pickup point selection for Germany and other countries
+      - Updated: configuration moved to Packeta delivery method
+      - Updated: pricing rules moved to dedicated admin section and allow other specific countries
+      - Updated: allow specific countries via Packeta carrier configuration
+      - Updated: address delivery support
+      - Updated: mixins
+      - Fixed: Magento installation with DB prefix is now supported
