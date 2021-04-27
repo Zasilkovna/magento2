@@ -2,6 +2,7 @@
 
 namespace Packetery\Checkout\Controller\Adminhtml\Order;
 
+use Magento\Framework\Controller\AbstractResult;
 use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 
 class Detail extends \Magento\Backend\App\Action
@@ -15,6 +16,14 @@ class Detail extends \Magento\Backend\App\Action
     /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
     private $orderCollectionFactory;
 
+    /**
+     * Detail constructor.
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollection
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
@@ -27,7 +36,10 @@ class Detail extends \Magento\Backend\App\Action
         $this->orderCollectionFactory = $orderCollection;
     }
 
-    public function execute()
+    /**
+     * @return \Magento\Framework\Controller\AbstractResult
+     */
+    public function execute(): AbstractResult
     {
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();

@@ -11,6 +11,13 @@ class Actions extends AbstractRenderer
     /** @var \Magento\Sales\Model\OrderFactory */
     protected $orderFactory;
 
+    /**
+     * Actions constructor.
+     *
+     * @param \Magento\Backend\Block\Context $context
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param array $data
+     */
     public function __construct(
         \Magento\Backend\Block\Context $context,
         \Magento\Sales\Model\OrderFactory $orderFactory,
@@ -21,7 +28,11 @@ class Actions extends AbstractRenderer
         parent::__construct($context, $data);
     }
 
-    public function render(DataObject $row)
+    /**
+     * @param \Magento\Framework\DataObject $row
+     * @return string
+     */
+    public function render(DataObject $row): string
     {
         $orderNumber =  $row->getData('order_number');
         $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
