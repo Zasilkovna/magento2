@@ -19,10 +19,10 @@ Installation and registration of the module is done by CLI utility, which is par
 
 ## Upgrading
 
-- disable Packetery_Checkout module
+- disable Packeta delivery method
 - remove all previous source files
 - next steps are same as during installation
-- allow Packetery_Checkout module
+- allow Packeta delivery method
 - check configuration
 
 ### Configuration
@@ -111,10 +111,10 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 
 ### Aktualizace modulu
 
-- zakázat modul Packetery_Checkout
+- zakázat doručování přes Zásilkovnu
 - smazat zdrojové soubory
 - další postup stejný jako při instalaci
-- povolit modul Packetery_Checkout
+- povolit doručování přes Zásilkovnu
 - zkontrolovat konfiguraci
 
 ### Konfigurace
