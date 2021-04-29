@@ -6,33 +6,5 @@
 		<!-- Add external resources -->
 		<script src="https://widget.packeta.com/v6/www/js/library.js" src_type="url" />
 	</head>
-
-	<body>
-		<referenceBlock name="checkout.root">
-			<arguments>
-				<argument name="jsLayout" xsi:type="array">
-					<item name="components" xsi:type="array">
-						<item name="checkout" xsi:type="array">
-							<item name="children" xsi:type="array">
-								<item name="steps" xsi:type="array">
-									<item name="children" xsi:type="array">
-										<item name="shipping-step" xsi:type="array">
-											<item name="children" xsi:type="array">
-												<item name="shippingAddress" xsi:type="array">
-													<item name="config" xsi:type="array">
-														<item name="shippingMethodItemTemplate" xsi:type="string">Packetery_Checkout/custom-method-item-template</item>
-													</item>
-												</item>
-											</item>
-										</item>
-									</item>
-								</item>
-							</item>
-						</item>
-					</item>
-				</argument>
-			</arguments>
-		</referenceBlock>
-	</body>
 </page>
 
