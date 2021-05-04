@@ -9,4 +9,3 @@
       - Fixed: Database DECIMAL types of Packeta tables now allow precision for order value, weight and COD
       - Fixed: cross origin policies for widget
       - Fixed: payment method list now show all methods
-      - Fixed: checkout shipping method template will not override other module template
