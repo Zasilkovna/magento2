@@ -19,10 +19,10 @@ Installation and registration of the module is done by CLI utility, which is par
 
 ## Upgrading
 
-- disable Packeta delivery method
-- remove all previous source files
+- enable maintenance mode
+- remove all previous source files (remove app/code/Packetery folder)
 - next steps are same as during installation
-- allow Packeta delivery method
+- disable maintenance mode
 - check configuration
 
 ### Configuration
@@ -111,10 +111,10 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 
 ### Aktualizace modulu
 
-- zakázat doručování přes Zásilkovnu
-- smazat zdrojové soubory
+- zapnout režim údržby
+- smazat zdrojové soubory (smazat složku app/code/Packetery)
 - další postup stejný jako při instalaci
-- povolit doručování přes Zásilkovnu
+- vypnout režim údržby
 - zkontrolovat konfiguraci
 
 ### Konfigurace
