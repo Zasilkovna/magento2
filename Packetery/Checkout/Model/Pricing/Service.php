@@ -9,7 +9,7 @@ use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Packetery\Checkout\Model\Pricingrule;
 
 /**
- * Do not inject PacketeryConfig or Carrier\Packetery due to dependency circulation
+ * Do not inject any Carrier related services due to dependency circulation
  */
 class Service
 {
@@ -31,9 +31,6 @@ class Service
     /** @var \Magento\Shipping\Model\Rate\ResultFactory  */
     private $rateResultFactory;
 
-    /** @var \Packetery\Checkout\Model\Config\Source\MethodSelect */
-    private $methodSelect;
-
     /**
      * Service constructor.
      *
@@ -43,7 +40,6 @@ class Service
      * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
      * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
-     * @param \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
      */
     public function __construct
     (
@@ -52,8 +48,7 @@ class Service
         \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory,
         \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
-        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
-        \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
+        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
     ) {
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
         $this->pricingruleFactory = $pricingruleFactory;
@@ -61,7 +56,6 @@ class Service
         $this->weightruleFactory = $weightruleFactory;
         $this->rateMethodFactory = $rateMethodFactory;
         $this->rateResultFactory = $rateResultFactory;
-        $this->methodSelect = $methodSelect;
     }
 
     /**
@@ -72,20 +66,17 @@ class Service
     {
         $request = $pricingRequest->getRateRequest();
         $result = $this->rateResultFactory->create();
-        $allowedMethods = $pricingRequest->getCarrierConfig()->getAllowedMethods();
+        $allowedMethods = $pricingRequest->getCarrier()->getConfig()->getFinalAllowedMethods();
 
         if ($this->hasValidWeight($pricingRequest) === false) {
             return null;
         }
 
         $methods = $allowedMethods->toArray();
-        if (empty($methods)) {
-            $methods = $this->methodSelect->getMethods();
-        }
 
         foreach ($methods as $allowedMethod) {
             if ($allowedMethod !== AllowedMethods::PICKUP_POINT_DELIVERY) {
-                $branchId = $this->resolvePointId($allowedMethod, $request->getDestCountryId());
+                $branchId = $pricingRequest->getCarrier()->resolvePointId($allowedMethod, $request->getDestCountryId());
                 if ($branchId === null) {
                     continue;
                 }
@@ -107,36 +98,8 @@ class Service
     private function hasValidWeight(Request $pricingRequest): bool
     {
         $weightTotal = $pricingRequest->getRateRequest()->getPackageWeight(); // custom unit
-        $weightMax = $pricingRequest->getCarrierConfig()->getMaxWeight();
+        $weightMax = $pricingRequest->getCarrier()->getConfig()->getMaxWeight();
         return is_numeric($weightMax) && $weightTotal <= $weightMax;
-    }
-
-    /** Returns data that are used to figure out destination point id
-     * @return int[]
-     */
-    private function getResolvableDestinationData(): array
-    {
-        return [
-            AllowedMethods::ADDRESS_DELIVERY => [
-                'countryBranchIds' => [
-                    'CZ' => 106,
-                    'SK' => 131,
-                    'HU' => 4159,
-                    'RO' => 4161,
-                    'PL' => 4162,
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @param string $countryId
-     * @return int|null
-     */
-    public function resolvePointId(string $method, string $countryId): ?int
-    {
-        $data = $this->getResolvableDestinationData();
-        return ($data[$method]['countryBranchIds'][$countryId] ?? null);
     }
 
     /**
@@ -168,7 +131,7 @@ class Service
         $weightTotal = (float)$request->getPackageWeight();
         $priceTotal = (float)$request->getPackageValue();
 
-        $freeShipping = $this->getFreeShippingThreshold($pricingRule, $pricingRequest->getCarrierConfig()->getFreeShippingThreshold());
+        $freeShipping = $this->getFreeShippingThreshold($pricingRule, $pricingRequest->getCarrier()->getConfig()->getFreeShippingThreshold());
 
         if ($freeShipping !== null && $freeShipping <= $priceTotal) {
             return 0;
@@ -180,11 +143,11 @@ class Service
         }
 
         if (!empty($weightRules)) {
-            $result = $this->resolveWeightedPrice($weightRules, $weightTotal, $pricingRequest->getCarrierConfig()->getMaxWeight());
+            $result = $this->resolveWeightedPrice($weightRules, $weightTotal, $pricingRequest->getCarrier()->getConfig()->getMaxWeight());
         }
 
         if ($result === null) {
-            $result = $pricingRequest->getCarrierConfig()->getDefaultPrice();
+            $result = $pricingRequest->getCarrier()->getConfig()->getDefaultPrice();
         }
 
         return $result;
@@ -231,16 +194,16 @@ class Service
     protected function createRateMethod(string $packeteryMethod, Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
     {
         $method = $this->rateMethodFactory->create();
-        $method->setCarrier($request->getCarrierCode());
+        $method->setCarrier($request->getCarrier()->getCarrierCode());
 
         if (empty($method->getCarrierTitle())) {
-            $method->setCarrierTitle($request->getCarrierConfig()->getTitle());
+            $method->setCarrierTitle($request->getCarrier()->getConfig()->getTitle());
         }
 
         $method->setMethod($packeteryMethod);
 
         if (empty($method->getMethodTitle())) {
-            $method->setMethodTitle($this->methodSelect->getLabelByValue($packeteryMethod));
+            $method->setMethodTitle($request->getCarrier()->getMethodSelect()->getLabelByValue($packeteryMethod));
         }
 
         $method->setCost($price);

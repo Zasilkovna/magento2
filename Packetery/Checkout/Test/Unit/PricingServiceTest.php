@@ -8,7 +8,6 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote\Address\RateResult\Method;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
-use Magento\Shipping\Model\Rate\ResultFactory;
 use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Packetery\Checkout\Model\Pricing;
 use Packetery\Checkout\Model\Pricingrule;
@@ -71,7 +70,6 @@ class PricingServiceTest extends BaseTest
         $service = $this->createProxy(
             Pricing\Service::class,
             [
-                'methodSelect' => $this->createProxy(\Packetery\Checkout\Model\Config\Source\MethodSelect::class),
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
@@ -85,14 +83,24 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => 'CZ']
         );
 
-        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\PacketeryConfig::class);
+        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config->method('getDefaultPrice')->willReturn(100.0);
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(null);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
+        $config->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $carrier = $this->createPartialMock(
+            \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
+            'getConfig',
+            'getCarrierCode',
+            'getMethodSelect',
+        ]);
+        $carrier->method('getConfig')->willReturn($config);
+        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
+
+        $result = $service->collectRates(new Pricing\Request($request, $carrier));
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -114,7 +122,17 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 11, 'getPackageValue' => 300, 'getDestCountryId' => 'CZ']
         );
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $carrier = $this->createPartialMock(
+            \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
+            'getConfig',
+            'getCarrierCode',
+            'getMethodSelect',
+        ]);
+        $carrier->method('getConfig')->willReturn($config);
+        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
+
+        $result = $service->collectRates(new Pricing\Request($request, $carrier));
         $this->assertNull($result);
 
         $request = $this->createProxyWithMethods(
@@ -124,7 +142,17 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 10, 'getPackageValue' => 50000, 'getDestCountryId' => 'CZ']
         );
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $carrier = $this->createPartialMock(
+            \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
+            'getConfig',
+            'getCarrierCode',
+            'getMethodSelect',
+        ]);
+        $carrier->method('getConfig')->willReturn($config);
+        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
+
+        $result = $service->collectRates(new Pricing\Request($request, $carrier));
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -141,7 +169,6 @@ class PricingServiceTest extends BaseTest
         $service = $this->createProxy(
             Pricing\Service::class,
             [
-                'methodSelect' => $this->createProxy(\Packetery\Checkout\Model\Config\Source\MethodSelect::class),
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
@@ -155,14 +182,24 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => 'DE']
         );
 
-        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\PacketeryConfig::class);
+        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config->method('getDefaultPrice')->willReturn(100.0);
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(333.58);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
+        $config->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $carrier = $this->createPartialMock(
+            \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
+            'getConfig',
+            'getCarrierCode',
+            'getMethodSelect',
+        ]);
+        $carrier->method('getConfig')->willReturn($config);
+        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
+
+        $result = $service->collectRates(new Pricing\Request($request, $carrier));
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -185,7 +222,6 @@ class PricingServiceTest extends BaseTest
         $service = $this->createProxy(
             Pricing\Service::class,
             [
-                'methodSelect' => $this->createProxy(\Packetery\Checkout\Model\Config\Source\MethodSelect::class),
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
@@ -199,14 +235,24 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => $pricingRule->getCountryId()]
         );
 
-        $config2 = $this->createMock(\Packetery\Checkout\Model\Carrier\PacketeryConfig::class);
+        $config2 = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config2->method('getDefaultPrice')->willReturn(100.01);
         $config2->method('getMaxWeight')->willReturn(10.0);
         $config2->method('getFreeShippingThreshold')->willReturn(333.58);
         $config2->method('getTitle')->willReturn('title');
-        $config2->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::ADDRESS_DELIVERY]));
+        $config2->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::ADDRESS_DELIVERY]));
 
-        $result = $service->collectRates(new Pricing\Request($request, $config2, 'packetery'));
+        $carrier = $this->createPartialMock(
+            \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
+            'getConfig',
+            'getCarrierCode',
+            'getMethodSelect',
+        ]);
+        $carrier->method('getConfig')->willReturn($config2);
+        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
+
+        $result = $service->collectRates(new Pricing\Request($request, $carrier));
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -225,7 +271,17 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 400, 'getDestCountryId' => $pricingRule->getCountryId()]
         );
 
-        $result = $service->collectRates(new Pricing\Request($request, $config2, 'packetery'));
+        $carrier = $this->createPartialMock(
+            \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
+            'getConfig',
+            'getCarrierCode',
+            'getMethodSelect',
+        ]);
+        $carrier->method('getConfig')->willReturn($config2);
+        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
+
+        $result = $service->collectRates(new Pricing\Request($request, $carrier));
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();

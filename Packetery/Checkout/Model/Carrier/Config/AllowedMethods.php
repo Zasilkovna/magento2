@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Config;
 
+/**
+ * Represents enum of all possible delivery methods and instance represent specific selected methods in any carrier config.
+ */
 class AllowedMethods
 {
     public const PICKUP_POINT_DELIVERY = 'pickupPointDelivery';

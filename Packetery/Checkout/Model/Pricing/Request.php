@@ -5,31 +5,25 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Pricing;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
-use Packetery\Checkout\Model\Carrier\PacketeryConfig;
 
 class Request
 {
     /** @var \Magento\Quote\Model\Quote\Address\RateRequest */
     private $rateRequest;
 
-    /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
-    private $carrierConfig;
-
-    /** @var string  */
-    private $carrierCode;
+    /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier */
+    private $carrier;
 
     /**
      * Request constructor.
      *
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $rateRequest
-     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $carrierConfig
-     * @param string $carrierCode
+     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      */
-    public function __construct(RateRequest $rateRequest, PacketeryConfig $carrierConfig, string $carrierCode)
+    public function __construct(RateRequest $rateRequest, \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier)
     {
         $this->rateRequest = $rateRequest;
-        $this->carrierConfig = $carrierConfig;
-        $this->carrierCode = $carrierCode;
+        $this->carrier = $carrier;
     }
 
     /**
@@ -40,19 +34,8 @@ class Request
         return $this->rateRequest;
     }
 
-    /**
-     * @return \Packetery\Checkout\Model\Carrier\PacketeryConfig
-     */
-    public function getCarrierConfig(): PacketeryConfig
+    public function getCarrier(): \Packetery\Checkout\Model\Carrier\AbstractCarrier
     {
-        return $this->carrierConfig;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCarrierCode(): string
-    {
-        return $this->carrierCode;
+        return $this->carrier;
     }
 }
