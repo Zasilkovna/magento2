@@ -151,7 +151,6 @@
                     <item name="elementTmpl" xsi:type="string">Packetery_Checkout/form/element/point-pick-button</item>
                     <item name="elementId" xsi:type="string">point_picker_field</item>
                     <item name="component" xsi:type="string">Packetery_Checkout/js/view/picker</item>
-                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
