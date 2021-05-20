@@ -59,7 +59,7 @@ define(
             };
         };
 
-        var createChangeSubscriber = function(callback, comparator) {
+        var createUniqueCallLimiter = function(callback, comparator) {
             var lastVal = null;
             var init = true;
 
@@ -76,7 +76,9 @@ define(
         };
 
         resetPickedPacketaPoint();
-        quote.shippingAddress.subscribe(createChangeSubscriber(resetPickedPacketaPoint, function(lastValue, value) {
+        quote.shippingAddress.subscribe(createUniqueCallLimiter(function() {
+            resetPickedPacketaPoint();
+        }, function(lastValue, value) {
             return lastValue.countryId !== value.countryId
         }));
 
