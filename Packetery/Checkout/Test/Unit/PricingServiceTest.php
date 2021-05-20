@@ -9,6 +9,7 @@ use Magento\Quote\Model\Quote\Address\RateResult\Method;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
+use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Pricing;
 use Packetery\Checkout\Model\Pricingrule;
 use Packetery\Checkout\Model\Weightrule;
@@ -88,7 +89,7 @@ class PricingServiceTest extends BaseTest
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(null);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
+        $config->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([Methods::PICKUP_POINT_DELIVERY]));
 
         $carrier = $this->createPartialMock(
             \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
@@ -187,7 +188,7 @@ class PricingServiceTest extends BaseTest
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(333.58);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
+        $config->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([Methods::PICKUP_POINT_DELIVERY]));
 
         $carrier = $this->createPartialMock(
             \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
@@ -240,7 +241,7 @@ class PricingServiceTest extends BaseTest
         $config2->method('getMaxWeight')->willReturn(10.0);
         $config2->method('getFreeShippingThreshold')->willReturn(333.58);
         $config2->method('getTitle')->willReturn('title');
-        $config2->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::ADDRESS_DELIVERY]));
+        $config2->method('getFinalAllowedMethods')->willReturn(new AllowedMethods([Methods::ADDRESS_DELIVERY]));
 
         $carrier = $this->createPartialMock(
             \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier::class, [
@@ -262,7 +263,7 @@ class PricingServiceTest extends BaseTest
         $method = array_shift($rates);
 
         $this->assertEquals(100.01, $method->getData('cost'));
-        $this->assertEquals(AllowedMethods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
+        $this->assertEquals(Methods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
 
         $request = $this->createProxyWithMethods(
             \Magento\Quote\Model\Quote\Address\RateRequest::class,
@@ -291,7 +292,7 @@ class PricingServiceTest extends BaseTest
         $method = array_shift($rates);
 
         $this->assertEquals(0, $method->getData('cost')); // free shipping
-        $this->assertEquals(AllowedMethods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
+        $this->assertEquals(Methods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
     }
 
     /**

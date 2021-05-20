@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Component\Pricingrule\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
+use Packetery\Checkout\Model\Carrier\Methods;
 
 class PricingRuleEnabled extends Column
 {
@@ -43,7 +43,7 @@ class PricingRuleEnabled extends Column
             $config = $carrier->getConfig();
             $methodAllowed = $config->getFinalAllowedMethods()->hasAllowed($method);
 
-            if ($method === AllowedMethods::PICKUP_POINT_DELIVERY) {
+            if ($method === Methods::PICKUP_POINT_DELIVERY) {
                 $pointIdResolves = true;
             } else {
                 $pointIdResolves = $carrier->resolvePointId($method, $countryId) !== null;

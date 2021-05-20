@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD;
 
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
+use Packetery\Checkout\Model\Carrier\Methods;
 
 class MethodSelect extends \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
 {
@@ -12,7 +12,7 @@ class MethodSelect extends \Packetery\Checkout\Model\Carrier\Config\AbstractMeth
     protected function createOptions(): array
     {
         return [
-            ['value' => AllowedMethods::ADDRESS_DELIVERY, 'label' => __('Address Delivery Method')],
+            ['value' => Methods::ADDRESS_DELIVERY, 'label' => __('Address Delivery Method')],
         ];
     }
 }

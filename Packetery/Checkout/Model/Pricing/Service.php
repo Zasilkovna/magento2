@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Pricing;
 
 use Magento\Shipping\Model\Rate\Result;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Packetery\Checkout\Model\Pricingrule;
 
 /**
@@ -75,7 +74,7 @@ class Service
         $methods = $allowedMethods->toArray();
 
         foreach ($methods as $allowedMethod) {
-            if ($allowedMethod !== AllowedMethods::PICKUP_POINT_DELIVERY) {
+            if ($allowedMethod !== \Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY) {
                 $branchId = $pricingRequest->getCarrier()->resolvePointId($allowedMethod, $request->getDestCountryId());
                 if ($branchId === null) {
                     continue;

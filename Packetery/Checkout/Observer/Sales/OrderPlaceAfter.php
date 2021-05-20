@@ -5,7 +5,7 @@ namespace Packetery\Checkout\Observer\Sales;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\InputException;
 use Packetery\Checkout\Model\Carrier\AbstractCarrier;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
+use Packetery\Checkout\Model\Carrier\Methods;
 
 class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -89,7 +89,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             // new order from frontend
             $shippingMethod = $order->getShippingMethod(true);
             $deliveryMethod = $shippingMethod['method'];
-            if ($deliveryMethod === AllowedMethods::PICKUP_POINT_DELIVERY) {
+            if ($deliveryMethod === Methods::PICKUP_POINT_DELIVERY) {
                 // pickup point delivery
                 $point = $postData->packetery->point;
                 $pointId = $point->pointId;

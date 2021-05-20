@@ -6,7 +6,6 @@ namespace Packetery\Checkout\Model\Carrier;
 
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 
 abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractCarrier implements CarrierInterface
 {
@@ -77,7 +76,7 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     protected function getResolvableDestinationData(): array
     {
         return [
-            AllowedMethods::ADDRESS_DELIVERY => [
+            Methods::ADDRESS_DELIVERY => [
                 'countryBranchIds' => [
                     'CZ' => 106,
                     'SK' => 131,
