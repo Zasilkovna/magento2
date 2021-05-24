@@ -15,6 +15,13 @@
 				<specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
 				<sallowspecific>0</sallowspecific>
 			</packetery>
+			<packeteryDPD>
+				<model>Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD\Carrier</model>
+				<active>0</active>
+                <title>Packeta DPD</title>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+                <sallowspecific>0</sallowspecific>
+			</packeteryDPD>
 		</carriers>
 	</default>
 </config>
