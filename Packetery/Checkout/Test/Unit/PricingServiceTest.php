@@ -8,6 +8,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote\Address\RateResult\Method;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
+use Packetery\Checkout\Model\Carrier\AbstractBrain;
 use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Pricing;
@@ -98,7 +99,7 @@ class PricingServiceTest extends BaseTest
             'getMethodSelect',
         ]);
         $carrier->method('getConfig')->willReturn($config);
-        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getCarrierCode')->willReturn(AbstractBrain::PREFIX);
         $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
 
         $result = $service->collectRates(new Pricing\Request($request, $carrier));
@@ -130,7 +131,7 @@ class PricingServiceTest extends BaseTest
             'getMethodSelect',
         ]);
         $carrier->method('getConfig')->willReturn($config);
-        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getCarrierCode')->willReturn(AbstractBrain::PREFIX);
         $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
 
         $result = $service->collectRates(new Pricing\Request($request, $carrier));
@@ -150,7 +151,7 @@ class PricingServiceTest extends BaseTest
             'getMethodSelect',
         ]);
         $carrier->method('getConfig')->willReturn($config);
-        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getCarrierCode')->willReturn(AbstractBrain::PREFIX);
         $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
 
         $result = $service->collectRates(new Pricing\Request($request, $carrier));
@@ -197,7 +198,7 @@ class PricingServiceTest extends BaseTest
             'getMethodSelect',
         ]);
         $carrier->method('getConfig')->willReturn($config);
-        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getCarrierCode')->willReturn(AbstractBrain::PREFIX);
         $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
 
         $result = $service->collectRates(new Pricing\Request($request, $carrier));
@@ -250,7 +251,7 @@ class PricingServiceTest extends BaseTest
             'getMethodSelect',
         ]);
         $carrier->method('getConfig')->willReturn($config2);
-        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getCarrierCode')->willReturn(AbstractBrain::PREFIX);
         $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
 
         $result = $service->collectRates(new Pricing\Request($request, $carrier));
@@ -279,7 +280,7 @@ class PricingServiceTest extends BaseTest
             'getMethodSelect',
         ]);
         $carrier->method('getConfig')->willReturn($config2);
-        $carrier->method('getCarrierCode')->willReturn(\Packetery\Checkout\Model\Carrier\AbstractCarrier::PREFIX);
+        $carrier->method('getCarrierCode')->willReturn(AbstractBrain::PREFIX);
         $carrier->method('getMethodSelect')->willReturn(new \Packetery\Checkout\Model\Config\Source\MethodSelect());
 
         $result = $service->collectRates(new Pricing\Request($request, $carrier));

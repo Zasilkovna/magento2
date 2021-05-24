@@ -40,13 +40,13 @@ class PricingRuleEnabled extends Column
     {
         $activeCarriers = $this->carrierFacade->getActiveCarriers();
         foreach ($activeCarriers as $carrier) {
-            $config = $carrier->getConfig();
+            $config = $carrier->getPacketeryConfig();
             $methodAllowed = $config->getFinalAllowedMethods()->hasAllowed($method);
 
             if ($method === Methods::PICKUP_POINT_DELIVERY) {
                 $pointIdResolves = true;
             } else {
-                $pointIdResolves = $carrier->resolvePointId($method, $countryId) !== null;
+                $pointIdResolves = $carrier->getPacketeryBrain()->resolvePointId($method, $countryId) !== null;
             }
 
             $countryAllowed = $config->hasSpecificCountryAllowed($countryId);

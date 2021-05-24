@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
-class Brain extends \Packetery\Checkout\Model\Carrier\Brain
+use Packetery\Checkout\Model\Carrier\Methods;
+
+class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
     /** @var \Packetery\Checkout\Model\Config\Source\MethodSelect */
     private $methodSelect;
@@ -33,9 +35,25 @@ class Brain extends \Packetery\Checkout\Model\Carrier\Brain
     }
 
     /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     */
+    public function createConfig(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
+        return new Config($carrier);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPacketeryCode(): string
+    {
+        return '';
+    }
+
+    /**
      * @return \Packetery\Checkout\Model\Config\Source\MethodSelect
      */
-    public function getMethodSelect(): \Packetery\Checkout\Model\Config\Source\MethodSelect
+    public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
     {
         return $this->methodSelect;
     }
@@ -43,7 +61,24 @@ class Brain extends \Packetery\Checkout\Model\Carrier\Brain
     /**
      * @return \Packetery\Checkout\Model\Carrier\Imp\Packetery\CountrySelect
      */
-    public function getCountrySelect(): \Packetery\Checkout\Model\Carrier\Imp\Packetery\CountrySelect {
+    public function getCountrySelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect {
         return $this->countrySelect;
+    }
+
+    /**
+     * @inheridoc
+     */
+    protected function getResolvableDestinationData(): array {
+        return [
+            Methods::ADDRESS_DELIVERY => [
+                'countryBranchIds' => [
+                    'CZ' => 106,
+                    'SK' => 131,
+                    'HU' => 4159,
+                    'RO' => 4161,
+                    'PL' => 4162,
+                ]
+            ]
+        ];
     }
 }

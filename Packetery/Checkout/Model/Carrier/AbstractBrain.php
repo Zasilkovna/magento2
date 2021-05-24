@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier;
 
 use Magento\Shipping\Model\Rate\Result;
+use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 use Packetery\Checkout\Model\Pricing\Request;
 
 /**
  * Use this service to extend custom carriers with new logic that is using dependencies. Good for avoiding constructor hell.
  */
-class Brain
+abstract class AbstractBrain
 {
+    public const PREFIX = 'packetery';
+    public const MULTI_SHIPPING_MODULE_NAME = 'multishipping';
+
     /** @var \Magento\Framework\App\Request\Http  */
     protected $httpRequest;
 
@@ -34,6 +38,42 @@ class Brain
     }
 
     /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     */
+    abstract public function createConfig(AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+
+    /** Returns unique carrier identified in packetery context
+     * @return string
+     */
+    abstract public function getPacketeryCode(): string;
+
+    /**
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
+     */
+    abstract public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
+
+    /**
+     * @return \Magento\Directory\Model\Config\Source\Country
+     */
+    abstract public function getCountrySelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect;
+
+    /** Returns data that are used to figure out destination point id
+     * @return int[]
+     */
+    abstract protected function getResolvableDestinationData(): array;
+
+    /**
+     * @param string $countryId
+     * @return int|null
+     */
+    public function resolvePointId(string $method, string $countryId): ?int
+    {
+        $data = $this->getResolvableDestinationData();
+        return ($data[$method]['countryBranchIds'][$countryId] ?? null);
+    }
+
+    /**
      * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
      * @return \Magento\Shipping\Model\Rate\Result|null
      */
@@ -49,11 +89,11 @@ class Brain
      */
     public function isCollectionPossible(AbstractCarrier $carrier, string $countryId)
     {
-        if ($this->httpRequest->getModuleName() == AbstractCarrier::MULTI_SHIPPING_MODULE_NAME) {
+        if ($this->httpRequest->getModuleName() == self::MULTI_SHIPPING_MODULE_NAME) {
             return false;
         }
 
-        $carrierConfig = $carrier->getConfig();
+        $carrierConfig = $carrier->getPacketeryConfig();
         if (!$carrierConfig->isActive()) {
             return false;
         }

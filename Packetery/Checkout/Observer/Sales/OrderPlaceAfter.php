@@ -4,7 +4,7 @@ namespace Packetery\Checkout\Observer\Sales;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\InputException;
-use Packetery\Checkout\Model\Carrier\AbstractCarrier;
+use Packetery\Checkout\Model\Carrier\AbstractBrain;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
@@ -51,7 +51,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $order = $observer->getEvent()->getOrder();
 
         // IF PACKETERY SHIPPING IS NOT SELECTED, RETURN
-        if (strpos($order->getShippingMethod(), AbstractCarrier::PREFIX) === false)
+        if (strpos($order->getShippingMethod(), AbstractBrain::PREFIX) === false)
         {
             return;
         }
@@ -99,7 +99,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             } else {
                 /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier */
                 $carrier = $this->carrierFactory->create($shippingMethod['carrier_code']);
-                $pointId = $carrier->resolvePointId($deliveryMethod, $order->getShippingAddress()->getCountryId());
+                $pointId = $carrier->getPacketeryBrain()->resolvePointId($deliveryMethod, $order->getShippingAddress()->getCountryId());
                 $pointName = $deliveryMethod; // translated on demand
             }
         }

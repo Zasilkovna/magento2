@@ -113,7 +113,7 @@ abstract class AbstractConfig
         }
 
         if ($this->getApplicableCountries() === 0) {
-            $countrySelect = $this->carrier->getCountrySelect();
+            $countrySelect = $this->carrier->getPacketeryBrain()->getCountrySelect();
             return $countrySelect->getLabelByValue($countryId) !== null;
         }
 
@@ -136,7 +136,7 @@ abstract class AbstractConfig
     public function getFinalAllowedMethods(): AllowedMethods {
         $allowedMethods = $this->getAllowedMethods();
         if (empty($allowedMethods->toArray())) {
-            return new AllowedMethods($this->carrier->getMethodSelect()->getMethods());
+            return new AllowedMethods($this->carrier->getPacketeryBrain()->getMethodSelect()->getMethods());
         }
 
         return $allowedMethods;
