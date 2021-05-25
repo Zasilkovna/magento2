@@ -41,15 +41,16 @@ class PricingRuleEnabled extends Column
         $activeCarriers = $this->carrierFacade->getActiveCarriers();
         foreach ($activeCarriers as $carrier) {
             $config = $carrier->getPacketeryConfig();
-            $methodAllowed = $config->getFinalAllowedMethods()->hasAllowed($method);
+            $brain = $carrier->getPacketeryBrain();
+            $methodAllowed = $brain->getFinalAllowedMethods($config, $carrier->getPacketeryBrain()->getMethodSelect())->hasAllowed($method);
 
             if ($method === Methods::PICKUP_POINT_DELIVERY) {
                 $pointIdResolves = true;
             } else {
-                $pointIdResolves = $carrier->getPacketeryBrain()->resolvePointId($method, $countryId) !== null;
+                $pointIdResolves = $brain->resolvePointId($method, $countryId) !== null;
             }
 
-            $countryAllowed = $config->hasSpecificCountryAllowed($countryId);
+            $countryAllowed = $brain->hasSpecificCountryAllowed($config, $brain->getCountrySelect(), $countryId);
 
             if ($countryAllowed && $methodAllowed && $pointIdResolves) {
                 return __('Enabled'); // if there is min 1 carrier, print Enabled

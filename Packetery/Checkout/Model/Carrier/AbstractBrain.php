@@ -6,6 +6,9 @@ namespace Packetery\Checkout\Model\Carrier;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+use Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect;
+use Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
+use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 
 /**
  * Use this service to extend custom carriers with new logic that is using dependencies. Good for avoiding constructor hell.
@@ -55,12 +58,12 @@ abstract class AbstractBrain
     /**
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
      */
-    abstract public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
+    abstract public function getMethodSelect(): AbstractMethodSelect;
 
     /**
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect
      */
-    abstract public function getCountrySelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect;
+    abstract public function getCountrySelect(): AbstractCountrySelect;
 
     /** Returns data that are used to figure out destination point id
      * @return array
@@ -87,12 +90,12 @@ abstract class AbstractBrain
         $config = $carrier->getPacketeryConfig();
         $brain = $carrier->getPacketeryBrain();
 
-        if (!$this->isCollectionPossible($config, $request->getDestCountryId())) {
+        if (!$this->isCollectionPossible($config, $brain, $request->getDestCountryId())) {
             return false;
         }
 
         $methods = [];
-        foreach ($config->getFinalAllowedMethods()->toArray() as $selectedMethod) {
+        foreach ($this->getFinalAllowedMethods($config, $brain->getMethodSelect())->toArray() as $selectedMethod) {
             if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
                 if ($this->resolvePointId($selectedMethod, $request->getDestCountryId()) === null) {
                     continue;
@@ -112,10 +115,11 @@ abstract class AbstractBrain
 
     /**
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
+     * @param \Packetery\Checkout\Model\Carrier\AbstractBrain $brain
      * @param string $countryId
      * @return bool
      */
-    public function isCollectionPossible(AbstractConfig $config, string $countryId): bool
+    public function isCollectionPossible(AbstractConfig $config, AbstractBrain $brain, string $countryId): bool
     {
         if ($this->httpRequest->getModuleName() == self::MULTI_SHIPPING_MODULE_NAME) {
             return false;
@@ -125,10 +129,43 @@ abstract class AbstractBrain
             return false;
         }
 
-        if (!$config->hasSpecificCountryAllowed($countryId)) {
+        if (!$brain->hasSpecificCountryAllowed($config, $brain->getCountrySelect(), $countryId)) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect $methodSelect
+     * @return \Packetery\Checkout\Model\Carrier\Config\AllowedMethods
+     */
+    public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): AllowedMethods {
+        $allowedMethods = $config->getAllowedMethods();
+        if (empty($allowedMethods->toArray())) {
+            return new AllowedMethods($methodSelect->getMethods());
+        }
+
+        return $allowedMethods;
+    }
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @param string $countryId
+     * @return bool
+     */
+    public function hasSpecificCountryAllowed(AbstractConfig $config, AbstractCountrySelect $countrySelect, string $countryId): bool
+    {
+        if ($config->getApplicableCountries() === 1) {
+            $countries = $config->getSpecificCountries();
+            return empty($countries) || in_array($countryId, $countries);
+        }
+
+        if ($config->getApplicableCountries() === 0) {
+            return $countrySelect->getLabelByValue($countryId) !== null;
+        }
+
+        return false;
     }
 }

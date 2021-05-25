@@ -68,9 +68,8 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     public function getAllowedMethods(): array
     {
         $result = [];
-        $config = $this->getPacketeryConfig();
-        $selectedMethods = $config->getFinalAllowedMethods();
         $select = $this->packeteryBrain->getMethodSelect();
+        $selectedMethods = $this->packeteryBrain->getFinalAllowedMethods($this->getPacketeryConfig(), $select);
 
         foreach ($selectedMethods->toArray() as $selectedMethod) {
             $result[$selectedMethod] = $select->getLabelByValue($selectedMethod);

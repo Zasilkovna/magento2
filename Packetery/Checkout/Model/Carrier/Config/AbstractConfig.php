@@ -98,43 +98,12 @@ abstract class AbstractConfig
     }
 
     /**
-     * @param string $countryId
-     * @return bool
-     */
-    public function hasSpecificCountryAllowed(string $countryId): bool
-    {
-        if ($this->getApplicableCountries() === 1) {
-            $countries = $this->getSpecificCountries();
-            return empty($countries) || in_array($countryId, $countries);
-        }
-
-        if ($this->getApplicableCountries() === 0) {
-            $countrySelect = $this->carrier->getPacketeryBrain()->getCountrySelect();
-            return $countrySelect->getLabelByValue($countryId) !== null;
-        }
-
-        return false;
-    }
-
-    /**
      * @return \Packetery\Checkout\Model\Carrier\Config\AllowedMethods
      */
-    private function getAllowedMethods(): AllowedMethods
+    public function getAllowedMethods(): AllowedMethods
     {
         $value = $this->carrier->getConfigData('allowedMethods');
         $methods = (is_string($value) ? explode(',', $value) : []);
         return new AllowedMethods($methods);
-    }
-
-    /** Allowed methods that are considered in rate collection
-     * @return \Packetery\Checkout\Model\Carrier\Config\AllowedMethods
-     */
-    public function getFinalAllowedMethods(): AllowedMethods {
-        $allowedMethods = $this->getAllowedMethods();
-        if (empty($allowedMethods->toArray())) {
-            return new AllowedMethods($this->carrier->getPacketeryBrain()->getMethodSelect()->getMethods());
-        }
-
-        return $allowedMethods;
     }
 }
