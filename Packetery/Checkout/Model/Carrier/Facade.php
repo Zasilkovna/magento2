@@ -14,11 +14,11 @@ class Facade
     /**
      * Facade constructor.
      *
-     * @param \Magento\Shipping\Model\Config $_shippingConfig
+     * @param \Magento\Shipping\Model\Config $shippingConfig
      */
-    public function __construct(\Magento\Shipping\Model\Config $_shippingConfig)
+    public function __construct(\Magento\Shipping\Model\Config $shippingConfig)
     {
-        $this->shippingConfig = $_shippingConfig;
+        $this->shippingConfig = $shippingConfig;
     }
 
     /**
