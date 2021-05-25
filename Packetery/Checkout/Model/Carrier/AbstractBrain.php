@@ -84,11 +84,25 @@ abstract class AbstractBrain
      */
     public function collectRates(AbstractCarrier $carrier, RateRequest $request)
     {
-        if (!$this->isCollectionPossible($carrier->getPacketeryConfig(), $request->getDestCountryId())) {
+        $config = $carrier->getPacketeryConfig();
+        $brain = $carrier->getPacketeryBrain();
+
+        if (!$this->isCollectionPossible($config, $request->getDestCountryId())) {
             return false;
         }
 
-        $result = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $carrier->getPacketeryConfig(), $carrier->getPacketeryBrain());
+        $methods = [];
+        foreach ($config->getFinalAllowedMethods()->toArray() as $selectedMethod) {
+            if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
+                if ($this->resolvePointId($selectedMethod, $request->getDestCountryId()) === null) {
+                    continue;
+                }
+            }
+
+            $methods[$selectedMethod] = $brain->getMethodSelect()->getLabelByValue($selectedMethod);
+        }
+
+        $result = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods);
         if (!$result instanceof \Magento\Shipping\Model\Rate\Result) {
             return false;
         }

@@ -6,7 +6,6 @@ namespace Packetery\Checkout\Model\Pricing;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Rate\Result;
-use Packetery\Checkout\Model\Carrier\AbstractBrain;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 use Packetery\Checkout\Model\Pricingrule;
 
@@ -50,14 +49,12 @@ class Service
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
      * @param string $carrierCode
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $carrierConfig
-     * @param \Packetery\Checkout\Model\Carrier\AbstractBrain $carrierBrain
+     * @param array $methods
      * @return \Magento\Shipping\Model\Rate\Result|null
      */
-    public function collectRates(RateRequest $request, string $carrierCode, AbstractConfig $carrierConfig, AbstractBrain $carrierBrain): ?Result
+    public function collectRates(RateRequest $request, string $carrierCode, AbstractConfig $carrierConfig, array $methods): ?Result
     {
         $result = $this->rateResultFactory->create();
-
-        $allowedMethods = $carrierConfig->getFinalAllowedMethods();
 
         $weightTotal = $request->getPackageWeight();
         $weightMax = $carrierConfig->getMaxWeight();
@@ -66,23 +63,14 @@ class Service
             return null;
         }
 
-        $methods = $allowedMethods->toArray();
-
-        foreach ($methods as $allowedMethod) {
-            if ($allowedMethod !== \Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY) {
-                $branchId = $carrierBrain->resolvePointId($allowedMethod, $request->getDestCountryId());
-                if ($branchId === null) {
-                    continue;
-                }
-            }
-
+        foreach ($methods as $allowedMethod => $methodLabel) {
             $pricingRule = $this->resolvePricingRule($allowedMethod, $request->getDestCountryId());
             $price = $this->resolvePrice($request, $carrierConfig, $pricingRule);
             $method = $this->createRateMethod(
                 $allowedMethod,
                 $carrierCode,
                 $carrierConfig->getTitle(),
-                $carrierBrain->getMethodSelect()->getLabelByValue($allowedMethod),
+                $methodLabel,
                 $price
             );
             $result->append($method);

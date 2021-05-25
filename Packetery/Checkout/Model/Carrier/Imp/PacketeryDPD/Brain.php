@@ -32,6 +32,10 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         $this->methodSelect = $methodSelect;
     }
 
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     */
     public function createConfig(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
         return new Config($carrier);
     }
@@ -44,10 +48,16 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         return $this->countrySelect;
     }
 
+    /**
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
+     */
     public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect {
         return $this->methodSelect;
     }
 
+    /**
+     * @return array
+     */
     protected function getResolvableDestinationData(): array {
         return [
             Methods::ADDRESS_DELIVERY => [
