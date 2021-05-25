@@ -43,14 +43,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
-     * @return string
-     */
-    public function getPacketeryCode(): string
-    {
-        return '';
-    }
-
-    /**
      * @return \Packetery\Checkout\Model\Config\Source\MethodSelect
      */
     public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect

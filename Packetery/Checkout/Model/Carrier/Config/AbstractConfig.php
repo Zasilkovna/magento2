@@ -80,16 +80,12 @@ abstract class AbstractConfig
 
     /** 1 => Specific countries
      *  0 => All countries
-     * @return int|null
+     * @return int
      */
     public function getApplicableCountries(): int
     {
         $value = $this->carrier->getConfigData('sallowspecific'); // "Use system value" resolves in 0
-        if (is_numeric($value)) {
-            return (int)$value;
-        }
-
-        throw new \Exception('sallowspecific config value was not restored');
+        return (int)$value;
     }
 
     /** Collection of allowed countries
@@ -117,7 +113,7 @@ abstract class AbstractConfig
             return $countrySelect->getLabelByValue($countryId) !== null;
         }
 
-        throw new \Exception('Unrecognized getApplicableCountries return value');
+        return false;
     }
 
     /**

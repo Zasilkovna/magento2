@@ -15,8 +15,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     private $methodSelect;
 
     /**
-     * Brain constructor.
-     *
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD\CountrySelect $countrySelect
@@ -48,11 +46,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 
     public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect {
         return $this->methodSelect;
-    }
-
-    public function getPacketeryCode(): string
-    {
-        return 'DPD';
     }
 
     protected function getResolvableDestinationData(): array {

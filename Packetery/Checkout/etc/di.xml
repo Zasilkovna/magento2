@@ -21,16 +21,4 @@
             <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Pricingrule</argument>
         </arguments>
     </virtualType>
-
-    <type name="Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD\Carrier">
-        <arguments>
-            <argument name="brain" xsi:type="object">Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD\Brain</argument>
-        </arguments>
-    </type>
-
-    <type name="Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier">
-        <arguments>
-            <argument name="brain" xsi:type="object">Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain</argument>
-        </arguments>
-    </type>
 </config>

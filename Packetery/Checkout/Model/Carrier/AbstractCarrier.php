@@ -31,7 +31,7 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
         \Packetery\Checkout\Model\Carrier\AbstractBrain $brain,
         array $data = []
     ) {
-        $this->_code = AbstractBrain::PREFIX . $brain->getPacketeryCode();
+        $this->_code = $brain->getCarrierCode();
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
         $this->packeteryBrain = $brain;
         $this->packeteryConfig = $brain->createConfig($this);

@@ -16,11 +16,28 @@ class Carrier extends \Packetery\Checkout\Model\Carrier\AbstractCarrier
     protected $packeteryBrain;
 
     /**
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain $brain
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory,
+        \Psr\Log\LoggerInterface $logger,
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain $brain,
+        array $data = []
+    ) {
+        parent::__construct($scopeConfig, $rateErrorFactory, $logger, $brain, $data);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function collectRates(RateRequest $request)
     {
-        if (!$this->packeteryBrain->isCollectionPossible($this, $request->getDestCountryId())) {
+        if (!$this->packeteryBrain->isCollectionPossible($this->getPacketeryConfig(), $request->getDestCountryId())) {
             return false;
         }
 

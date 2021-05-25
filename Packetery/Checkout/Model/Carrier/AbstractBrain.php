@@ -46,7 +46,12 @@ abstract class AbstractBrain
     /** Returns unique carrier identified in packetery context
      * @return string
      */
-    abstract public function getPacketeryCode(): string;
+    public function getCarrierCode(): string {
+        $reflection = new \ReflectionClass(static::class);
+        $fileName = $reflection->getFileName();
+        $carrierDir = basename(dirname($fileName));
+        return lcfirst($carrierDir);
+    }
 
     /**
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
@@ -54,12 +59,12 @@ abstract class AbstractBrain
     abstract public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
 
     /**
-     * @return \Magento\Directory\Model\Config\Source\Country
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect
      */
     abstract public function getCountrySelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect;
 
     /** Returns data that are used to figure out destination point id
-     * @return int[]
+     * @return array
      */
     abstract protected function getResolvableDestinationData(): array;
 
@@ -83,22 +88,21 @@ abstract class AbstractBrain
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
      * @param string $countryId
      * @return bool
      */
-    public function isCollectionPossible(AbstractCarrier $carrier, string $countryId)
+    public function isCollectionPossible(AbstractConfig $config, string $countryId): bool
     {
         if ($this->httpRequest->getModuleName() == self::MULTI_SHIPPING_MODULE_NAME) {
             return false;
         }
 
-        $carrierConfig = $carrier->getPacketeryConfig();
-        if (!$carrierConfig->isActive()) {
+        if (!$config->isActive()) {
             return false;
         }
 
-        if (!$carrierConfig->hasSpecificCountryAllowed($countryId)) {
+        if (!$config->hasSpecificCountryAllowed($countryId)) {
             return false;
         }
 
