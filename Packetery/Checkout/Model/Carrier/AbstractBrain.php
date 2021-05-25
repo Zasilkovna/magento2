@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier;
 
-use Magento\Shipping\Model\Rate\Result;
+use Magento\Quote\Model\Quote\Address\RateRequest;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
-use Packetery\Checkout\Model\Pricing\Request;
 
 /**
  * Use this service to extend custom carriers with new logic that is using dependencies. Good for avoiding constructor hell.
@@ -79,12 +78,22 @@ abstract class AbstractBrain
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
-     * @return \Magento\Shipping\Model\Rate\Result|null
+     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
+     * @return false|\Magento\Shipping\Model\Rate\Result
      */
-    public function collectRates(Request $pricingRequest): ?Result
+    public function collectRates(AbstractCarrier $carrier, RateRequest $request)
     {
-        return $this->pricingService->collectRates($pricingRequest);
+        if (!$this->isCollectionPossible($carrier->getPacketeryConfig(), $request->getDestCountryId())) {
+            return false;
+        }
+
+        $result = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $carrier->getPacketeryConfig(), $carrier->getPacketeryBrain());
+        if (!$result instanceof \Magento\Shipping\Model\Rate\Result) {
+            return false;
+        }
+
+        return $result;
     }
 
     /**

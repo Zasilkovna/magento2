@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier;
 
+use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 
@@ -35,6 +36,14 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
         $this->packeteryBrain = $brain;
         $this->packeteryConfig = $brain->createConfig($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function collectRates(RateRequest $request)
+    {
+        return $this->packeteryBrain->collectRates($this, $request);
     }
 
     /**

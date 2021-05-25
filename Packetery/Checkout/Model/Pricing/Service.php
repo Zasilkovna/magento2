@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Pricing;
 
+use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Rate\Result;
+use Packetery\Checkout\Model\Carrier\AbstractBrain;
+use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 use Packetery\Checkout\Model\Pricingrule;
 
 /**
@@ -25,12 +28,8 @@ class Service
     private $rateResultFactory;
 
     /**
-     * Service constructor.
-     *
      * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
-     * @param \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory
      * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
-     * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
      * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      */
@@ -48,16 +47,22 @@ class Service
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
+     * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
+     * @param string $carrierCode
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $carrierConfig
+     * @param \Packetery\Checkout\Model\Carrier\AbstractBrain $carrierBrain
      * @return \Magento\Shipping\Model\Rate\Result|null
      */
-    public function collectRates(Request $pricingRequest): ?Result
+    public function collectRates(RateRequest $request, string $carrierCode, AbstractConfig $carrierConfig, AbstractBrain $carrierBrain): ?Result
     {
-        $request = $pricingRequest->getRateRequest();
         $result = $this->rateResultFactory->create();
-        $allowedMethods = $pricingRequest->getCarrier()->getPacketeryConfig()->getFinalAllowedMethods();
 
-        if ($this->hasValidWeight($pricingRequest) === false) {
+        $allowedMethods = $carrierConfig->getFinalAllowedMethods();
+
+        $weightTotal = $request->getPackageWeight();
+        $weightMax = $carrierConfig->getMaxWeight();
+
+        if ($this->hasValidWeight($weightTotal, $weightMax) === false) {
             return null;
         }
 
@@ -65,15 +70,21 @@ class Service
 
         foreach ($methods as $allowedMethod) {
             if ($allowedMethod !== \Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY) {
-                $branchId = $pricingRequest->getCarrier()->getPacketeryBrain()->resolvePointId($allowedMethod, $request->getDestCountryId());
+                $branchId = $carrierBrain->resolvePointId($allowedMethod, $request->getDestCountryId());
                 if ($branchId === null) {
                     continue;
                 }
             }
 
-            $pricingRule = $this->resolvePricingRule($allowedMethod, $pricingRequest);
-            $price = $this->resolvePrice($pricingRequest, $pricingRule);
-            $method = $this->createRateMethod($allowedMethod, $pricingRequest, $price);
+            $pricingRule = $this->resolvePricingRule($allowedMethod, $request->getDestCountryId());
+            $price = $this->resolvePrice($request, $carrierConfig, $pricingRule);
+            $method = $this->createRateMethod(
+                $allowedMethod,
+                $carrierCode,
+                $carrierConfig->getTitle(),
+                $carrierBrain->getMethodSelect()->getLabelByValue($allowedMethod),
+                $price
+            );
             $result->append($method);
         }
 
@@ -81,25 +92,22 @@ class Service
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
+     * @param float $weightTotal
+     * @param float|null $weightMax
      * @return bool
      */
-    private function hasValidWeight(Request $pricingRequest): bool
+    private function hasValidWeight(float $weightTotal, ?float $weightMax): bool
     {
-        $weightTotal = $pricingRequest->getRateRequest()->getPackageWeight(); // custom unit
-        $weightMax = $pricingRequest->getCarrier()->getPacketeryConfig()->getMaxWeight();
         return is_numeric($weightMax) && $weightTotal <= $weightMax;
     }
 
     /**
      * @param string $method
-     * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
+     * @param string $destCountryId
      * @return \Packetery\Checkout\Model\Pricingrule|null
      */
-    public function resolvePricingRule(string $method, Request $pricingRequest): ?Pricingrule
+    public function resolvePricingRule(string $method, string $destCountryId): ?Pricingrule
     {
-        $destCountryId = ($pricingRequest->getRateRequest()->getDestCountryId() ?: null);
-
         $pricingRuleCollection = $this->pricingRuleCollectionFactory->create();
         $pricingRuleCollection->addFilter('method', $method);
         $pricingRuleCollection->addFilter('country_id', $destCountryId); // iso 2
@@ -109,18 +117,18 @@ class Service
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Pricing\Request $pricingRequest
+     * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
      * @param \Packetery\Checkout\Model\Pricingrule|null $pricingRule
      * @return float
      */
-    protected function resolvePrice(Request $pricingRequest, ?Pricingrule $pricingRule): float
+    protected function resolvePrice(RateRequest $request, AbstractConfig $config, ?Pricingrule $pricingRule): float
     {
         $result = null;
-        $request = $pricingRequest->getRateRequest();
         $weightTotal = (float)$request->getPackageWeight();
         $priceTotal = (float)$request->getPackageValue();
 
-        $freeShipping = $this->getFreeShippingThreshold($pricingRule, $pricingRequest->getCarrier()->getPacketeryConfig()->getFreeShippingThreshold());
+        $freeShipping = $this->getFreeShippingThreshold($pricingRule, $config->getFreeShippingThreshold());
 
         if ($freeShipping !== null && $freeShipping <= $priceTotal) {
             return 0;
@@ -132,11 +140,11 @@ class Service
         }
 
         if (!empty($weightRules)) {
-            $result = $this->resolveWeightedPrice($weightRules, $weightTotal, $pricingRequest->getCarrier()->getPacketeryConfig()->getMaxWeight());
+            $result = $this->resolveWeightedPrice($weightRules, $weightTotal, $config->getMaxWeight());
         }
 
         if ($result === null) {
-            $result = $pricingRequest->getCarrier()->getPacketeryConfig()->getDefaultPrice();
+            $result = $config->getDefaultPrice();
         }
 
         return $result;
@@ -176,23 +184,25 @@ class Service
 
     /**
      * @param string $packeteryMethod
-     * @param \Packetery\Checkout\Model\Pricing\Request $request
+     * @param string $carrierCode
+     * @param string|\Magento\Framework\Phrase $carrierTitle
+     * @param string|\Magento\Framework\Phrase $methodTitle
      * @param float $price
      * @return \Magento\Quote\Model\Quote\Address\RateResult\Method
      */
-    protected function createRateMethod(string $packeteryMethod, Request $request, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
+    protected function createRateMethod(string $packeteryMethod, string $carrierCode, $carrierTitle, $methodTitle, float $price): \Magento\Quote\Model\Quote\Address\RateResult\Method
     {
         $method = $this->rateMethodFactory->create();
-        $method->setCarrier($request->getCarrier()->getCarrierCode());
+        $method->setCarrier($carrierCode);
 
         if (empty($method->getCarrierTitle())) {
-            $method->setCarrierTitle($request->getCarrier()->getPacketeryConfig()->getTitle());
+            $method->setCarrierTitle($carrierTitle);
         }
 
         $method->setMethod($packeteryMethod);
 
         if (empty($method->getMethodTitle())) {
-            $method->setMethodTitle($request->getCarrier()->getPacketeryBrain()->getMethodSelect()->getLabelByValue($packeteryMethod));
+            $method->setMethodTitle($methodTitle);
         }
 
         $method->setCost($price);
