@@ -10,16 +10,28 @@ namespace Packetery\Checkout\Model\Carrier\Config;
 abstract class AbstractConfig
 {
     /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier  */
-    protected $carrier;
+    protected $data;
 
     /**
      * AbstractConfig constructor.
      *
-     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
+     * @param array $data
      */
-    public function __construct(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier)
+    public function __construct(array $data)
     {
-        $this->carrier = $carrier;
+        $this->data = $data;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed|null
+     */
+    protected function getConfigData(string $key) {
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
+        }
+
+        return null;
     }
 
     /**
@@ -27,7 +39,7 @@ abstract class AbstractConfig
      */
     public function isActive(): bool
     {
-        return $this->carrier->getConfigFlag('active');
+        return $this->getConfigData('active') === '1';
     }
 
     /**
@@ -35,7 +47,7 @@ abstract class AbstractConfig
      */
     public function getTitle()
     {
-        return ($this->carrier->getConfigData('title') ?: __("Packeta"));
+        return ($this->getConfigData('title') ?: __("Packeta"));
     }
 
     /**
@@ -43,7 +55,7 @@ abstract class AbstractConfig
      */
     public function getDefaultPrice(): ?float
     {
-        $value = $this->carrier->getConfigData('default_price');
+        $value = $this->getConfigData('default_price');
         return (is_numeric($value) ? (float)$value : null);
     }
 
@@ -52,7 +64,7 @@ abstract class AbstractConfig
      */
     public function getMaxWeight(): ?float
     {
-        $value = $this->carrier->getConfigData('max_weight');
+        $value = $this->getConfigData('max_weight');
         return (is_numeric($value) ? (float)$value : null);
     }
 
@@ -61,7 +73,7 @@ abstract class AbstractConfig
      */
     protected function getFreeShippingEnable(): ?int
     {
-        $value = $this->carrier->getConfigData('free_shipping_enable');
+        $value = $this->getConfigData('free_shipping_enable');
         return (is_numeric($value) ? (int)$value : null);
     }
 
@@ -71,7 +83,7 @@ abstract class AbstractConfig
     public function getFreeShippingThreshold(): ?float
     {
         if ($this->getFreeShippingEnable() === 1) {
-            $value = $this->carrier->getConfigData('free_shipping_subtotal');
+            $value = $this->getConfigData('free_shipping_subtotal');
             return (is_numeric($value) ? (float)$value : null);
         }
 
@@ -84,7 +96,7 @@ abstract class AbstractConfig
      */
     public function getApplicableCountries(): int
     {
-        $value = $this->carrier->getConfigData('sallowspecific'); // "Use system value" resolves in 0
+        $value = $this->getConfigData('sallowspecific'); // "Use system value" resolves in 0
         return (int)$value;
     }
 
@@ -93,7 +105,7 @@ abstract class AbstractConfig
      */
     public function getSpecificCountries(): array
     {
-        $value = $this->carrier->getConfigData('specificcountry');
+        $value = $this->getConfigData('specificcountry');
         return (is_string($value) ? explode(',', $value) : []);
     }
 
@@ -102,7 +114,7 @@ abstract class AbstractConfig
      */
     public function getAllowedMethods(): AllowedMethods
     {
-        $value = $this->carrier->getConfigData('allowedMethods');
+        $value = $this->getConfigData('allowedMethods');
         $methods = (is_string($value) ? explode(',', $value) : []);
         return new AllowedMethods($methods);
     }

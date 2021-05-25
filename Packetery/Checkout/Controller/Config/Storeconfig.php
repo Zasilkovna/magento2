@@ -31,19 +31,19 @@ class Storeconfig implements HttpGetActionInterface
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Packetery\Checkout\Helper\Data $helperData
-     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config $packeteryConfig
+     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Packetery\Checkout\Helper\Data $helperData,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config $packeteryConfig
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
     ) {
         $this->messageManager = $context->getMessageManager();
         $this->resultJsonFactory = $resultJsonFactory;
         $this->storeManager = $storeManager;
-        $this->packeteryConfig = $packeteryConfig;
+        $this->packeteryConfig = $packetery->getPacketeryConfig();
         $this->helperData = $helperData;
     }
 

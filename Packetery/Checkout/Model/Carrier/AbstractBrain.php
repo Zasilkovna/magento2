@@ -24,19 +24,25 @@ abstract class AbstractBrain
     /** @var \Packetery\Checkout\Model\Pricing\Service  */
     protected $pricingService;
 
+    /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
+    private $scopeConfig;
+
     /**
-     * CarrierBrain constructor.
+     * AbstractBrain constructor.
      *
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
-        \Packetery\Checkout\Model\Pricing\Service $pricingService
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     )
     {
         $this->httpRequest = $httpRequest;
         $this->pricingService = $pricingService;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -44,6 +50,21 @@ abstract class AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
     abstract public function createConfig(AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+
+    /**
+     * @param string $carrierCode
+     * @param mixed $scope
+     * @return mixed
+     */
+    protected function getConfigData(string $carrierCode, $scope) {
+        $path = 'carriers/' . $carrierCode;
+
+        return $this->scopeConfig->getValue(
+            $path,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $scope
+        );
+    }
 
     /** Returns unique carrier identified in packetery context
      * @return string

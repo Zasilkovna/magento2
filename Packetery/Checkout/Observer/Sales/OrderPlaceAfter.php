@@ -27,13 +27,13 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     public function __construct(
         CheckoutSession $checkoutSession,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config $packeteryConfig,
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery,
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Shipping\Model\CarrierFactory $carrierFactory
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
-        $this->packeteryConfig = $packeteryConfig;
+        $this->packeteryConfig = $packetery->getPacketeryConfig();
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->carrierFactory = $carrierFactory;
     }

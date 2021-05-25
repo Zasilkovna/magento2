@@ -19,17 +19,19 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      *
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\CountrySelect $countrySelect
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect,
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\CountrySelect $countrySelect
     )
     {
-        parent::__construct($httpRequest, $pricingService);
+        parent::__construct($httpRequest, $pricingService, $scopeConfig);
         $this->methodSelect = $methodSelect;
         $this->countrySelect = $countrySelect;
     }
@@ -39,7 +41,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
     public function createConfig(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
-        return new Config($carrier);
+        return new Config($this->getConfigData($carrier->getCarrierCode(), $carrier->getStore()));
     }
 
     /**
