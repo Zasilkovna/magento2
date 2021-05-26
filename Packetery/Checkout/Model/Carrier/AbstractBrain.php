@@ -6,7 +6,6 @@ namespace Packetery\Checkout\Model\Carrier;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
-use Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect;
 use Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
 use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 
@@ -80,11 +79,6 @@ abstract class AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
      */
     abstract public function getMethodSelect(): AbstractMethodSelect;
-
-    /**
-     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractCountrySelect
-     */
-    abstract public function getCountrySelect(): AbstractCountrySelect;
 
     /** Returns data that are used to figure out destination point id
      * @return array
