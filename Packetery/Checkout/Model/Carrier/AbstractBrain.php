@@ -111,7 +111,7 @@ abstract class AbstractBrain
         $config = $carrier->getPacketeryConfig();
         $brain = $carrier->getPacketeryBrain();
 
-        if (!$this->isCollectionPossible($config, $brain, $request->getDestCountryId())) {
+        if (!$this->isCollectionPossible($config)) {
             return false;
         }
 
@@ -136,21 +136,15 @@ abstract class AbstractBrain
 
     /**
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
-     * @param \Packetery\Checkout\Model\Carrier\AbstractBrain $brain
-     * @param string $countryId
      * @return bool
      */
-    public function isCollectionPossible(AbstractConfig $config, AbstractBrain $brain, string $countryId): bool
+    public function isCollectionPossible(AbstractConfig $config): bool
     {
         if ($this->httpRequest->getModuleName() == self::MULTI_SHIPPING_MODULE_NAME) {
             return false;
         }
 
         if (!$config->isActive()) {
-            return false;
-        }
-
-        if (!$brain->hasSpecificCountryAllowed($config, $brain->getCountrySelect(), $countryId)) {
             return false;
         }
 
@@ -169,24 +163,5 @@ abstract class AbstractBrain
         }
 
         return $allowedMethods;
-    }
-
-    /**
-     * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
-     * @param string $countryId
-     * @return bool
-     */
-    public function hasSpecificCountryAllowed(AbstractConfig $config, AbstractCountrySelect $countrySelect, string $countryId): bool
-    {
-        if ($config->getApplicableCountries() === 1) {
-            $countries = $config->getSpecificCountries();
-            return empty($countries) || in_array($countryId, $countries);
-        }
-
-        if ($config->getApplicableCountries() === 0) {
-            return $countrySelect->getLabelByValue($countryId) !== null;
-        }
-
-        return false;
     }
 }

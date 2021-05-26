@@ -11,7 +11,6 @@
 				<model>Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier</model>
 				<active>0</active>
 				<title>Packeta</title>
-				<price>0.00</price>
 				<specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
 				<sallowspecific>0</sallowspecific>
 			</packetery>

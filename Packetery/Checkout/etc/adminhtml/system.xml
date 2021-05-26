@@ -30,10 +30,6 @@
                     <validate>required-entry</validate>
                     <backend_model>Packetery\Checkout\Block\System\Config\Form\ApiKeyValidate</backend_model>
                 </field>
-                <field id="default_price" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="61" translate="label" type="text">
-                    <label>Default price</label>
-                    <validate>required-entry validate-not-negative-number</validate>
-                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>
@@ -55,16 +51,6 @@
                     <source_model>Packetery\Checkout\Model\Config\Source\PaymentMethod</source_model>
                     <comment>The payment methods selected above will be considered as cash on delivery (for Packeta).</comment>
                 </field>
-                <field id="sallowspecific" translate="label" type="select" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Ship to Applicable Countries</label>
-                    <frontend_class>shipping-applicable-country</frontend_class>
-                    <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
-                </field>
-                <field id="specificcountry" translate="label" type="multiselect" sortOrder="1910" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Ship to Specific Countries</label>
-                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-                    <can_be_empty>1</can_be_empty>
-                </field>
                 <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="9000" translate="label" type="text">
                     <label>Sort Order</label>
                 </field>
@@ -84,10 +70,6 @@
                     <source_model>Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD\MethodSelect</source_model>
                     <can_be_empty>1</can_be_empty>
                 </field>
-                <field id="default_price" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="61" translate="label" type="text">
-                    <label>Default price</label>
-                    <validate>required-entry validate-not-negative-number</validate>
-                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>
@@ -102,16 +84,6 @@
                     <depends>
                         <field id="free_shipping_enable">1</field>
                     </depends>
-                </field>
-                <field id="sallowspecific" translate="label" type="select" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Ship to Applicable Countries</label>
-                    <frontend_class>shipping-applicable-country</frontend_class>
-                    <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
-                </field>
-                <field id="specificcountry" translate="label" type="multiselect" sortOrder="1910" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Ship to Specific Countries</label>
-                    <source_model>Packetery\Checkout\Model\Carrier\Imp\PacketeryDPD\CountrySelect</source_model>
-                    <can_be_empty>1</can_be_empty>
                 </field>
                 <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="9000" translate="label" type="text">
                     <label>Sort Order</label>

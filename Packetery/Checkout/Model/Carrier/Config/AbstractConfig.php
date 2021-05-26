@@ -53,15 +53,6 @@ abstract class AbstractConfig
     /**
      * @return float|null
      */
-    public function getDefaultPrice(): ?float
-    {
-        $value = $this->getConfigData('default_price');
-        return (is_numeric($value) ? (float)$value : null);
-    }
-
-    /** kilos
-     * @return float|null
-     */
     public function getMaxWeight(): ?float
     {
         $value = $this->getConfigData('max_weight');
@@ -88,25 +79,6 @@ abstract class AbstractConfig
         }
 
         return null;
-    }
-
-    /** 1 => Specific countries
-     *  0 => All countries
-     * @return int
-     */
-    public function getApplicableCountries(): int
-    {
-        $value = $this->getConfigData('sallowspecific'); // "Use system value" resolves in 0
-        return (int)$value;
-    }
-
-    /** Collection of allowed countries
-     * @return array
-     */
-    public function getSpecificCountries(): array
-    {
-        $value = $this->getConfigData('specificcountry');
-        return (is_string($value) ? explode(',', $value) : []);
     }
 
     /**

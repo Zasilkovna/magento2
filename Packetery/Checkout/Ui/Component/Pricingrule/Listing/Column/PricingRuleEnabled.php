@@ -50,9 +50,7 @@ class PricingRuleEnabled extends Column
                 $pointIdResolves = $brain->resolvePointId($method, $countryId) !== null;
             }
 
-            $countryAllowed = $brain->hasSpecificCountryAllowed($config, $brain->getCountrySelect(), $countryId);
-
-            if ($countryAllowed && $methodAllowed && $pointIdResolves) {
+            if ($methodAllowed && $pointIdResolves) {
                 return __('Enabled'); // if there is min 1 carrier, print Enabled
             }
         }

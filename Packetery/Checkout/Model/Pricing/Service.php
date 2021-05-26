@@ -56,15 +56,16 @@ class Service
     {
         $result = $this->rateResultFactory->create();
 
-        $weightTotal = $request->getPackageWeight();
-        $weightMax = $carrierConfig->getMaxWeight();
-
-        if ($this->hasValidWeight($weightTotal, $weightMax) === false) {
+        if ($request->getPackageWeight() > $carrierConfig->getMaxWeight()) {
             return null;
         }
 
         foreach ($methods as $allowedMethod => $methodLabel) {
             $pricingRule = $this->resolvePricingRule($allowedMethod, $request->getDestCountryId());
+            if ($pricingRule === null) {
+                continue;
+            }
+
             $price = $this->resolvePrice($request, $carrierConfig, $pricingRule);
             $method = $this->createRateMethod(
                 $allowedMethod,
@@ -73,20 +74,11 @@ class Service
                 $methodLabel,
                 $price
             );
+
             $result->append($method);
         }
 
         return $result;
-    }
-
-    /**
-     * @param float $weightTotal
-     * @param float|null $weightMax
-     * @return bool
-     */
-    private function hasValidWeight(float $weightTotal, ?float $weightMax): bool
-    {
-        return is_numeric($weightMax) && $weightTotal <= $weightMax;
     }
 
     /**
@@ -99,22 +91,19 @@ class Service
         $pricingRuleCollection = $this->pricingRuleCollectionFactory->create();
         $pricingRuleCollection->addFilter('method', $method);
         $pricingRuleCollection->addFilter('country_id', $destCountryId); // iso 2
-        $first = ($pricingRuleCollection->getFirstRecord() ?: null);
-
-        return $first;
+        return ($pricingRuleCollection->getFirstRecord() ?: null);
     }
 
     /**
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
-     * @param \Packetery\Checkout\Model\Pricingrule|null $pricingRule
+     * @param \Packetery\Checkout\Model\Pricingrule $pricingRule
      * @return float
      */
-    protected function resolvePrice(RateRequest $request, AbstractConfig $config, ?Pricingrule $pricingRule): float
+    protected function resolvePrice(RateRequest $request, AbstractConfig $config, Pricingrule $pricingRule): float
     {
-        $result = null;
-        $weightTotal = (float)$request->getPackageWeight();
-        $priceTotal = (float)$request->getPackageValue();
+        $weightTotal = $request->getPackageWeight();
+        $priceTotal = $request->getPackageValue();
 
         $freeShipping = $this->getFreeShippingThreshold($pricingRule, $config->getFreeShippingThreshold());
 
@@ -122,32 +111,18 @@ class Service
             return 0;
         }
 
-        $weightRules = null;
-        if ($pricingRule) {
-            $weightRules = $this->getWeightRulesByPricingRule($pricingRule);
-        }
-
-        if (!empty($weightRules)) {
-            $result = $this->resolveWeightedPrice($weightRules, $weightTotal, $config->getMaxWeight());
-        }
-
-        if ($result === null) {
-            $result = $config->getDefaultPrice();
-        }
-
-        return $result;
+        $weightRules = $this->getWeightRulesByPricingRule($pricingRule);
+        return $this->resolveWeightedPrice($weightRules, $weightTotal, $config->getMaxWeight());
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Weightrule[] $weightRules
+     * @param array $weightRules
      * @param float $weightTotal
+     * @param float $fallbackWeight
      * @return float|null
      */
-    protected function resolveWeightedPrice(array $weightRules, float $weightTotal, ?float $fallbackWeight = null): ?float
+    protected function resolveWeightedPrice(array $weightRules, float $weightTotal, float $fallbackWeight): ?float
     {
-        $minWeight = null;
-        $price = null;
-
         foreach ($weightRules as $rule) {
             $ruleMaxWeight = $rule->getMaxWeight();
             $rulePrice = $rule->getPrice();
@@ -161,13 +136,10 @@ class Service
                 continue;
             }
 
-            if ($minWeight === null || $minWeight > $ruleMaxWeight) {
-                $minWeight = $ruleMaxWeight;
-                $price = $rulePrice;
-            }
+            return $rulePrice;
         }
 
-        return $price;
+        return null;
     }
 
     /**
@@ -207,26 +179,27 @@ class Service
     {
         $collection = $this->weightRuleCollectionFactory->create();
         $collection->addFilter('packetery_pricing_rule_id', $pricingRule->getId());
+        $collection->setOrder('max_weight', 'ASC');
         return $collection->getItems();
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Pricingrule|null $pricingrule
+     * @param \Packetery\Checkout\Model\Pricingrule $pricingrule
      * @param float|null $globalFreeShipping
      * @return float|null
      */
-    protected function getFreeShippingThreshold(?Pricingrule $pricingrule, ?float $globalFreeShipping): ?float
+    protected function getFreeShippingThreshold(Pricingrule $pricingrule, ?float $globalFreeShipping): ?float
     {
-        $countryFreeShipping = ($pricingrule ? $pricingrule->getFreeShipment() : null);
+        $countryFreeShipping = $pricingrule->getFreeShipment();
 
         if (is_numeric($countryFreeShipping)) {
-            $freeShipping = $countryFreeShipping;
-        } elseif (is_numeric($globalFreeShipping)) {
-            $freeShipping = $globalFreeShipping;
-        } else {
-            $freeShipping = null; // disabled
+            return $countryFreeShipping;
         }
 
-        return ($freeShipping === null ? null : (float)$freeShipping);
+        if (is_numeric($globalFreeShipping)) {
+            return $globalFreeShipping;
+        }
+
+        return null;
     }
 }
