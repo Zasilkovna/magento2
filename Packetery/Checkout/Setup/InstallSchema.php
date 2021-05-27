@@ -158,6 +158,7 @@ class InstallSchema implements InstallSchemaInterface
         $this->ordersTable($setup);
         $this->pricingRulesTable($setup);
         $this->weightRulesTable($setup);
+        $this->carrierTable($setup);
 
         $setup->endSetup();
     }
@@ -273,6 +274,123 @@ class InstallSchema implements InstallSchemaInterface
         );
 
         $table->setComment('Packetery weight rules. Relates to packetery pricing rules.');
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @throws \Zend_Db_Exception
+     */
+    public function carrierTable(SchemaSetupInterface &$setup): void
+    {
+        $table = $setup->getConnection()->newTable(
+            $setup->getTable('packetery_carrier')
+        );
+
+        $this->columns($table, [
+            'id' => [
+                'type' => Table::TYPE_INTEGER,
+                'attr' => ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+            ],
+            'name' => [
+                'type' => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => false,
+                    'length' => '64',
+                    'after' => 'id'
+                ]
+            ],
+            'is_pickup_points' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'name',
+                ],
+            ],
+            'has_carrier_direct_label' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'is_pickup_points',
+                ],
+            ],
+            'separate_house_number' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'has_carrier_direct_label',
+                ],
+            ],
+            'customs_declarations' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'separate_house_number',
+                ],
+            ],
+            'requires_email' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'customs_declarations',
+                ],
+            ],
+            'requires_phone' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'requires_email',
+                ],
+            ],
+            'requires_size' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'requires_phone',
+                ],
+            ],
+            'disallows_cod' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'requires_size',
+                ],
+            ],
+            'country' => [
+                'type' => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => false,
+                    'length' => '3',
+                    'after' => 'disallows_cod',
+                ],
+            ],
+            'currency' => [
+                'type' => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => false,
+                    'length' => '3',
+                    'after' => 'country',
+                ],
+            ],
+            "max_weight" => [
+                'type' => Table::TYPE_DECIMAL,
+                'attr' => [
+                    'nullable' => false,
+                    'length' => '12,4',
+                    'after' => 'currency',
+                ],
+            ],
+            'deleted' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'max_weight',
+                ],
+            ],
+        ]);
+
+        $table->setComment('Packetery carriers regulary updated via cron job');
 
         $setup->getConnection()->createTable($table);
     }
