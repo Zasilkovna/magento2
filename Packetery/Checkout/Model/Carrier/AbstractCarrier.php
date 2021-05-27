@@ -43,7 +43,12 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
      */
     public function collectRates(RateRequest $request)
     {
-        return $this->packeteryBrain->collectRates($this, $request);
+        $result = $this->packeteryBrain->collectRates($this, $request);
+        if ($result === null) {
+            return false;
+        }
+
+        return $result;
     }
 
     /**
@@ -71,7 +76,7 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
         $select = $this->packeteryBrain->getMethodSelect();
         $selectedMethods = $this->packeteryBrain->getFinalAllowedMethods($this->getPacketeryConfig(), $select);
 
-        foreach ($selectedMethods->toArray() as $selectedMethod) {
+        foreach ($selectedMethods as $selectedMethod) {
             $result[$selectedMethod] = $select->getLabelByValue($selectedMethod);
         }
 

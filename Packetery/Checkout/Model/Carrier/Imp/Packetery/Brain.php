@@ -8,7 +8,7 @@ use Packetery\Checkout\Model\Carrier\Methods;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
-    /** @var \Packetery\Checkout\Model\Config\Source\MethodSelect */
+    /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect */
     private $methodSelect;
 
     /**
@@ -17,13 +17,13 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
+     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Packetery\Checkout\Model\Config\Source\MethodSelect $methodSelect
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect
     ) {
         parent::__construct($httpRequest, $pricingService, $scopeConfig);
         $this->methodSelect = $methodSelect;
@@ -38,7 +38,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
-     * @return \Packetery\Checkout\Model\Config\Source\MethodSelect
+     * @return \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect
      */
     public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect {
         return $this->methodSelect;

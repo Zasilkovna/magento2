@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Model\Config\Source;
+namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
 use Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
 use Packetery\Checkout\Model\Carrier\Methods;

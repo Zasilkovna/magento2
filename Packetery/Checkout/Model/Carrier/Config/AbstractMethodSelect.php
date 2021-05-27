@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Config;
 
-abstract class AbstractMethodSelect implements \Magento\Framework\Option\ArrayInterface
+abstract class AbstractMethodSelect implements \Magento\Framework\Data\OptionSourceInterface
 {
     /**
      * Options array

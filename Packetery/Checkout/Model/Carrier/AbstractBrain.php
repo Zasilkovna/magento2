@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier;
 
 use Magento\Quote\Model\Quote\Address\RateRequest;
+use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 use Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 
 /**
  * Use this service to extend custom carriers with new logic that is using dependencies. Good for avoiding constructor hell.
@@ -98,19 +98,19 @@ abstract class AbstractBrain
     /**
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
-     * @return false|\Magento\Shipping\Model\Rate\Result
+     * @return null|\Magento\Shipping\Model\Rate\Result
      */
-    public function collectRates(AbstractCarrier $carrier, RateRequest $request)
+    public function collectRates(AbstractCarrier $carrier, RateRequest $request): ?Result
     {
         $config = $carrier->getPacketeryConfig();
         $brain = $carrier->getPacketeryBrain();
 
         if (!$this->isCollectionPossible($config)) {
-            return false;
+            return null;
         }
 
         $methods = [];
-        foreach ($this->getFinalAllowedMethods($config, $brain->getMethodSelect())->toArray() as $selectedMethod) {
+        foreach ($this->getFinalAllowedMethods($config, $brain->getMethodSelect()) as $selectedMethod) {
             if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
                 if ($this->resolvePointId($selectedMethod, $request->getDestCountryId()) === null) {
                     continue;
@@ -120,12 +120,7 @@ abstract class AbstractBrain
             $methods[$selectedMethod] = $brain->getMethodSelect()->getLabelByValue($selectedMethod);
         }
 
-        $result = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods);
-        if (!$result instanceof \Magento\Shipping\Model\Rate\Result) {
-            return false;
-        }
-
-        return $result;
+        return $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods);
     }
 
     /**
@@ -148,12 +143,12 @@ abstract class AbstractBrain
     /**
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect $methodSelect
-     * @return \Packetery\Checkout\Model\Carrier\Config\AllowedMethods
+     * @return array
      */
-    public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): AllowedMethods {
+    public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): array {
         $allowedMethods = $config->getAllowedMethods();
-        if (empty($allowedMethods->toArray())) {
-            return new AllowedMethods($methodSelect->getMethods());
+        if (empty($allowedMethods)) {
+            return $methodSelect->getMethods();
         }
 
         return $allowedMethods;

@@ -131,12 +131,9 @@ class Service
                 $ruleMaxWeight = $fallbackWeight;
             }
 
-            $relevant = $weightTotal <= $ruleMaxWeight;
-            if ($relevant === false) {
-                continue;
+            if ($weightTotal <= $ruleMaxWeight) {
+                return $rulePrice;
             }
-
-            return $rulePrice;
         }
 
         return null;

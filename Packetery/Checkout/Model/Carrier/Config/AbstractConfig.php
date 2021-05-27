@@ -9,7 +9,7 @@ namespace Packetery\Checkout\Model\Carrier\Config;
  */
 abstract class AbstractConfig
 {
-    /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier  */
+    /** @var array  */
     protected $data;
 
     /**
@@ -82,12 +82,11 @@ abstract class AbstractConfig
     }
 
     /**
-     * @return \Packetery\Checkout\Model\Carrier\Config\AllowedMethods
+     * @return array
      */
-    public function getAllowedMethods(): AllowedMethods
+    public function getAllowedMethods(): array
     {
         $value = $this->getConfigData('allowedMethods');
-        $methods = (is_string($value) ? explode(',', $value) : []);
-        return new AllowedMethods($methods);
+        return (is_string($value) ? explode(',', $value) : []);
     }
 }

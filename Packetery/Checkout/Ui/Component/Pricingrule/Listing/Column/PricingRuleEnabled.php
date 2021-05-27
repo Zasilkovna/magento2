@@ -7,29 +7,30 @@ namespace Packetery\Checkout\Ui\Component\Pricingrule\Listing\Column;
 use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
+use Packetery\Checkout\Model\Carrier\AbstractCarrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class PricingRuleEnabled extends Column
 {
-    /** @var \Packetery\Checkout\Model\Carrier\Facade */
-    private $carrierFacade;
+    /** @var \Magento\Shipping\Model\Config */
+    private $shippingConfig;
 
     /**
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+     * @param \Magento\Shipping\Model\Config $shippingConfig
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
+        \Magento\Shipping\Model\Config $shippingConfig,
         array $components = [],
         array $data = []
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
-        $this->carrierFacade = $carrierFacade;
+        $this->shippingConfig = $shippingConfig;
     }
 
     /**
@@ -38,11 +39,14 @@ class PricingRuleEnabled extends Column
      */
     private function createCellContent(string $method, string $countryId): \Magento\Framework\Phrase
     {
-        $activeCarriers = $this->carrierFacade->getActiveCarriers();
-        foreach ($activeCarriers as $carrier) {
+        foreach ($this->shippingConfig->getActiveCarriers() as $carrier) {
+            if (!$carrier instanceof AbstractCarrier) {
+                continue;
+            }
+
             $config = $carrier->getPacketeryConfig();
             $brain = $carrier->getPacketeryBrain();
-            $methodAllowed = $brain->getFinalAllowedMethods($config, $carrier->getPacketeryBrain()->getMethodSelect())->hasAllowed($method);
+            $methodAllowed = in_array($method, $brain->getFinalAllowedMethods($config, $carrier->getPacketeryBrain()->getMethodSelect()));
 
             if ($method === Methods::PICKUP_POINT_DELIVERY) {
                 $pointIdResolves = true;
