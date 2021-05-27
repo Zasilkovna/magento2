@@ -293,20 +293,12 @@ class InstallSchema implements InstallSchemaInterface
                 'type' => Table::TYPE_INTEGER,
                 'attr' => ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
             ],
-            'carrier_id' => [
-                'type' => Table::TYPE_INTEGER,
-                'attr' => [
-                    'nullable' => false,
-                    'after' => 'id',
-                    'length' => '11',
-                ],
-            ],
             'name' => [
                 'type' => Table::TYPE_TEXT,
                 'attr' => [
                     'nullable' => false,
                     'length' => '64',
-                    'after' => 'carrier_id'
+                    'after' => 'id'
                 ]
             ],
             'is_pickup_points' => [
