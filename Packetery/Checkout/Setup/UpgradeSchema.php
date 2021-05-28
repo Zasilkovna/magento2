@@ -88,7 +88,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         if (version_compare($context->getVersion(), "2.0.6", "<")) {
-            $this->installSchema->carrierTable($setup); // todo test
+            $this->installSchema->carrierTable($setup);
         }
 
         $setup->endSetup();

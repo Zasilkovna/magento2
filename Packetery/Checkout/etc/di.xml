@@ -21,4 +21,12 @@
             <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Pricingrule</argument>
         </arguments>
     </virtualType>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="packetery_importFeedCarriers" xsi:type="object">Packetery\Checkout\Console\Command\ImportFeedCarriers</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
