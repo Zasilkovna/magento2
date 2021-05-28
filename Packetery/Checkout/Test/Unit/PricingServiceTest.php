@@ -62,6 +62,7 @@ class PricingServiceTest extends BaseTest
     {
         $pricingRule = $this->createPricingRule(20000, 'CZ');
         $weightRules = [
+            $this->createWeightRule(41, null),
             $this->createWeightRule(44, 3),
             $this->createWeightRule(58, 6),
             $this->createWeightRule(76.88, 9),
@@ -319,10 +320,10 @@ class PricingServiceTest extends BaseTest
 
     /**
      * @param float $price
-     * @param float $maxWeightKg
+     * @param float|null $maxWeightKg
      * @return \Packetery\Checkout\Model\Weightrule|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createWeightRule(float $price, float $maxWeightKg)
+    protected function createWeightRule(float $price, ?float $maxWeightKg)
     {
         $weightRule = $this->createMock(Weightrule::class);
         $weightRule->method('getPrice')->willReturn($price);

@@ -8,6 +8,7 @@ use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 use Packetery\Checkout\Model\Pricingrule;
+use Packetery\Checkout\Model\Weightrule;
 
 /**
  * Do not inject any Carrier related services due to dependency circulation
@@ -123,6 +124,15 @@ class Service
      */
     protected function resolveWeightedPrice(array $weightRules, float $weightTotal, float $fallbackWeight): ?float
     {
+        usort(
+            $weightRules,
+            function (Weightrule $a, Weightrule $b) use ($fallbackWeight) {
+                $weightA = ($a->getMaxWeight() ?? $fallbackWeight);
+                $weightB = ($b->getMaxWeight() ?? $fallbackWeight);
+                return $weightA <=> $weightB; // has to be sorted in ASC order
+            }
+        );
+
         foreach ($weightRules as $rule) {
             $ruleMaxWeight = $rule->getMaxWeight();
             $rulePrice = $rule->getPrice();
