@@ -38,8 +38,7 @@ class MigrateDefaultPrice extends Command
         \Magento\Config\Model\Config\Factory $configFactory,
         \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
-        \Packetery\Checkout\Model\Pricing\Service $pricingService
-        ,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ValueFactory $configValueFactory
     ) {
         parent::__construct();
@@ -94,7 +93,7 @@ class MigrateDefaultPrice extends Command
 
         foreach ($allowedMethods as $allowedMethod) {
             foreach ($countries as $country) {
-                
+
                 $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country);
 
                 if ($resolvedPricingRule === null) {
