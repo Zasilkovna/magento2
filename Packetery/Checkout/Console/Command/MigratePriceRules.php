@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Console\Command;
 
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
+use Packetery\Checkout\Model\Carrier\Methods;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -106,7 +106,7 @@ class MigratePriceRules extends Command
             $pricingRule = [
                 'free_shipment' => (is_numeric($countryFreeShipping) ? (float)$countryFreeShipping : null),
                 'country_id' => strtoupper($country),
-                'method' => AllowedMethods::PICKUP_POINT_DELIVERY,
+                'method' => Methods::PICKUP_POINT_DELIVERY,
             ];
 
             usort($countryRules, function ($countryRuleA, $countryRuleB) {

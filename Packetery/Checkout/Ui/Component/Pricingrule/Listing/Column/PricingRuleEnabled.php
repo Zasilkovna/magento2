@@ -5,39 +5,32 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Component\Pricingrule\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
+use Packetery\Checkout\Model\Carrier\AbstractCarrier;
+use Packetery\Checkout\Model\Carrier\Methods;
 
 class PricingRuleEnabled extends Column
 {
-    /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
-    protected $packeteryConfig;
-
-    /** @var \Packetery\Checkout\Model\Pricing\Service */
-    private $pricingService;
+    /** @var \Magento\Shipping\Model\Config */
+    private $shippingConfig;
 
     /**
-     * MaxWeight constructor.
-     *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
-     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Magento\Shipping\Model\Config $shippingConfig
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig,
-        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Magento\Shipping\Model\Config $shippingConfig,
         array $components = [],
         array $data = []
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
-        $this->packeteryConfig = $packeteryConfig;
-        $this->pricingService = $pricingService;
+        $this->shippingConfig = $shippingConfig;
     }
 
     /**
@@ -46,23 +39,27 @@ class PricingRuleEnabled extends Column
      */
     private function createCellContent(string $method, string $countryId): \Magento\Framework\Phrase
     {
-        $methodAllowed = $this->packeteryConfig->getAllowedMethods()->hasAllowed($method);
+        foreach ($this->shippingConfig->getActiveCarriers() as $carrier) {
+            if (!$carrier instanceof AbstractCarrier) {
+                continue;
+            }
 
-        if ($method === AllowedMethods::PICKUP_POINT_DELIVERY) {
-            $pointIdResolves = true;
-        } else {
-            $pointIdResolves = $this->pricingService->resolvePointId($method, $countryId);
+            $config = $carrier->getPacketeryConfig();
+            $brain = $carrier->getPacketeryBrain();
+            $methodAllowed = in_array($method, $brain->getFinalAllowedMethods($config, $carrier->getPacketeryBrain()->getMethodSelect()));
+
+            if ($method === Methods::PICKUP_POINT_DELIVERY) {
+                $pointIdResolves = true;
+            } else {
+                $pointIdResolves = $brain->resolvePointId($method, $countryId) !== null;
+            }
+
+            if ($methodAllowed && $pointIdResolves) {
+                return __('Enabled'); // if there is min 1 carrier, print Enabled
+            }
         }
 
-        $countryAllowed = $this->packeteryConfig->hasSpecificCountryAllowed($countryId);
-
-        if ($countryAllowed && $methodAllowed && $pointIdResolves) {
-            $result = __('Enabled');
-        } else {
-            $result = __('Disabled');
-        }
-
-        return $result;
+        return __('Disabled');
     }
 
     /**

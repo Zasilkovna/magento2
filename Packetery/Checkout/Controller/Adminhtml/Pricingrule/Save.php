@@ -10,62 +10,25 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NotFoundException;
-use Packetery\Checkout\Model\Pricing;
 
 class Save extends Action implements HttpPostActionInterface
 {
     const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
 
-    /** @var \Packetery\Checkout\Model\PricingruleFactory */
-    private $pricingruleFactory;
-
-    /** @var \Packetery\Checkout\Model\WeightruleFactory */
-    private $weightruleFactory;
-
-    /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection */
-    private $pricingRuleCollectionFactory;
-
-    /** @var \Packetery\Checkout\Model\ResourceModel\Weightrule\Collection */
-    private $weightRuleCollectionFactory;
-
-    /** @var Pricing\Service */
-    private $pricingService;
-
     /** @var \Packetery\Checkout\Model\ResourceModel\PricingruleRepository */
     private $pricingruleRepository;
-
-    /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
-    private $packeteryConfig;
 
     /**
      * Save constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory
-     * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
-     * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
-     * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
-     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
-     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
      */
     public function __construct(
         Context $context,
-        \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory,
-        \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory,
-        \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory,
-        \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory,
-        \Packetery\Checkout\Model\Pricing\Service $pricingService,
-        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
-        \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
+        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
     ) {
-        $this->pricingruleFactory = $pricingruleFactory;
-        $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
-        $this->weightruleFactory = $weightruleFactory;
-        $this->weightRuleCollectionFactory = $weightRuleCollectionFactory;
-        $this->pricingService = $pricingService;
         $this->pricingruleRepository = $pricingruleRepository;
-        $this->packeteryConfig = $packeteryConfig;
 
         parent::__construct($context);
     }
@@ -94,7 +57,7 @@ class Save extends Action implements HttpPostActionInterface
             $this->messageManager->addErrorMessage(__('Price rule for specified country already exists'));
             return $this->createPricingRuleDetailRedirect((isset($postData['id']) ? $postData['id'] : null));
         } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
-            $this->messageManager->addErrorMessage(__('The weight is invalid', $this->packeteryConfig->getMaxWeight()));
+            $this->messageManager->addErrorMessage(__('The weight is invalid'));
             return $this->createPricingRuleDetailRedirect((isset($postData['id']) ? $postData['id'] : null));
         } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
             $this->messageManager->addErrorMessage(__('Pricing rule not found'));
