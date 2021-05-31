@@ -8,8 +8,8 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote\Address\RateResult\Method;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
-use Magento\Shipping\Model\Rate\ResultFactory;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
+use Packetery\Checkout\Model\Carrier\AbstractBrain;
+use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Pricing;
 use Packetery\Checkout\Model\Pricingrule;
 use Packetery\Checkout\Model\Weightrule;
@@ -30,29 +30,29 @@ class PricingServiceTest extends BaseTest
             $this->createWeightRule(79, 10),
         ];
 
-        $this->assertEquals(null, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 11]));
-        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 10]));
-        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 8]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 5]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 1]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 0]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, -2]));
+        $this->assertEquals(null, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 11, 999]));
+        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 10, 999]));
+        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 8, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 5, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 1, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 0, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, -2, 999]));
 
         $weightRules = [
-            $this->createWeightRule(89, 15),
             $this->createWeightRule(49, 5),
             $this->createWeightRule(79, 10),
+            $this->createWeightRule(89, 15),
         ];
 
-        $this->assertEquals(null, $this->invokeMethod($service, 'resolveWeightedPrice', [[], 20]));
-        $this->assertEquals(null, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 20]));
-        $this->assertEquals(89, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 11]));
-        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 10]));
-        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 8]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 5]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 1]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 0]));
-        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, -2]));
+        $this->assertEquals(null, $this->invokeMethod($service, 'resolveWeightedPrice', [[], 20, 999]));
+        $this->assertEquals(null, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 20, 999]));
+        $this->assertEquals(89, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 11, 999]));
+        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 10, 999]));
+        $this->assertEquals(79, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 8, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 5, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 1, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, 0, 999]));
+        $this->assertEquals(49, $this->invokeMethod($service, 'resolveWeightedPrice', [$weightRules, -2, 999]));
     }
 
     /**
@@ -62,16 +62,16 @@ class PricingServiceTest extends BaseTest
     {
         $pricingRule = $this->createPricingRule(20000, 'CZ');
         $weightRules = [
-            $this->createWeightRule(76.88, 9),
-            $this->createWeightRule(58, 6),
+            $this->createWeightRule(41, null),
             $this->createWeightRule(44, 3),
+            $this->createWeightRule(58, 6),
+            $this->createWeightRule(76.88, 9),
         ];
 
         /** @var \Packetery\Checkout\Model\Pricing\Service|MockObject $service */
         $service = $this->createProxy(
             Pricing\Service::class,
             [
-                'methodSelect' => $this->createProxy(\Packetery\Checkout\Model\Config\Source\MethodSelect::class),
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
@@ -85,14 +85,15 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => 'CZ']
         );
 
-        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\PacketeryConfig::class);
-        $config->method('getDefaultPrice')->willReturn(100.0);
+        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(null);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config, [
+            Methods::PICKUP_POINT_DELIVERY => $method->getLabelByValue(Methods::PICKUP_POINT_DELIVERY)
+        ]);
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -114,7 +115,10 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 11, 'getPackageValue' => 300, 'getDestCountryId' => 'CZ']
         );
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config, [
+            Methods::PICKUP_POINT_DELIVERY => $method->getLabelByValue(Methods::PICKUP_POINT_DELIVERY)
+        ]);
         $this->assertNull($result);
 
         $request = $this->createProxyWithMethods(
@@ -124,7 +128,10 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 10, 'getPackageValue' => 50000, 'getDestCountryId' => 'CZ']
         );
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config, [
+            Methods::PICKUP_POINT_DELIVERY => $method->getLabelByValue(Methods::PICKUP_POINT_DELIVERY)
+        ]);
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -141,7 +148,6 @@ class PricingServiceTest extends BaseTest
         $service = $this->createProxy(
             Pricing\Service::class,
             [
-                'methodSelect' => $this->createProxy(\Packetery\Checkout\Model\Config\Source\MethodSelect::class),
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
@@ -155,22 +161,19 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => 'DE']
         );
 
-        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\PacketeryConfig::class);
-        $config->method('getDefaultPrice')->willReturn(100.0);
+        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config->method('getMaxWeight')->willReturn(10.0);
         $config->method('getFreeShippingThreshold')->willReturn(333.58);
         $config->method('getTitle')->willReturn('title');
-        $config->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::PICKUP_POINT_DELIVERY]));
 
-        $result = $service->collectRates(new Pricing\Request($request, $config, 'packetery'));
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config, [
+            Methods::PICKUP_POINT_DELIVERY => $method->getLabelByValue(Methods::PICKUP_POINT_DELIVERY)
+        ]);
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
-        $this->assertNotEmpty($rates);
-
-        /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
-        $method = array_shift($rates);
-        $this->assertEquals(100, $method->getData('cost'));
+        $this->assertEmpty($rates, 'For empty pricing rule there are no rates due to country per method limitation. Default price fallback was removed.');
     }
 
     /**
@@ -179,13 +182,14 @@ class PricingServiceTest extends BaseTest
     public function testAddressDeliveryMethodRateCollection()
     {
         $pricingRule = $this->createPricingRule(400, 'CZ');
-        $weightRules = [];
+        $weightRules = [
+            $this->createWeightRule(100.01, 10),
+        ];
 
         /** @var \Packetery\Checkout\Model\Pricing\Service|MockObject $service */
         $service = $this->createProxy(
             Pricing\Service::class,
             [
-                'methodSelect' => $this->createProxy(\Packetery\Checkout\Model\Config\Source\MethodSelect::class),
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
@@ -199,14 +203,15 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => $pricingRule->getCountryId()]
         );
 
-        $config2 = $this->createMock(\Packetery\Checkout\Model\Carrier\PacketeryConfig::class);
-        $config2->method('getDefaultPrice')->willReturn(100.01);
+        $config2 = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config2->method('getMaxWeight')->willReturn(10.0);
         $config2->method('getFreeShippingThreshold')->willReturn(333.58);
         $config2->method('getTitle')->willReturn('title');
-        $config2->method('getAllowedMethods')->willReturn(new AllowedMethods([AllowedMethods::ADDRESS_DELIVERY]));
 
-        $result = $service->collectRates(new Pricing\Request($request, $config2, 'packetery'));
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config2, [
+            Methods::ADDRESS_DELIVERY => $method->getLabelByValue(Methods::ADDRESS_DELIVERY)
+        ]);
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -216,7 +221,7 @@ class PricingServiceTest extends BaseTest
         $method = array_shift($rates);
 
         $this->assertEquals(100.01, $method->getData('cost'));
-        $this->assertEquals(AllowedMethods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
+        $this->assertEquals(Methods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
 
         $request = $this->createProxyWithMethods(
             \Magento\Quote\Model\Quote\Address\RateRequest::class,
@@ -225,7 +230,10 @@ class PricingServiceTest extends BaseTest
             ['getPackageWeight' => 5, 'getPackageValue' => 400, 'getDestCountryId' => $pricingRule->getCountryId()]
         );
 
-        $result = $service->collectRates(new Pricing\Request($request, $config2, 'packetery'));
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config2, [
+            Methods::ADDRESS_DELIVERY => $method->getLabelByValue(Methods::ADDRESS_DELIVERY)
+        ]);
         $this->assertNotNull($result);
 
         $rates = $result->getAllRates();
@@ -235,7 +243,7 @@ class PricingServiceTest extends BaseTest
         $method = array_shift($rates);
 
         $this->assertEquals(0, $method->getData('cost')); // free shipping
-        $this->assertEquals(AllowedMethods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
+        $this->assertEquals(Methods::ADDRESS_DELIVERY, $method->getData('method')); // for CZ there is address delivery
     }
 
     /**
@@ -312,10 +320,10 @@ class PricingServiceTest extends BaseTest
 
     /**
      * @param float $price
-     * @param float $maxWeightKg
+     * @param float|null $maxWeightKg
      * @return \Packetery\Checkout\Model\Weightrule|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createWeightRule(float $price, float $maxWeightKg)
+    protected function createWeightRule(float $price, ?float $maxWeightKg)
     {
         $weightRule = $this->createMock(Weightrule::class);
         $weightRule->method('getPrice')->willReturn($price);

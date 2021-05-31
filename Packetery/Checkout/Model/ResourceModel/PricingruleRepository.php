@@ -18,9 +18,6 @@ class PricingruleRepository
     /** @var \Packetery\Checkout\Model\WeightruleFactory */
     private $weightruleFactory;
 
-    /** @var \Packetery\Checkout\Model\Carrier\PacketeryConfig */
-    private $packeteryConfig;
-
     /**
      * PricingruleRepository constructor.
      *
@@ -28,15 +25,13 @@ class PricingruleRepository
      * @param \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory
      * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
      * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
-     * @param \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig
      */
-    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory, \Packetery\Checkout\Model\Carrier\PacketeryConfig $packeteryConfig)
+    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory)
     {
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
         $this->pricingruleFactory = $pricingruleFactory;
         $this->weightRuleCollectionFactory = $weightRuleCollectionFactory;
         $this->weightruleFactory = $weightruleFactory;
-        $this->packeteryConfig = $packeteryConfig;
     }
 
     /**
@@ -67,11 +62,6 @@ class PricingruleRepository
      */
     public function validatePricingRuleMaxWeight(array $weightRules): bool
     {
-        $globalMaxWeight = $this->packeteryConfig->getMaxWeight();
-        if (!is_numeric($globalMaxWeight)) {
-            return false;
-        }
-
         $usedWeights = [];
         foreach ($weightRules as $weightRule) {
             $weight = $weightRule['max_weight'];
@@ -82,14 +72,6 @@ class PricingruleRepository
             }
 
             $usedWeights[$key] = 1;
-
-            if (empty($weight)) {
-                continue;
-            }
-
-            if ($weight > $globalMaxWeight) {
-                return false;
-            }
         }
 
         return true;

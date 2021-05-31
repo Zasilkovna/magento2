@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Component\Pricingrule\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
-use Packetery\Checkout\Model\Carrier\Config\AllowedMethods;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 
