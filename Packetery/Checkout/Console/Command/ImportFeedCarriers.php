@@ -63,6 +63,11 @@ class ImportFeedCarriers extends Command
         $content = $response->getBody()->getContents();
         $data = json_decode($content);
 
+        if (empty($data) || !isset($data->carriers)) {
+            $output->writeln('An error has occurred');
+            return;
+        }
+
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->collectionFactory->create();
         $collection->setDataToAll(
