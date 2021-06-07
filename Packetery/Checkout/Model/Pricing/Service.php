@@ -7,6 +7,7 @@ namespace Packetery\Checkout\Model\Pricing;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+use Packetery\Checkout\Model\Carrier\MethodCode;
 use Packetery\Checkout\Model\Pricingrule;
 use Packetery\Checkout\Model\Weightrule;
 
@@ -51,9 +52,10 @@ class Service
      * @param string $carrierCode
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $carrierConfig
      * @param array $methods
+     * @param int|null $dynamicCarrierId
      * @return \Magento\Shipping\Model\Rate\Result|null
      */
-    public function collectRates(RateRequest $request, string $carrierCode, AbstractConfig $carrierConfig, array $methods): ?Result
+    public function collectRates(RateRequest $request, string $carrierCode, AbstractConfig $carrierConfig, array $methods, ?int $dynamicCarrierId = null): ?Result
     {
         $result = $this->rateResultFactory->create();
 
@@ -62,14 +64,16 @@ class Service
         }
 
         foreach ($methods as $allowedMethod => $methodLabel) {
-            $pricingRule = $this->resolvePricingRule($allowedMethod, $request->getDestCountryId());
-            if ($pricingRule === null) {
+            $pricingRule = $this->resolvePricingRule($allowedMethod, $request->getDestCountryId(), $carrierCode, $dynamicCarrierId);
+            if ($pricingRule === null || $pricingRule->getEnabled() === false) {
                 continue;
             }
 
             $price = $this->resolvePrice($request, $carrierConfig, $pricingRule);
+
+            $methodCode = new MethodCode($allowedMethod, $dynamicCarrierId);
             $method = $this->createRateMethod(
-                $allowedMethod,
+                $methodCode->toString(),
                 $carrierCode,
                 $carrierConfig->getTitle(),
                 $methodLabel,
@@ -85,13 +89,21 @@ class Service
     /**
      * @param string $method
      * @param string $destCountryId
+     * @param string $carrierCode
+     * @param int|null $carrierId
      * @return \Packetery\Checkout\Model\Pricingrule|null
      */
-    public function resolvePricingRule(string $method, string $destCountryId): ?Pricingrule
+    public function resolvePricingRule(string $method, string $destCountryId, string $carrierCode, ?int $carrierId = null): ?Pricingrule
     {
         $pricingRuleCollection = $this->pricingRuleCollectionFactory->create();
         $pricingRuleCollection->addFilter('method', $method);
         $pricingRuleCollection->addFilter('country_id', $destCountryId); // iso 2
+        $pricingRuleCollection->addFilter('carrier_code', $carrierCode);
+
+        if ($carrierId !== null) {
+            $pricingRuleCollection->addFilter('carrier_id', $carrierId);
+        }
+
         return ($pricingRuleCollection->getFirstRecord() ?: null);
     }
 
@@ -182,7 +194,7 @@ class Service
      * @param \Packetery\Checkout\Model\Pricingrule $pricingRule
      * @return array
      */
-    protected function getWeightRulesByPricingRule(Pricingrule $pricingRule): array
+    public function getWeightRulesByPricingRule(Pricingrule $pricingRule): array
     {
         $collection = $this->weightRuleCollectionFactory->create();
         $collection->addFilter('packetery_pricing_rule_id', $pricingRule->getId());

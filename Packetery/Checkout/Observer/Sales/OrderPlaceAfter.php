@@ -5,6 +5,7 @@ namespace Packetery\Checkout\Observer\Sales;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\InputException;
 use Packetery\Checkout\Model\Carrier\AbstractBrain;
+use Packetery\Checkout\Model\Carrier\MethodCode;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
@@ -88,7 +89,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         {
             // new order from frontend
             $shippingMethod = $order->getShippingMethod(true);
-            $deliveryMethod = $shippingMethod['method'];
+            $deliveryMethod = MethodCode::fromString($shippingMethod['method']);
             if ($deliveryMethod === Methods::PICKUP_POINT_DELIVERY) {
                 // pickup point delivery
                 $point = $postData->packetery->point;
@@ -99,7 +100,12 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             } else {
                 /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier */
                 $carrier = $this->carrierFactory->create($shippingMethod['carrier_code']);
-                $pointId = $carrier->getPacketeryBrain()->resolvePointId($deliveryMethod, $order->getShippingAddress()->getCountryId());
+                $pointId = $carrier->getPacketeryBrain()->resolvePointId(
+                    $deliveryMethod->getMethod(),
+                    $order->getShippingAddress()->getCountryId(),
+                    $carrier->getPacketeryBrain()->getDynamicCarrierById($deliveryMethod->getDynamicCarrierId())
+                );
+
                 $pointName = $deliveryMethod; // translated on demand
             }
         }

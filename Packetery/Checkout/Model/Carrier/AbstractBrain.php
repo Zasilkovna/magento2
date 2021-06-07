@@ -69,6 +69,13 @@ abstract class AbstractBrain
      * @return string
      */
     public function getCarrierCode(): string {
+        return static::getCarrierCodeStatic();
+    }
+
+    /** Returns unique carrier identified in packetery context
+     * @return string
+     */
+    public static function getCarrierCodeStatic(): string {
         $reflection = new \ReflectionClass(static::class);
         $fileName = $reflection->getFileName();
         $carrierDir = basename(dirname($fileName));
@@ -86,21 +93,32 @@ abstract class AbstractBrain
     abstract protected function getResolvableDestinationData(): array;
 
     /**
+     * @param string $method
      * @param string $countryId
+     * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
      * @return int|null
      */
-    public function resolvePointId(string $method, string $countryId): ?int
+    public function resolvePointId(string $method, string $countryId, ?\Packetery\Checkout\Model\Carrier $dynamicCarrier = null): ?int
     {
         $data = $this->getResolvableDestinationData();
         return ($data[$method]['countryBranchIds'][$countryId] ?? null);
     }
 
+    /** Used only by Packeta Dynamic
+     * @param int $id
+     * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Carrier|null
+     */
+    public function getDynamicCarrierById(?int $id): ?\Packetery\Checkout\Model\Carrier {
+        return null; // majority of Magento carriers do not have dynamic carriers
+    }
+
     /**
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
-     * @return null|\Magento\Shipping\Model\Rate\Result
+     * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
+     * @return \Magento\Shipping\Model\Rate\Result|null
      */
-    public function collectRates(AbstractCarrier $carrier, RateRequest $request): ?Result
+    public function collectRates(AbstractCarrier $carrier, RateRequest $request, ?\Packetery\Checkout\Model\Carrier $dynamicCarrier = null): ?Result
     {
         $config = $carrier->getPacketeryConfig();
         $brain = $carrier->getPacketeryBrain();

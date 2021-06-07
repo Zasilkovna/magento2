@@ -4,16 +4,16 @@
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">
-                packetery_pricingrule_multiDetail.packetery_pricingrule_item_detail_data_source
+                packetery_pricingrule_multiDetail.packetery_checkout_carrierCountry_listing_data_source
             </item>
             <item name="deps" xsi:type="string">
-                packetery_pricingrule_multiDetail.packetery_pricingrule_item_detail_data_source
+                packetery_pricingrule_multiDetail.packetery_checkout_carrierCountry_listing_data_source
             </item>
         </item>
         <item name="label" xsi:type="string" translate="true">Pricing rule</item>
         <item name="config" xsi:type="array">
             <item name="dataScope" xsi:type="string">data</item>
-            <item name="namespace" xsi:type="string">packetery_pricingrule_item_detail</item>
+            <item name="namespace" xsi:type="string">packetery_pricingrule_multiDetail</item>
         </item>
         <item name="layout" xsi:type="array">
             <!--            <item name="navContainerName" xsi:type="string">left</item>-->
@@ -35,18 +35,12 @@
             </item>
         </item>
     </argument>
-    <dataSource name="packetery_pricingrule_item_detail_data_source">
+    <dataSource name="packetery_checkout_carrierCountry_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Packetery\Checkout\Ui\Pricingrule\CarrierDataProvider</argument>
-            <argument name="name" xsi:type="string">packetery_pricingrule_item_detail_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">id</argument>
-            <argument name="requestFieldName" xsi:type="string">id</argument>
-            <argument name="collectionFactory" xsi:type="object">
-                Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory
-            </argument>
-            <argument name="weightRuleCollectionFactory" xsi:type="object">
-                Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory
-            </argument>
+            <argument name="name" xsi:type="string">packetery_checkout_carrierCountry_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">country</argument>
+            <argument name="requestFieldName" xsi:type="string">country</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="submit_url" xsi:type="url" path="*/*/multiSave"/>

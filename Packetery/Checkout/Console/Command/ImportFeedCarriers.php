@@ -23,20 +23,26 @@ class ImportFeedCarriers extends Command
     /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
     private $scopeConfig;
 
+    /** @var \Packetery\Checkout\Model\ResourceModel\PricingruleRepository */
+    private $pricingRuleRepository;
+
     /**
      * @param \GuzzleHttp\Client $client
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $collectionFactory
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingRuleRepository
      */
     public function __construct(
         \GuzzleHttp\Client $client,
         \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $collectionFactory,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingRuleRepository
     ) {
         parent::__construct();
         $this->client = $client;
         $this->collectionFactory = $collectionFactory;
         $this->scopeConfig = $scopeConfig;
+        $this->pricingRuleRepository = $pricingRuleRepository;
     }
 
     /**
@@ -113,6 +119,8 @@ class ImportFeedCarriers extends Command
                 $collection->save();
             }
         }
+//
+//        $this->pricingRuleRepository->disablePricingRulesByDynamicCarriers();
 
         $output->writeln('Carrier feed import ended successfully');
     }

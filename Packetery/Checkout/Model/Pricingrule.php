@@ -61,4 +61,12 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
         $value = ($this->getData('method') ?: null);
         return ($value === null ? null : (string)$value);
     }
+
+    /**
+     * @return bool
+     */
+    public function getEnabled(): bool
+    {
+        return (bool)$this->getData('enabled');
+    }
 }

@@ -35,9 +35,12 @@ class PricingRuleEnabled extends Column
 
     /**
      * @param string $method
+     * @param string $countryId
+     * @param string $carrierCode
+     * @param int|null $carrierId
      * @return \Magento\Framework\Phrase
      */
-    private function createCellContent(string $method, string $countryId): \Magento\Framework\Phrase
+    private function createCellContent(string $method, string $countryId, string $carrierCode, ?int $carrierId): \Magento\Framework\Phrase
     {
         foreach ($this->shippingConfig->getActiveCarriers() as $carrier) {
             if (!$carrier instanceof AbstractCarrier) {
@@ -51,7 +54,7 @@ class PricingRuleEnabled extends Column
             if ($method === Methods::PICKUP_POINT_DELIVERY) {
                 $pointIdResolves = true;
             } else {
-                $pointIdResolves = $brain->resolvePointId($method, $countryId) !== null;
+                $pointIdResolves = $brain->resolvePointId($method, $countryId) !== null; // todo pass carrier_id
             }
 
             if ($methodAllowed && $pointIdResolves) {
@@ -70,7 +73,7 @@ class PricingRuleEnabled extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                $item[$this->getData('name')] = $this->createCellContent($item["method"], $item["country_id"]);
+                $item[$this->getData('name')] = $this->createCellContent($item["method"], $item["country_id"], $item["carrier_code"], $item["carrier_id"]);
             }
         }
 

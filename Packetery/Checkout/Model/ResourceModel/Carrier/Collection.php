@@ -18,4 +18,11 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct() {
         $this->_init('Packetery\Checkout\Model\Carrier', 'Packetery\Checkout\Model\ResourceModel\Carrier');
     }
+
+    /**
+     * @return \Packetery\Checkout\Model\Carrier[]
+     */
+    public function getItems() {
+        return parent::getItems();
+    }
 }

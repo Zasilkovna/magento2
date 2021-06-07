@@ -18,19 +18,30 @@ class MultiSave extends Action implements HttpPostActionInterface
     /** @var \Packetery\Checkout\Model\ResourceModel\PricingruleRepository */
     private $pricingruleRepository;
 
+    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
+    private $carrierCollectionFactory;
+
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     /**
-     * Save constructor.
+     * MultiSave constructor.
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
+     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
     public function __construct(
         Context $context,
-        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
+        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
+        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
     ) {
-        $this->pricingruleRepository = $pricingruleRepository;
-
         parent::__construct($context);
+        $this->pricingruleRepository = $pricingruleRepository;
+        $this->carrierCollectionFactory = $carrierCollectionFactory;
+        $this->carrierFacade = $carrierFacade;
     }
 
     /**
@@ -42,32 +53,57 @@ class MultiSave extends Action implements HttpPostActionInterface
             throw new NotFoundException(__('Page not found'));
         }
 
-        throw new NotFoundException(__('Page not found')); //todo rm
+        $country = null;
 
-        $postData = $this->getRequest()->getPostValue()['general'];
+        $postData = $this->getRequest()->getPostValue()['shipping_methods'];
 
         foreach ($postData as &$carrierPriceRule) {
-            $weightRules = ($carrierPriceRule['weightRules']['weightRules'] ?? []);
-            unset($carrierPriceRule['weightRules']);
+            $carrierEnabled = $carrierPriceRule['enabled'];
+            $country = $carrierPriceRule['country'];
+            $pricingRule = &$carrierPriceRule['pricing_rule'];
+            $pricingRule['enabled'] = (int)$carrierEnabled;
+            $carrierCode = $pricingRule['carrier_code'];
+            $carrierId = $pricingRule['carrier_id'] ?? null;
+            $carrierId = $carrierId === null ? null : (int)$carrierId;
+            $carrierName = $carrierPriceRule['carrier_name'] ?? null;
+            $carrierPublicName = $this->carrierFacade->getPublicName($carrierCode, $carrierId);
 
-            if (empty($carrierPriceRule['free_shipment']) && !is_numeric($carrierPriceRule['free_shipment'])) {
-                $carrierPriceRule['free_shipment'] = null; // empty string is casted to 0
+            if (!$carrierEnabled) {
+                if (isset($pricingRule['id'])) {
+                    $this->pricingruleRepository->setPricingRuleEnabled((int)$pricingRule['id'], (bool)$carrierEnabled);
+                }
+                continue;
+            }
+
+            if ($carrierName) {
+                $this->carrierFacade->updateCarrierName($carrierName, $carrierCode, $carrierId);
+            }
+
+            $weightRules = $pricingRule['weight_rules']['weight_rules'] ?? [];
+            unset($pricingRule['weight_rules']);
+
+            if (empty($pricingRule['free_shipment']) && !is_numeric($pricingRule['free_shipment'])) {
+                $pricingRule['free_shipment'] = null; // empty string is casted to 0
             }
 
             try {
-                $this->pricingruleRepository->savePricingRule($carrierPriceRule, $weightRules);
+                $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
             } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
-                $this->messageManager->addErrorMessage(__('Price rule for specified country already exists')); // todo what carrier does it relates to?
-                return $this->createPricingRuleDetailRedirect((isset($carrierPriceRule['id']) ? $carrierPriceRule['id'] : null));
+                $this->messageManager->addErrorMessage($carrierPublicName);
+                $this->messageManager->addErrorMessage(__('Price rule for specified country already exists'));
+                return $this->createRedirect($country);
             } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
+                $this->messageManager->addErrorMessage($carrierPublicName);
                 $this->messageManager->addErrorMessage(__('The weight is invalid'));
-                return $this->createPricingRuleDetailRedirect((isset($carrierPriceRule['id']) ? $carrierPriceRule['id'] : null));
+                return $this->createRedirect($country);
             } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
+                $this->messageManager->addErrorMessage($carrierPublicName);
                 $this->messageManager->addErrorMessage(__('Pricing rule not found'));
                 return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/carrierCountry/index');
             } catch (\Packetery\Checkout\Model\Exception\WeightRuleMissing $e) {
+                $this->messageManager->addErrorMessage($carrierPublicName);
                 $this->messageManager->addErrorMessage(__('Weight rule is missing'));
-                return $this->createPricingRuleDetailRedirect((isset($carrierPriceRule['id']) ? $carrierPriceRule['id'] : null));
+                return $this->createRedirect($country);
             }
         }
 
@@ -75,19 +111,19 @@ class MultiSave extends Action implements HttpPostActionInterface
             __('Saved')
         );
 
-        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/carrierCountry/index'); // todo move to pricerule controller ?
+        return $this->createRedirect($country);
     }
 
     /**
-     * @param $id
+     * @param $country
      * @return \Magento\Framework\Controller\Result\Redirect
      */
-    private function createPricingRuleDetailRedirect($id): Redirect
+    private function createRedirect($country = null): Redirect
     {
-        if ($id > 0) {
-            return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/pricingrule/multiDetail/country/' . $id);
+        if ($country) {
+            return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/pricingrule/multiDetail/country/' . $country);
         }
 
-        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/carrierCountry/index');
+        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/carrierCountry/index'); // todo move to pricerule controller ?
     }
 }

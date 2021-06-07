@@ -221,7 +221,32 @@ class InstallSchema implements InstallSchemaInterface
                     'comment' => 'Related delivery method',
                     'after' => 'country_id'
                 ]
-            ]
+            ],
+            "carrier_code" => [
+                "type" => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => false,
+                    'length' => '64',
+                    'comment' => 'Magento unique carrier class identifier',
+                    'after' => 'method'
+                ]
+            ],
+            "carrier_id" => [
+                "type" => Table::TYPE_INTEGER,
+                'attr' => [
+                    'nullable' => true,
+                    'length' => '11',
+                    'comment' => 'Dynamic carrier id from Mordor',
+                    'after' => 'carrier_code'
+                ]
+            ], // todo shiping method name?
+            'enabled' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'carrier_id',
+                ],
+            ],
         ]);
 
         $table->setComment('Packetery pricing rules. Relates to packetery_weight_rules.');
@@ -307,6 +332,14 @@ class InstallSchema implements InstallSchemaInterface
                     'nullable' => false,
                     'length' => '64',
                     'after' => 'carrier_id'
+                ]
+            ],
+            'carrier_name' => [
+                'type' => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => true,
+                    'length' => '64',
+                    'after' => 'name'
                 ]
             ],
             'is_pickup_points' => [

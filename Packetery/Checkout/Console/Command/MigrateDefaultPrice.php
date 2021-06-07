@@ -94,7 +94,7 @@ class MigrateDefaultPrice extends Command
         foreach ($allowedMethods as $allowedMethod) {
             foreach ($countries as $country) {
 
-                $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country);
+                $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country, \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
 
                 if ($resolvedPricingRule === null) {
                     $pricingRule = [

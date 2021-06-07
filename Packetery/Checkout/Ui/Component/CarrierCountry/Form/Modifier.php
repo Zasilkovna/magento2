@@ -6,6 +6,7 @@ namespace Packetery\Checkout\Ui\Component\CarrierCountry\Form;
 
 use Magento\Ui\Component\Form;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Packetery\Checkout\Model\Carrier\MethodCode;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class Modifier implements ModifierInterface
@@ -19,20 +20,33 @@ class Modifier implements ModifierInterface
     /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier */
     private $packeteryCarrier;
 
+    /** @var \Packetery\Checkout\Model\Pricing\Service */
+    private $pricingService;
+
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     /**
      * Modifier constructor.
      *
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier
+     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
-    public function __construct(\Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory, \Magento\Framework\App\RequestInterface $request, \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier) {
+    public function __construct(\Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory, \Magento\Framework\App\RequestInterface $request, \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier, \Packetery\Checkout\Model\Pricing\Service $pricingService, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade) {
         $this->carrierCollectionFactory = $carrierCollectionFactory;
         $this->request = $request;
         $this->packeteryCarrier = $packeteryCarrier;
+        $this->pricingService = $pricingService;
+        $this->carrierFacade = $carrierFacade;
     }
 
-    public function modifyMeta(array $meta) {
+    /**
+     * @return \Packetery\Checkout\Model\Carrier[]
+     */
+    private function getCarriers(): array {
         $country = $this->request->getParam('country');
         $countryId = strtoupper($country);
 
@@ -40,17 +54,18 @@ class Modifier implements ModifierInterface
         $collection = $this->carrierCollectionFactory->create();
         $collection->addFilter('country', $country);
         $collection->addFilter('is_pickup_points', 0);
-        $collection->addFilter('deleted', 0); // The shopkeeper wants to change the price, but he can't. He goes to do something else. In an hour, the Packeta will turn on his carrier and it will have the old price.
+//        $collection->addFilter('deleted', 0); // The shopkeeper wants to change the price, but he can't. He goes to do something else. In an hour, the Packeta will turn on his carrier and it will have the old price.
         $carriers = $collection->getItems();
 
         if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $countryId)) {
             $packetaCarrier = $collection->getNewEmptyItem();
             $packetaCarrier->setData(
                 [
+                    'country' => $country,
                     'carrier_id' => null,
-                    'carrier_code' => 'packetery',
+                    'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                     'method' => Methods::ADDRESS_DELIVERY,
-                    'method_code' => Methods::ADDRESS_DELIVERY,
+                    'method_code' => (new MethodCode(Methods::ADDRESS_DELIVERY, null))->toString(),
                     'name' => $countryId . ' Packeta HD',
                 ]
             );
@@ -61,51 +76,68 @@ class Modifier implements ModifierInterface
         $packetaCarrier = $collection->getNewEmptyItem();
         $packetaCarrier->setData(
             [
+                'country' => $country,
                 'carrier_id' => null,
-                'carrier_code' => 'packetery',
+                'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                 'method' => Methods::PICKUP_POINT_DELIVERY,
-                'method_code' => Methods::PICKUP_POINT_DELIVERY,
+                'method_code' => (new MethodCode(Methods::PICKUP_POINT_DELIVERY, null))->toString(),
                 'name' => $countryId . ' Packeta PP',
             ]
         );
 
         array_unshift($carriers, $packetaCarrier);
+        return $carriers;
+    }
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier $carrier
+     * @return string
+     */
+    private function getCarrierFieldName(\Packetery\Checkout\Model\Carrier $carrier): string {
+        return $carrier->getData('carrier_code') . '_' . $carrier->getData('method_code');
+    }
+
+    public function modifyMeta(array $meta) {
+        $country = $this->request->getParam('country');
+        $countryId = strtoupper($country);
+
+        $carriers = $this->getCarriers();
 
         $newMeta = [];
         foreach ($carriers as $carrier) {
-            if (empty($carrier->getData('carrier_code'))) {
-                $carrier->setData('carrier_code', 'packeteryDynamic'); // todo create Magento class
+            $this->enrichCarrierData($carrier);
+            $carrierFieldName = $this->getCarrierFieldName($carrier); // pure number wont work
+            $isDynamic = $this->carrierFacade->isDynamicCarrier($carrier->getData('carrier_code'), $carrier->getData('carrier_id'));
+
+            $carrierFieldLabel = $carrier->getData('name');
+
+            if ($carrier->getData('deleted')) {
+                $carrierFieldLabel = '(disabled by Packeta) ' . $carrierFieldLabel;
             }
 
-            if (empty($carrier->getData('method'))) {
-                if ($carrier->getData('is_pickup_points') === '1') {
-                    $carrier->setData('method', Methods::PICKUP_POINT_DELIVERY);
-                } else {
-                    $carrier->setData('method', Methods::ADDRESS_DELIVERY);
-                }
-            }
-            $method = $carrier->getData('method');
-
-            if (empty($carrier->getData('method_code'))) {
-                if ($carrier->getData('carrier_id')) {
-                    $carrier->setData('method_code', $carrier->getData('carrier_id') . '-' . $method);
-                } else {
-                    $carrier->setData('method_code', $method);
-                }
-            }
-
-            $carrierFieldName = $carrier->getData('carrier_code') . '_' . $carrier->getData('method_code'); // pure number wont work
             $newMeta[$carrierFieldName] = [
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'label' => $carrier->getData('name'),
+                            'label' => $carrierFieldLabel,
                             'componentType' => 'fieldset',
                             'collapsible' => true,
                         ],
                     ],
                 ],
                 'children' => [
+                    'country' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'formElement' => 'input',
+                                    'dataType' => 'text',
+                                    'componentType' => 'field',
+                                    'visible' => false,
+                                ],
+                            ],
+                        ],
+                    ],
                     'enabled' => [
                         'arguments' => [
                             'data' => [
@@ -114,7 +146,6 @@ class Modifier implements ModifierInterface
                                     'formElement' => 'checkbox',
                                     'componentType' => 'field',
                                     'visible' => true,
-                                    'required' => false,
                                     'label' => __('Use carrier?'),
                                     'globalScope' => false,
                                     'prefer' => 'toggle',
@@ -125,20 +156,28 @@ class Modifier implements ModifierInterface
                                     'additionalClasses' => 'packetery-checkbox',
                                     'switcherConfig' => [
                                         'rules' => [
-                                            [
+                                            '0' => [
                                                 "value" => '0',
                                                 "actions" => [
-                                                    [
+                                                    '0' => [
                                                         "target" => "packetery_pricingrule_multiDetail.areas.shipping_methods.shipping_methods.{$carrierFieldName}.pricing_rule",
+                                                        "callback" => "hide",
+                                                    ],
+                                                    '1' => [
+                                                        "target" => "packetery_pricingrule_multiDetail.areas.shipping_methods.shipping_methods.{$carrierFieldName}.carrier_name",
                                                         "callback" => "hide",
                                                     ],
                                                 ],
                                             ],
-                                            [
+                                            '1' => [
                                                 "value" => '1',
                                                 "actions" => [
-                                                    [
+                                                    '0' => [
                                                         "target" => "packetery_pricingrule_multiDetail.areas.shipping_methods.shipping_methods.{$carrierFieldName}.pricing_rule",
+                                                        "callback" => "show",
+                                                    ],
+                                                    '1' => [
+                                                        "target" => "packetery_pricingrule_multiDetail.areas.shipping_methods.shipping_methods.{$carrierFieldName}.carrier_name",
                                                         "callback" => "show",
                                                     ],
                                                 ],
@@ -150,18 +189,32 @@ class Modifier implements ModifierInterface
                             ],
                         ],
                     ],
+                    'carrier_name' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'formElement' => 'input',
+                                    'dataType' => 'text',
+                                    'componentType' => 'field',
+                                    'label' => __('Carrier name'),
+                                    'visible' => $isDynamic,
+                                    'validation' => [
+                                        'required-entry' => $isDynamic,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     'pricing_rule' => [
                         'arguments' => [
                             'data' => [
                                 'config' => [
                                     'componentType' => 'container',
                                     'component' => 'Packetery_Checkout/js/view/multidetail-carrier-data-container',
-                                    'visible' => true,
-//                                    'additionalClasses' => 'packetery-settings-fieldset'
                                 ],
                             ],
                         ],
-                        'children' => $this->getPricingRuleFields($carrier, $country, $method),
+                        'children' => $this->getPricingRuleFields($carrier, $countryId),
                     ],
                 ],
             ];
@@ -187,8 +240,21 @@ class Modifier implements ModifierInterface
         return $meta;
     }
 
-    protected function getPricingRuleFields($carrier, $country, $method): array {
+    protected function getPricingRuleFields($carrier, $countryId): array {
         return [
+            'id' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'formElement' => 'input',
+                            'dataType' => 'text',
+                            'componentType' => 'field',
+                            'visible' => false,
+                            'required' => true,
+                        ],
+                    ],
+                ],
+            ],
             'carrier_id' => [
                 'arguments' => [
                     'data' => [
@@ -226,7 +292,7 @@ class Modifier implements ModifierInterface
                             'componentType' => 'field',
                             'visible' => false,
                             'required' => true,
-                            'value' => strtoupper($country),
+                            'value' => $countryId,
                         ],
                     ],
                 ],
@@ -240,7 +306,7 @@ class Modifier implements ModifierInterface
                             'componentType' => 'field',
                             'visible' => false,
                             'required' => true,
-                            'value' => $method,
+                            'value' => $carrier->getData('method'),
                         ],
                     ],
                 ],
@@ -255,7 +321,6 @@ class Modifier implements ModifierInterface
                             'componentType' => 'field',
                             'visible' => true,
                             'required' => false,
-                            'value' => null, // todo needed?
                             'validation' => [
                                 'required-entry' => false,
                             ],
@@ -370,6 +435,66 @@ class Modifier implements ModifierInterface
     }
 
     public function modifyData(array $data) {
-        return $data;
+        $country = $this->request->getParam('country');
+
+        $result = [
+            'shipping_methods' => [],
+        ];
+
+        $carriers = $this->getCarriers();
+        foreach ($carriers as $carrier) {
+            $shippingMethod = [];
+            $pricingRule = [];
+
+            $this->enrichCarrierData($carrier);
+            $carrierCode = $carrier->getData('carrier_code'); // todo new class to represent this hybrid?
+            $method = $carrier->getData('method');
+            $carrierId = $carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null;
+
+            $shippingMethod['carrier_name'] = $carrier->getFinalCarrierName();
+            $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $carrier->getCountryId(), $carrierCode, $carrierId);
+
+            $shippingMethod['enabled'] = '0';
+            $shippingMethod['country'] = $country;
+            $pricingRule['carrier_code'] = $carrierCode;
+            $pricingRule['carrier_id'] = $carrierId;
+            $pricingRule['country_id'] = strtoupper($country);
+            $pricingRule['method'] = $method;
+
+            if ($resolvedPricingRule !== null) {
+                $shippingMethod['enabled'] = ($resolvedPricingRule->getEnabled() ? '1' : '0');
+                $pricingRule['id'] = $resolvedPricingRule->getId();
+                $pricingRule['free_shipment'] = $resolvedPricingRule->getFreeShipment();
+
+                $weightRules = $this->pricingService->getWeightRulesByPricingRule($resolvedPricingRule);
+                $pricingRule['weight_rules']['weight_rules'] = [];
+                foreach ($weightRules as $weightRule) {
+                    $pricingRule['weight_rules']['weight_rules'][] = $weightRule->getData();
+                }
+            }
+
+            $shippingMethod['pricing_rule'] = $pricingRule;
+            $result['shipping_methods'][$this->getCarrierFieldName($carrier)] = $shippingMethod;
+        }
+
+        return [$country => $result];
+    }
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier $carrier
+     */
+    private function enrichCarrierData(\Packetery\Checkout\Model\Carrier $carrier): void {
+        if (empty($carrier->getData('carrier_code'))) {
+            $carrier->setData('carrier_code', \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
+        }
+
+        // we are mixing dynamic carriers with fixed
+        if (empty($carrier->getData('method'))) {
+            $carrier->setData('method', $carrier->getMethod());
+        }
+
+        if (empty($carrier->getData('method_code'))) {
+            $carrier->setData('method_code', (new MethodCode($carrier->getData('method'), $carrier->getCarrierId()))->toString());
+        }
     }
 }
