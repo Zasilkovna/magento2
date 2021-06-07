@@ -16,6 +16,9 @@ Installation and registration of the module is done by CLI utility, which is par
 - re-deploy static content (not needed in dev mode): `bin/magento setup:static-content:deploy`
 - project recompiling: `bin/magento setup:di:compile`
 - clean cache: `bin/magento cache:clean`
+- set Packeta configuration in administration for default scope even if Packeta carrier is inactive
+- import carriers: `bin/magento packetery:import-feed-carriers`
+- set or update call of `bin/magento cron:run`, in such way Packeta cron jobs can be processed
 
 ## Upgrading
 
@@ -108,6 +111,9 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 - re-deploy statického obsahu (není potřeba v dev módu): `bin/magento setup:static-content:deploy`
 - rekompilace projektu: `bin/magento setup:di:compile`
 - smazání cache: `bin/magento cache:clean`
+- nastavte v administraci přepravce Zásilkovna pro výchozí kontext (scope), ikdyž je přepravce neaktivní
+- nahrajte přepravce: `bin/magento packetery:import-feed-carriers`
+- nastavte či upravte volání `bin/magento cron:run`, tak aby se Zásilkovní úlohy dokázaly zpracovat
 
 ### Aktualizace modulu
 
