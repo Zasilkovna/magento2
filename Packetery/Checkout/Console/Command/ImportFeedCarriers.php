@@ -119,8 +119,8 @@ class ImportFeedCarriers extends Command
                 $collection->save();
             }
         }
-//
-//        $this->pricingRuleRepository->disablePricingRulesByDynamicCarriers();
+
+        $this->pricingRuleRepository->disablePricingRulesByDynamicCarriers();
 
         $output->writeln('Carrier feed import ended successfully');
     }

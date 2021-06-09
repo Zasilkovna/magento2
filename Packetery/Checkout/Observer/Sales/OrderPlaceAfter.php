@@ -90,7 +90,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             // new order from frontend
             $shippingMethod = $order->getShippingMethod(true);
             $deliveryMethod = MethodCode::fromString($shippingMethod['method']);
-            if ($deliveryMethod === Methods::PICKUP_POINT_DELIVERY) {
+            if ($deliveryMethod->getMethod() === Methods::PICKUP_POINT_DELIVERY) {
                 // pickup point delivery
                 $point = $postData->packetery->point;
                 $pointId = $point->pointId;
@@ -106,7 +106,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
                     $carrier->getPacketeryBrain()->getDynamicCarrierById($deliveryMethod->getDynamicCarrierId())
                 );
 
-                $pointName = $deliveryMethod; // translated on demand
+                $pointName = $deliveryMethod->getMethod(); // translated on demand
             }
         }
         else

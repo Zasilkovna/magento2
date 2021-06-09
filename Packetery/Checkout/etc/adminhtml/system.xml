@@ -61,11 +61,6 @@
                     <label>Enabled for Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="allowedMethods" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                    <label>Allowed Methods</label>
-                    <source_model>Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect</source_model>
-                    <can_be_empty>1</can_be_empty>
-                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>

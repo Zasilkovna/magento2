@@ -18,7 +18,9 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
     }
 
     private function getAvailableExpr(): \Zend_Db_Expr {
-        return new \Zend_Db_Expr('sum(case when `deleted` = 1 then 0 else 1 end) > 0');
+        // todo is it need when Packeta will be there if enabled?
+        // todo fix
+        return new \Zend_Db_Expr('SUM(CASE WHEN `deleted` = 0 AND `disallows_cod` = 0 AND `customs_declarations` = 0 THEN 1 ELSE 0 END) > 0');
     }
 
     protected function _initSelect() {

@@ -59,7 +59,6 @@ class Actions extends Column
                 if (isset($item['country'])) {
                     $item[$name]['view']   = [
                         'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['country' => $item['country']]),
-                        'target' => '_blank',
                         'label' => __('Detail')
                     ];
                 }

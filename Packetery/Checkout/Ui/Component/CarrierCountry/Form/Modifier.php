@@ -52,9 +52,9 @@ class Modifier implements ModifierInterface
 
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
-        $collection->addFilter('country', $country);
-        $collection->addFilter('is_pickup_points', 0);
-//        $collection->addFilter('deleted', 0); // The shopkeeper wants to change the price, but he can't. He goes to do something else. In an hour, the Packeta will turn on his carrier and it will have the old price.
+        $collection->configurableOnly();
+        $collection->whereCountry($country);
+        $collection->forDeliveryMethod(Methods::ADDRESS_DELIVERY);
         $carriers = $collection->getItems();
 
         if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $countryId)) {

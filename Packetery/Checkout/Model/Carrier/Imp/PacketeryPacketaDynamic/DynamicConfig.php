@@ -12,17 +12,13 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractCon
     /** @var \Packetery\Checkout\Model\Carrier */
     private $carrier;
 
-    /** @var array */
-    private $finalMethods;
-
     /**
      * @param array $data
      */
-    public function __construct(array $data, \Packetery\Checkout\Model\Carrier $carrier, array $finalMethods)
+    public function __construct(array $data, \Packetery\Checkout\Model\Carrier $carrier)
     {
         parent::__construct($data);
         $this->carrier = $carrier;
-        $this->finalMethods = $finalMethods;
     }
 
     /**
@@ -37,13 +33,5 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractCon
      */
     public function getTitle() {
         return $this->carrier->getFinalCarrierName();
-    }
-
-    /**
-     * @return array
-     */
-    public function getAllowedMethods(): array {
-        $dynamicCarrierMethods = [$this->carrier->getMethod()];
-        return array_diff($this->finalMethods, $dynamicCarrierMethods);
     }
 }

@@ -173,12 +173,12 @@ class PricingruleRepository
         $rule->save();
     }
 
-//    public function disablePricingRulesByDynamicCarriers(): void {
-//        $collection = $this->pricingRuleCollectionFactory->create();
-//        $collection->join('packetery_carrier', 'main_table.carrier_id = packetery_carrier.carrier_id', '');
-//        $collection->addFieldToFilter('packetery_carrier.deleted', ['eq' => 1]);
-//        $collection->addFieldToFilter('main_table.enabled', ['eq' => 1]);
-//        $collection->setDataToAll('enabled', 0);
-//        $collection->save();
-//    }
+    public function disablePricingRulesByDynamicCarriers(): void {
+        $collection = $this->pricingRuleCollectionFactory->create();
+        $collection->join('packetery_carrier', 'main_table.carrier_id = packetery_carrier.carrier_id', '');
+        $collection->addFieldToFilter('packetery_carrier.deleted', ['eq' => 1]);
+        $collection->addFieldToFilter('main_table.enabled', ['eq' => 1]);
+        $collection->setDataToAll('enabled', 0);
+        $collection->save();
+    }
 }

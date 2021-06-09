@@ -115,8 +115,8 @@ class Service
      */
     protected function resolvePrice(RateRequest $request, AbstractConfig $config, Pricingrule $pricingRule): float
     {
-        $weightTotal = $request->getPackageWeight();
-        $priceTotal = $request->getPackageValue();
+        $weightTotal = (float)$request->getPackageWeight();
+        $priceTotal = (float)$request->getPackageValue();
 
         $freeShipping = $this->getFreeShippingThreshold($pricingRule, $config->getFreeShippingThreshold());
 

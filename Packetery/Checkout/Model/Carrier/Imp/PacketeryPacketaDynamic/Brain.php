@@ -78,17 +78,16 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier|null
      */
     public function getDynamicCarrierById(?int $dynamicCarrierId): ?\Packetery\Checkout\Model\Carrier {
-        return $this->carrierCollectionFactory->create()->getItemById($dynamicCarrierId);
+        return $this->carrierCollectionFactory->create()->getItemByColumnValue('carrier_id', $dynamicCarrierId);
     }
 
     /**
      * @return array
      */
     public function findResolvableDynamicCarriers(): array {
+        /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
-        $collection->join('packetery_pricing_rule', 'main_table.carrier_id = packetery_pricing_rule.carrier_id', ''); // no pricing rule = no delivery option
-        $collection->addFilter('main_table.deleted', 0);
-        $collection->addFilter('packetery_pricing_rule.enabled', 1);
+        $collection->resolvableOnly();
         return $collection->getItems();
     }
 
@@ -129,8 +128,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 
         $config = new DynamicConfig(
             $this->getConfigData($carrier->getCarrierCode(), $carrier->getStore()),
-            $dynamicCarrier,
-            $brain->getFinalAllowedMethods($carrier->getPacketeryConfig(), $brain->getMethodSelect())
+            $dynamicCarrier
         );
 
         if (!$brain->isCollectionPossible($config)) {
@@ -140,7 +138,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         $methods = [];
         $selectedMethod = $dynamicCarrier->getMethod();
         if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
-            if ($this->resolvePointId($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) === null) {
+            if ($this->resolvePointId($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) !== null) {
                 $methods[$selectedMethod] = $brain->getMethodSelect()->getLabelByValue($selectedMethod);
             }
         }

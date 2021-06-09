@@ -32,6 +32,11 @@ class MethodCode
         $parts = explode('-', $methodCode);
         $method = array_pop($parts);
         $dynamicCarrierId = array_pop($parts);
+
+        if ($dynamicCarrierId !== null) {
+            $dynamicCarrierId = (int)$dynamicCarrierId;
+        }
+
         return new self($method, $dynamicCarrierId);
     }
 
