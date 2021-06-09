@@ -30,15 +30,10 @@
             </argument>
         </argument>
     </dataSource>
-    <listingToolbar>
-        <filters name="listing_filters"/>
-    </listingToolbar>
     <columns name="spinner_columns">
         <column name="countryName" class="Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Column\Country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="sorting" xsi:type="string">ASC</item>
-                    <item name="indexField" xsi:type="string">country</item>
                     <item name="label" xsi:type="string" translate="true">Country</item>
                 </item>
             </argument>
@@ -46,15 +41,16 @@
         <column name="country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
+                    <item name="sorting" xsi:type="string">ASC</item>
+                    <item name="indexField" xsi:type="string">country</item>
                     <item name="label" xsi:type="string" translate="true">Country Code</item>
                 </item>
             </argument>
         </column>
         <column name="available" class="Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Column\Available">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Filter\AvailableSelect</item>
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Available</item>
                 </item>

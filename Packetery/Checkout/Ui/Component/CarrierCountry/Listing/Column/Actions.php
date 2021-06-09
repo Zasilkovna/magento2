@@ -57,7 +57,7 @@ class Actions extends Column
             foreach ($dataSource['data']['items'] as &$item) {
                 $name = $this->getData('name');
                 if (isset($item['country'])) {
-                    $item[$name]['view']   = [
+                    $item[$name]['view'] = [
                         'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['country' => $item['country']]),
                         'label' => __('Detail')
                     ];

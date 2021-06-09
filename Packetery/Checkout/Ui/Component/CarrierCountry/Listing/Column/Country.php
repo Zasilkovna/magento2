@@ -45,27 +45,6 @@ class Country extends Column
                 $country = $this->_countryFactory->create()->loadByCode(strtoupper($item["country"]));
                 $item[$this->getData('name')] = $country->getName();
             }
-
-            $sorting = $this->getContext()->getRequestParam('sorting');
-            $isSortable = $this->getData('config/sortable');
-            if ($isSortable !== false
-                && !empty($sorting['field'])
-                && !empty($sorting['direction'])
-                && $sorting['field'] === $this->getName()
-                && in_array(strtoupper($sorting['direction']), ['ASC', 'DESC'], true)
-            ) {
-                if (strtoupper($sorting['direction']) === 'ASC') {
-                    usort($dataSource['data']['items'], function ($a, $b) {
-                        return strcmp($a[$this->getData('name')], $b[$this->getData('name')]);
-                    });
-                }
-
-                if (strtoupper($sorting['direction']) === 'DESC') {
-                    usort($dataSource['data']['items'], function ($a, $b) {
-                        return strcmp($b[$this->getData('name')], $a[$this->getData('name')]);
-                    });
-                }
-            }
         }
 
         return $dataSource;
