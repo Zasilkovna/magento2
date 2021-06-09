@@ -95,7 +95,7 @@ class ImportFeedCarriers extends Command
                 'requires_phone' => $this->parseBool($carrier->requiresPhone),
                 'requires_size' => $this->parseBool($carrier->requiresSize),
                 'disallows_cod' => $this->parseBool($carrier->disallowsCod),
-                'country' => $carrier->country,
+                'country' => strtoupper($carrier->country),
                 'currency' => $carrier->currency,
                 'max_weight' => (float)$carrier->maxWeight,
                 'deleted' => false,

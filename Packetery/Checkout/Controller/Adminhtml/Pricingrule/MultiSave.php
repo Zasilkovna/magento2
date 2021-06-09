@@ -59,8 +59,8 @@ class MultiSave extends Action implements HttpPostActionInterface
 
         foreach ($postData as &$carrierPriceRule) {
             $carrierEnabled = $carrierPriceRule['enabled'];
-            $country = $carrierPriceRule['country'];
             $pricingRule = &$carrierPriceRule['pricing_rule'];
+            $country = $pricingRule['country_id'];
             $pricingRule['enabled'] = (int)$carrierEnabled;
             $carrierCode = $pricingRule['carrier_code'];
             $carrierId = $pricingRule['carrier_id'] ?? null;
@@ -99,7 +99,7 @@ class MultiSave extends Action implements HttpPostActionInterface
             } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
                 $this->messageManager->addErrorMessage($carrierPublicName);
                 $this->messageManager->addErrorMessage(__('Pricing rule not found'));
-                return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/carrierCountry/index');
+                return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('pricingrule/carrierCountries');
             } catch (\Packetery\Checkout\Model\Exception\WeightRuleMissing $e) {
                 $this->messageManager->addErrorMessage($carrierPublicName);
                 $this->messageManager->addErrorMessage(__('Weight rule is missing'));
@@ -124,6 +124,6 @@ class MultiSave extends Action implements HttpPostActionInterface
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/pricingrule/multiDetail/country/' . $country);
         }
 
-        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/carrierCountry/index'); // todo move to pricerule controller ?
+        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('packetery/pricingrule/carrierCountries');
     }
 }

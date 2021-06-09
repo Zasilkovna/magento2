@@ -48,7 +48,6 @@ class Modifier implements ModifierInterface
      */
     private function getCarriers(): array {
         $country = $this->request->getParam('country');
-        $countryId = strtoupper($country);
 
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
@@ -57,7 +56,7 @@ class Modifier implements ModifierInterface
         $collection->forDeliveryMethod(Methods::ADDRESS_DELIVERY);
         $carriers = $collection->getItems();
 
-        if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $countryId)) {
+        if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $country)) {
             $packetaCarrier = $collection->getNewEmptyItem();
             $packetaCarrier->setData(
                 [
@@ -66,7 +65,7 @@ class Modifier implements ModifierInterface
                     'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                     'method' => Methods::ADDRESS_DELIVERY,
                     'method_code' => (new MethodCode(Methods::ADDRESS_DELIVERY, null))->toString(),
-                    'name' => $countryId . ' Packeta HD',
+                    'name' => $country . ' Packeta HD',
                 ]
             );
 
@@ -81,7 +80,7 @@ class Modifier implements ModifierInterface
                 'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                 'method' => Methods::PICKUP_POINT_DELIVERY,
                 'method_code' => (new MethodCode(Methods::PICKUP_POINT_DELIVERY, null))->toString(),
-                'name' => $countryId . ' Packeta PP',
+                'name' => $country . ' Packeta PP',
             ]
         );
 
@@ -98,8 +97,7 @@ class Modifier implements ModifierInterface
     }
 
     public function modifyMeta(array $meta) {
-        $country = $this->request->getParam('country');
-        $countryId = strtoupper($country);
+        $countryId = $this->request->getParam('country');
 
         $carriers = $this->getCarriers();
 
@@ -126,18 +124,6 @@ class Modifier implements ModifierInterface
                     ],
                 ],
                 'children' => [
-                    'country' => [
-                        'arguments' => [
-                            'data' => [
-                                'config' => [
-                                    'formElement' => 'input',
-                                    'dataType' => 'text',
-                                    'componentType' => 'field',
-                                    'visible' => false,
-                                ],
-                            ],
-                        ],
-                    ],
                     'enabled' => [
                         'arguments' => [
                             'data' => [
@@ -455,10 +441,9 @@ class Modifier implements ModifierInterface
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $carrier->getCountryId(), $carrierCode, $carrierId);
 
             $shippingMethod['enabled'] = '0';
-            $shippingMethod['country'] = $country;
             $pricingRule['carrier_code'] = $carrierCode;
             $pricingRule['carrier_id'] = $carrierId;
-            $pricingRule['country_id'] = strtoupper($country);
+            $pricingRule['country_id'] = $country;
             $pricingRule['method'] = $method;
 
             if ($resolvedPricingRule !== null) {

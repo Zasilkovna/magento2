@@ -2,9 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Controller\Adminhtml\CarrierCountry;
+namespace Packetery\Checkout\Controller\Adminhtml\Pricingrule;
 
-class Index extends \Magento\Backend\App\Action
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
+
+class CarrierCountries extends \Magento\Backend\App\Action
 {
     /** @var \Magento\Framework\View\Result\PageFactory  */
     protected $resultPageFactory;

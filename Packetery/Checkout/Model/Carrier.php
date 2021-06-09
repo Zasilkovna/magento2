@@ -78,7 +78,7 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
      * @return string
      */
     public function getCountryId(): string {
-        return strtoupper($this->getCountry());
+        return $this->getCountry();
     }
 
     /**
