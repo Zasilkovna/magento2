@@ -18,6 +18,9 @@ class PricingruleRepository
     /** @var \Packetery\Checkout\Model\WeightruleFactory */
     private $weightruleFactory;
 
+    /** @var \Packetery\Checkout\Model\Pricing\Service */
+    private $pricingService;
+
     /**
      * PricingruleRepository constructor.
      *
@@ -25,13 +28,15 @@ class PricingruleRepository
      * @param \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory
      * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
      * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
+     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      */
-    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory)
+    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory, \Packetery\Checkout\Model\Pricing\Service $pricingService)
     {
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
         $this->pricingruleFactory = $pricingruleFactory;
         $this->weightRuleCollectionFactory = $weightRuleCollectionFactory;
         $this->weightruleFactory = $weightruleFactory;
+        $this->pricingService = $pricingService;
     }
 
     /**
@@ -40,16 +45,14 @@ class PricingruleRepository
      */
     public function validateDuplicateCountry(array $postData): bool
     {
-        /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection $validation */
-        $validation = $this->pricingRuleCollectionFactory->create();
-        $validation->addFilter('country_id', $postData['country_id']);
-        $validation->addFilter('method', $postData['method']);
+        $carrierId = isset($postData['carrier_id']) ? (int)$postData['carrier_id'] : null;
+        $resolvedPricingRule = $this->pricingService->resolvePricingRule($postData['method'], $postData['country_id'], $postData['carrier_code'], $carrierId);
 
-        if (isset($postData['id'])) {
-            $validation->addFieldToFilter('id', ['nin' => [$postData['id']]]);
+        if (isset($postData['id']) && $resolvedPricingRule && $resolvedPricingRule->getId() == $postData['id']) {
+            return true;
         }
 
-        if ($validation->count() > 0) {
+        if ($resolvedPricingRule !== null) {
             return false;
         }
 
