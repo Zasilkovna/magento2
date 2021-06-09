@@ -6,7 +6,6 @@ namespace Packetery\Checkout\Ui\Component\CarrierCountry\Form;
 
 use Magento\Ui\Component\Form;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use Packetery\Checkout\Model\Carrier\MethodCode;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class Modifier implements ModifierInterface
@@ -44,7 +43,7 @@ class Modifier implements ModifierInterface
     }
 
     /**
-     * @return \Packetery\Checkout\Model\Carrier[]
+     * @return \Packetery\Checkout\Model\HybridCarrier[]
      */
     private function getCarriers(): array {
         $country = $this->request->getParam('country');
@@ -56,34 +55,19 @@ class Modifier implements ModifierInterface
         $collection->forDeliveryMethod(Methods::ADDRESS_DELIVERY);
         $carriers = $collection->getItems();
 
-        if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $country)) {
-            $packetaCarrier = $collection->getNewEmptyItem();
-            $packetaCarrier->setData(
-                [
-                    'country' => $country,
-                    'carrier_id' => null,
-                    'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
-                    'method' => Methods::ADDRESS_DELIVERY,
-                    'method_code' => (new MethodCode(Methods::ADDRESS_DELIVERY, null))->toString(),
-                    'name' => $country . ' Packeta HD',
-                ]
-            );
+        $carriers = array_map(
+            function ($carrier) {
+                return \Packetery\Checkout\Model\HybridCarrier::fromDynamic($carrier);
+            },
+            $carriers
+        );
 
+        if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $country)) {
+            $packetaCarrier = \Packetery\Checkout\Model\HybridCarrier::fromAbstract($this->packeteryCarrier, Methods::ADDRESS_DELIVERY, $country);
             array_unshift($carriers, $packetaCarrier);
         }
 
-        $packetaCarrier = $collection->getNewEmptyItem();
-        $packetaCarrier->setData(
-            [
-                'country' => $country,
-                'carrier_id' => null,
-                'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
-                'method' => Methods::PICKUP_POINT_DELIVERY,
-                'method_code' => (new MethodCode(Methods::PICKUP_POINT_DELIVERY, null))->toString(),
-                'name' => $country . ' Packeta PP',
-            ]
-        );
-
+        $packetaCarrier = \Packetery\Checkout\Model\HybridCarrier::fromAbstract($this->packeteryCarrier, Methods::PICKUP_POINT_DELIVERY, $country);
         array_unshift($carriers, $packetaCarrier);
         return $carriers;
     }
@@ -103,16 +87,11 @@ class Modifier implements ModifierInterface
 
         $newMeta = [];
         foreach ($carriers as $carrier) {
-            $this->enrichCarrierData($carrier);
             $carrierFieldName = $this->getCarrierFieldName($carrier); // pure number wont work
             $isDynamic = $this->carrierFacade->isDynamicCarrier($carrier->getData('carrier_code'), $carrier->getData('carrier_id'));
 
-            $carrierFieldLabel = $carrier->getData('name');
-
-            if ($carrier->getData('deleted')) {
-                $carrierFieldLabel = '(disabled by Packeta) ' . $carrierFieldLabel;
-            }
-
+            $resolvedPricingRule = $this->pricingService->resolvePricingRule($carrier->getMethod(), $carrier->getCountryId(), $carrier->getCarrierCode(), $carrier->getCarrierId());
+            $carrierFieldLabel = $carrier->getFieldsetTitle($resolvedPricingRule);
             $newMeta[$carrierFieldName] = [
                 'arguments' => [
                     'data' => [
@@ -432,8 +411,7 @@ class Modifier implements ModifierInterface
             $shippingMethod = [];
             $pricingRule = [];
 
-            $this->enrichCarrierData($carrier);
-            $carrierCode = $carrier->getData('carrier_code'); // todo new class to represent this hybrid?
+            $carrierCode = $carrier->getData('carrier_code');
             $method = $carrier->getData('method');
             $carrierId = $carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null;
 
@@ -463,23 +441,5 @@ class Modifier implements ModifierInterface
         }
 
         return [$country => $result];
-    }
-
-    /**
-     * @param \Packetery\Checkout\Model\Carrier $carrier
-     */
-    private function enrichCarrierData(\Packetery\Checkout\Model\Carrier $carrier): void {
-        if (empty($carrier->getData('carrier_code'))) {
-            $carrier->setData('carrier_code', \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
-        }
-
-        // we are mixing dynamic carriers with fixed
-        if (empty($carrier->getData('method'))) {
-            $carrier->setData('method', $carrier->getMethod());
-        }
-
-        if (empty($carrier->getData('method_code'))) {
-            $carrier->setData('method_code', (new MethodCode($carrier->getData('method'), $carrier->getCarrierId()))->toString());
-        }
     }
 }

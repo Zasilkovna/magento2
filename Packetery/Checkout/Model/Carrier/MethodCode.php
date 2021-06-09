@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier;
 
 /**
- *  Magento method code of Magento shipping method string
+ *  Magento method code of Magento shipping method string that is used in magento JS framework
  */
 class MethodCode
 {

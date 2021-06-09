@@ -239,7 +239,7 @@ class InstallSchema implements InstallSchemaInterface
                     'comment' => 'Dynamic carrier id from Mordor',
                     'after' => 'carrier_code'
                 ]
-            ], // todo shiping method name?
+            ],
             'enabled' => [
                 'type' => Table::TYPE_BOOLEAN,
                 'attr' => [

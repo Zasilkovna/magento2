@@ -18,9 +18,6 @@ class MultiSave extends Action implements HttpPostActionInterface
     /** @var \Packetery\Checkout\Model\ResourceModel\PricingruleRepository */
     private $pricingruleRepository;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
-    private $carrierCollectionFactory;
-
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
 
@@ -29,18 +26,15 @@ class MultiSave extends Action implements HttpPostActionInterface
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
-     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
     public function __construct(
         Context $context,
         \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
-        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
     ) {
         parent::__construct($context);
         $this->pricingruleRepository = $pricingruleRepository;
-        $this->carrierCollectionFactory = $carrierCollectionFactory;
         $this->carrierFacade = $carrierFacade;
     }
 
@@ -75,7 +69,7 @@ class MultiSave extends Action implements HttpPostActionInterface
                 continue;
             }
 
-            if ($carrierName) {
+            if ($carrierName && $this->carrierFacade->isDynamicCarrier($carrierCode, $carrierId)) {
                 $this->carrierFacade->updateCarrierName($carrierName, $carrierCode, $carrierId);
             }
 

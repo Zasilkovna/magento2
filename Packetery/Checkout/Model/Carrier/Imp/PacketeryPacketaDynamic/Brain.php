@@ -106,7 +106,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
             return null;
         }
 
-        if ($dynamicCarrier->getCountry() !== strtolower($countryId)) {
+        if ($dynamicCarrier->getCountryId() !== $countryId) {
             return null;
         }
 

@@ -87,6 +87,5 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     private function leftJoinPricingRules(): void {
         // cols has to be empty otherwise setDataToAll wont work
         $this->getSelect()->joinLeft(['pricingRules' => $this->getTable('packetery_pricing_rule')], 'main_table.carrier_id = pricingRules.carrier_id', '');
-//        $this->join(['pricingRules' => 'packetery_pricing_rule'], 'main_table.carrier_id = pricingRules.carrier_id', ''); // todo rm
     }
 }

@@ -43,8 +43,7 @@ class Facade
             return;
         }
 
-        $carrier = $this->getMagentoCarrier($carrierCode);
-        $carrier->setData('title', $carrierName); // todo rm or fix
+        throw new \InvalidArgumentException('Not implemented');
     }
 
     private function assertValidIdentifiers(string $carrierCode, $carrierId): void {

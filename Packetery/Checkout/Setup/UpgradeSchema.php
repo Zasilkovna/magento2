@@ -125,7 +125,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Dynamic carrier id from Mordor',
                     'after' => 'carrier_code'
                 ]
-            ); // todo shiping method name?
+            );
 
             $setup->getConnection()->addColumn(
                 $setup->getTable('packetery_pricing_rule'),
