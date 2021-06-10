@@ -10,10 +10,8 @@ use Packetery\Checkout\Model\Misc\ComboPhrase;
 /**
  * Merges dynamic (feed) carrier data structure and Magento fixed carrier data structure
  */
-class HybridCarrier extends Carrier
+class HybridCarrier extends \Magento\Framework\DataObject
 {
-    public function __construct() {}
-
     /**
      * @param \Packetery\Checkout\Model\Carrier $carrier
      * @return static
@@ -91,5 +89,55 @@ class HybridCarrier extends Carrier
      */
     public function getMethodCode(): string {
         return $this->getData('method_code');
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCarrierId(): ?int {
+        $value = $this->getData('carrier_id');
+        return (is_numeric($value) ? (int)$value : null);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string {
+        return (string)$this->getData('name');
+    }
+
+    /**
+     * @return string
+     */
+    public function getCarrierName(): string {
+        return (string)$this->getData('carrier_name');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFinalCarrierName(): string {
+        return ($this->getCarrierName() ?: $this->getName());
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry(): string {
+        return (string)$this->getData('country');
+    }
+
+    /** Not in database
+     * @return string
+     */
+    public function getCountryId(): string {
+        return $this->getCountry();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDeleted(): bool {
+        return (bool)$this->getData('deleted');
     }
 }
