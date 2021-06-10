@@ -45,9 +45,15 @@ class Modifier implements ModifierInterface
     /**
      * @return \Packetery\Checkout\Model\HybridCarrier[]
      */
-    private function getCarriers(): array {
+    private function getCarriersByParams(): array {
         $country = $this->request->getParam('country');
+        return $this->getCarriers($country);
+    }
 
+    /**
+     * @return \Packetery\Checkout\Model\HybridCarrier[]
+     */
+    public function getCarriers(string $country): array {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->configurableOnly();
@@ -67,8 +73,12 @@ class Modifier implements ModifierInterface
             array_unshift($carriers, $packetaCarrier);
         }
 
-        $packetaCarrier = \Packetery\Checkout\Model\HybridCarrier::fromAbstract($this->packeteryCarrier, Methods::PICKUP_POINT_DELIVERY, $country);
-        array_unshift($carriers, $packetaCarrier);
+        $packeteryCarrierPPCountries = $this->packeteryCarrier->getPacketeryBrain()->getAvailableCountries([Methods::PICKUP_POINT_DELIVERY]);
+        if (in_array($country, $packeteryCarrierPPCountries)) {
+            $packetaCarrier = \Packetery\Checkout\Model\HybridCarrier::fromAbstract($this->packeteryCarrier, Methods::PICKUP_POINT_DELIVERY, $country);
+            array_unshift($carriers, $packetaCarrier);
+        }
+
         return $carriers;
     }
 
@@ -83,7 +93,7 @@ class Modifier implements ModifierInterface
     public function modifyMeta(array $meta) {
         $countryId = $this->request->getParam('country');
 
-        $carriers = $this->getCarriers();
+        $carriers = $this->getCarriersByParams();
 
         $newMeta = [];
         foreach ($carriers as $carrier) {
@@ -406,7 +416,7 @@ class Modifier implements ModifierInterface
             'shipping_methods' => [],
         ];
 
-        $carriers = $this->getCarriers();
+        $carriers = $this->getCarriersByParams();
         foreach ($carriers as $carrier) {
             $shippingMethod = [];
             $pricingRule = [];
