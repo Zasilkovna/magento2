@@ -315,6 +315,7 @@ class PricingServiceTest extends BaseTest
         $weightRule = $this->createMock(Pricingrule::class);
         $weightRule->method('getFreeShipment')->willReturn($freeShipment);
         $weightRule->method('getCountryId')->willReturn($countryId);
+        $weightRule->method('getEnabled')->willReturn(true);
         return $weightRule;
     }
 

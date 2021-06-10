@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic;
 
-use Magento\Quote\Model\Quote\Address\RateRequest;
-use Packetery\Checkout\Model\Carrier\AbstractCarrier;
-use Packetery\Checkout\Model\Carrier\Methods;
+use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
@@ -77,8 +75,13 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @param int|null $dynamicCarrierId
      * @return \Packetery\Checkout\Model\Carrier|null
      */
-    public function getDynamicCarrierById(?int $dynamicCarrierId): ?\Packetery\Checkout\Model\Carrier {
-        return $this->carrierCollectionFactory->create()->getItemByColumnValue('carrier_id', $dynamicCarrierId);
+    public function getDynamicCarrierById(?int $dynamicCarrierId): ?AbstractDynamicCarrier {
+        $model = $this->carrierCollectionFactory->create()->getItemByColumnValue('carrier_id', $dynamicCarrierId);
+        if ($model === null) {
+            return null;
+        }
+
+        return new DynamicCarrier($model);
     }
 
     /**
@@ -97,7 +100,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return int|null
      * @throws \Exception
      */
-    public function resolvePointId(string $method, string $countryId, ?\Packetery\Checkout\Model\Carrier $dynamicCarrier = null): ?int {
+    public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int {
         if ($dynamicCarrier === null) {
             throw new \Exception('Invalid usage');
         }
@@ -110,39 +113,17 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
             return null;
         }
 
-        if ($dynamicCarrier->getMethod() !== $method) {
+        if (in_array($method, $dynamicCarrier->getMethods()) === false) {
             return null;
         }
 
         return $dynamicCarrier->getCarrierId();
     }
 
-    /**
-     * @param \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Carrier $carrier
-     * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
-     * @param \Packetery\Checkout\Model\Carrier $dynamicCarrier
-     * @return \Magento\Shipping\Model\Rate\Result|null
-     */
-    public function collectRates(AbstractCarrier $carrier, RateRequest $request, ?\Packetery\Checkout\Model\Carrier $dynamicCarrier = null): ?\Magento\Shipping\Model\Rate\Result {
-        $brain = $carrier->getPacketeryBrain();
-
-        $config = new DynamicConfig(
-            $this->getConfigData($carrier->getCarrierCode(), $carrier->getStore()),
+    public function createDynamicConfig(\Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
+        return new DynamicConfig(
+            $config,
             $dynamicCarrier
         );
-
-        if (!$brain->isCollectionPossible($config)) {
-            return null;
-        }
-
-        $methods = [];
-        $selectedMethod = $dynamicCarrier->getMethod();
-        if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
-            if ($this->resolvePointId($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) !== null) {
-                $methods[$selectedMethod] = $brain->getMethodSelect()->getLabelByValue($selectedMethod);
-            }
-        }
-
-        return $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods, $dynamicCarrier->getCarrierId());
     }
 }

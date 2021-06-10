@@ -77,7 +77,7 @@ class Modifier implements ModifierInterface
      * @return string
      */
     private function getCarrierFieldName(\Packetery\Checkout\Model\Carrier $carrier): string {
-        return $carrier->getData('carrier_code') . '_' . $carrier->getData('method_code');
+        return $carrier->getData('carrier_code') . '_' . $carrier->getData('method_code'); // pure number wont work
     }
 
     public function modifyMeta(array $meta) {
@@ -87,7 +87,7 @@ class Modifier implements ModifierInterface
 
         $newMeta = [];
         foreach ($carriers as $carrier) {
-            $carrierFieldName = $this->getCarrierFieldName($carrier); // pure number wont work
+            $carrierFieldName = $this->getCarrierFieldName($carrier);
             $isDynamic = $this->carrierFacade->isDynamicCarrier($carrier->getData('carrier_code'), $carrier->getData('carrier_id'));
 
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($carrier->getMethod(), $carrier->getCountryId(), $carrier->getCarrierCode(), $carrier->getCarrierId());

@@ -17,10 +17,10 @@ abstract class AbstractBrain
     public const PREFIX = 'packetery';
     public const MULTI_SHIPPING_MODULE_NAME = 'multishipping';
 
-    /** @var \Magento\Framework\App\Request\Http  */
+    /** @var \Magento\Framework\App\Request\Http */
     protected $httpRequest;
 
-    /** @var \Packetery\Checkout\Model\Pricing\Service  */
+    /** @var \Packetery\Checkout\Model\Pricing\Service */
     protected $pricingService;
 
     /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
@@ -37,8 +37,7 @@ abstract class AbstractBrain
         \Magento\Framework\App\Request\Http $httpRequest,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-    )
-    {
+    ) {
         $this->httpRequest = $httpRequest;
         $this->pricingService = $pricingService;
         $this->scopeConfig = $scopeConfig;
@@ -49,6 +48,15 @@ abstract class AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
     abstract public function createConfig(AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
+     * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     */
+    public function createDynamicConfig(AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): AbstractConfig {
+        return $config;
+    }
 
     /**
      * @param string $carrierCode
@@ -66,6 +74,7 @@ abstract class AbstractBrain
     }
 
     /** Returns unique carrier identified in packetery context
+     *
      * @return string
      */
     public function getCarrierCode(): string {
@@ -73,6 +82,7 @@ abstract class AbstractBrain
     }
 
     /** Returns unique carrier identified in packetery context
+     *
      * @return string
      */
     public static function getCarrierCodeStatic(): string {
@@ -88,6 +98,7 @@ abstract class AbstractBrain
     abstract public function getMethodSelect(): AbstractMethodSelect;
 
     /** Returns data that are used to figure out destination point id
+     *
      * @return array
      */
     abstract protected function getResolvableDestinationData(): array;
@@ -95,42 +106,45 @@ abstract class AbstractBrain
     /**
      * @param string $method
      * @param string $countryId
-     * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return int|null
      */
-    public function resolvePointId(string $method, string $countryId, ?\Packetery\Checkout\Model\Carrier $dynamicCarrier = null): ?int
-    {
+    public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int {
         $data = $this->getResolvableDestinationData();
         return ($data[$method]['countryBranchIds'][$countryId] ?? null);
     }
 
     /** Used only by Packeta Dynamic
+     *
      * @param int $id
-     * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Carrier|null
+     * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null
      */
-    public function getDynamicCarrierById(?int $id): ?\Packetery\Checkout\Model\Carrier {
+    public function getDynamicCarrierById(?int $id): ?AbstractDynamicCarrier {
         return null; // majority of Magento carriers do not have dynamic carriers
     }
 
     /**
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
-     * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return \Magento\Shipping\Model\Rate\Result|null
      */
-    public function collectRates(AbstractCarrier $carrier, RateRequest $request, ?\Packetery\Checkout\Model\Carrier $dynamicCarrier = null): ?Result
-    {
-        $config = $carrier->getPacketeryConfig();
+    public function collectRates(AbstractCarrier $carrier, RateRequest $request, ?AbstractDynamicCarrier $dynamicCarrier = null): ?Result {
         $brain = $carrier->getPacketeryBrain();
 
-        if (!$this->isCollectionPossible($config)) {
+        $config = $this->createDynamicConfig(
+            $carrier->getPacketeryConfig(),
+            $dynamicCarrier
+        );
+
+        if (!$brain->isCollectionPossible($config)) {
             return null;
         }
 
         $methods = [];
         foreach ($this->getFinalAllowedMethods($config, $brain->getMethodSelect()) as $selectedMethod) {
             if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
-                if ($this->resolvePointId($selectedMethod, $request->getDestCountryId()) === null) {
+                if ($this->resolvePointId($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) === null) {
                     continue;
                 }
             }
@@ -138,15 +152,14 @@ abstract class AbstractBrain
             $methods[$selectedMethod] = $brain->getMethodSelect()->getLabelByValue($selectedMethod);
         }
 
-        return $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods);
+        return $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods, ($dynamicCarrier ? $dynamicCarrier->getCarrierId() : null));
     }
 
     /**
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
      * @return bool
      */
-    public function isCollectionPossible(AbstractConfig $config): bool
-    {
+    public function isCollectionPossible(AbstractConfig $config): bool {
         if ($this->httpRequest->getModuleName() == self::MULTI_SHIPPING_MODULE_NAME) {
             return false;
         }
@@ -164,6 +177,11 @@ abstract class AbstractBrain
      * @return array
      */
     public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): array {
+        if ($config instanceof \Packetery\Checkout\Model\Carrier\Config\AbstractDynamicConfig) {
+            $final = $this->getFinalAllowedMethods($config->getConfig(), $methodSelect);
+            return array_intersect($config->getAllowedMethods(), $final);
+        }
+
         $allowedMethods = $config->getAllowedMethods();
         if (empty($allowedMethods)) {
             return $methodSelect->getMethods();
