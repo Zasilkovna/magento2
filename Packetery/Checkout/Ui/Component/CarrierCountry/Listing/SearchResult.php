@@ -6,11 +6,6 @@ namespace Packetery\Checkout\Ui\Component\CarrierCountry\Listing;
 
 class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult
 {
-    private function getAvailableExpr(): \Zend_Db_Expr {
-        // todo is it need when Packeta will be there if enabled? FIX IT
-        return new \Zend_Db_Expr('1');
-    }
-
     protected function _initSelect() {
         $packeteryCarrierTable = $this->getTable('packetery_carrier');
         $this->getSelect()
@@ -18,12 +13,6 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
             ->columns(
                 [
                     'country',
-                    'available' => $this->getAvailableExpr(),
-                ]
-            )
-            ->order(
-                [
-                    'country ASC',
                 ]
             )
             ->group(
