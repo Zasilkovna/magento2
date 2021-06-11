@@ -59,6 +59,11 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      * dynamic carriers with attributes not supported by Packetery extension are omitted
      */
     private function supportedOnly(): void {
+        $allowUnsupported = ($_SERVER['PACKETERY_CHECKOUT_ALLOW_UNSUPPORTED_DYNAMIC_CARRIERS'] ?? '0');
+        if ($allowUnsupported === '1') {
+            return;
+        }
+
         $this->addFilter('main_table.disallows_cod', 0); // todo implement payment method filter
         $this->addFilter('main_table.customs_declarations', 0); // todo what does it require? New order edit form fields?
     }
