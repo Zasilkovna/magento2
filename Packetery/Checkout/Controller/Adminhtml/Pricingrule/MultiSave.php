@@ -53,11 +53,11 @@ class MultiSave extends Action implements HttpPostActionInterface
         $postData = $this->getRequest()->getPostValue()['shipping_methods'];
 
         foreach ($postData as &$carrierPriceRule) {
-            $carrierEnabled = $carrierPriceRule['enabled'];
+            $carrierEnabled = $carrierPriceRule['enabled'] === '1';
             $pricingRule = &$carrierPriceRule['pricing_rule'];
             $country = $pricingRule['country_id'];
             $method = $pricingRule['method'];
-            $pricingRule['enabled'] = (int)$carrierEnabled;
+            $pricingRule['enabled'] = $carrierEnabled;
             $carrierCode = $pricingRule['carrier_code'];
             $carrierId = $pricingRule['carrier_id'] ?? null;
             $carrierId = $carrierId === null ? null : (int)$carrierId;
@@ -65,7 +65,7 @@ class MultiSave extends Action implements HttpPostActionInterface
 
             if (!$carrierEnabled) {
                 if (isset($pricingRule['id'])) {
-                    $this->pricingruleRepository->setPricingRuleEnabled((int)$pricingRule['id'], (bool)$carrierEnabled);
+                    $this->pricingruleRepository->setPricingRuleEnabled((int)$pricingRule['id'], $carrierEnabled);
                 }
                 continue;
             }
