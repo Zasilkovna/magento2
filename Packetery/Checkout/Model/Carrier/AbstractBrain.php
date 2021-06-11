@@ -7,6 +7,7 @@ namespace Packetery\Checkout\Model\Carrier;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+use Packetery\Checkout\Model\Carrier\Config\AbstractDynamicConfig;
 use Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
 
 /**
@@ -177,7 +178,7 @@ abstract class AbstractBrain
      * @return array
      */
     public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): array {
-        if ($config instanceof \Packetery\Checkout\Model\Carrier\Config\AbstractDynamicConfig) {
+        if ($config instanceof AbstractDynamicConfig) {
             $final = $this->getFinalAllowedMethods($config->getConfig(), $methodSelect);
             return array_intersect($config->getAllowedMethods(), $final);
         }

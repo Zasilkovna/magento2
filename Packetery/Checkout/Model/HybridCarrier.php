@@ -18,8 +18,12 @@ class HybridCarrier extends \Magento\Framework\DataObject
      */
     public static function fromDynamic(Carrier $carrier): self {
         $hybridCarrier = new self();
-        $hybridCarrier->setData($carrier->getData());
         $hybridCarrier->setData('carrier_code', \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
+
+        foreach (['carrier_id', 'name', 'carrier_name', 'country'] as $key) {
+            $hybridCarrier->setData($key, $carrier->getData($key));
+        }
+
         $hybridCarrier->setData('method', $carrier->getMethod());
         $hybridCarrier->setData('method_code', (new MethodCode($hybridCarrier->getData('method'), $carrier->getCarrierId()))->toString());
         return $hybridCarrier;
@@ -125,13 +129,6 @@ class HybridCarrier extends \Magento\Framework\DataObject
      */
     public function getCountry(): string {
         return (string)$this->getData('country');
-    }
-
-    /** Not in database
-     * @return string
-     */
-    public function getCountryId(): string {
-        return $this->getCountry();
     }
 
     /**

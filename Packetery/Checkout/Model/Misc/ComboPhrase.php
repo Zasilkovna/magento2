@@ -47,7 +47,7 @@ class ComboPhrase extends Phrase
         return implode(
             $this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator,
             array_map(
-                function (Phrase $phrase) {
+                function ($phrase) {
                     return $phrase instanceof Phrase ? $phrase->getText() : (string)$phrase;
                 },
                 $this->phrases

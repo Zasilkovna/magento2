@@ -6,13 +6,28 @@ namespace Packetery\Checkout\Model\Carrier;
 
 abstract class AbstractDynamicCarrier
 {
+    /**
+     * @return int
+     */
     abstract public function getCarrierId(): int;
 
+    /**
+     * @return string
+     */
     abstract public function getCountryId(): string;
 
+    /**
+     * @return bool
+     */
     abstract public function getDeleted(): bool;
 
+    /**
+     * @return string
+     */
     abstract public function getFinalCarrierName(): string;
 
+    /**
+     * @return array
+     */
     abstract public function getMethods(): array;
 }

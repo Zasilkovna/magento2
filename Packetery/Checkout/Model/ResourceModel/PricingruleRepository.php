@@ -48,7 +48,7 @@ class PricingruleRepository
         $carrierId = isset($postData['carrier_id']) ? (int)$postData['carrier_id'] : null;
         $resolvedPricingRule = $this->pricingService->resolvePricingRule($postData['method'], $postData['country_id'], $postData['carrier_code'], $carrierId);
 
-        if (isset($postData['id']) && $resolvedPricingRule && $resolvedPricingRule->getId() == $postData['id']) {
+        if (isset($postData['id']) && $resolvedPricingRule !== null && $resolvedPricingRule->getId() == $postData['id']) {
             return true;
         }
 

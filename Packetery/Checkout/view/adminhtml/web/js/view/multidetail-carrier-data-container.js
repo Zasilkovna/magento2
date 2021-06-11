@@ -1,8 +1,6 @@
 define([
-    'underscore',
     'uiComponent'
 ], function(
-    _,
     Component
 ) {
     'use strict';
@@ -27,7 +25,6 @@ define([
         var elems = dataContainer.elems();
         for(var key in elems) {
             if(elems.hasOwnProperty(key)) {
-                // console.log(elems[key]);
                 if(elems[key].elems) {
                     elems[key].visible(visible);
                     changeVisibility(elems[key], visible);

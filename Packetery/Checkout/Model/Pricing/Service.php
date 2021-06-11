@@ -70,6 +70,9 @@ class Service
             }
 
             $price = $this->resolvePrice($request, $carrierConfig, $pricingRule);
+            if ($price === null) {
+                continue; // if cart weight did not match any rule
+            }
 
             $methodCode = new MethodCode($allowedMethod, $dynamicCarrierId);
             $method = $this->createRateMethod(
@@ -111,9 +114,9 @@ class Service
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
      * @param \Packetery\Checkout\Model\Pricingrule $pricingRule
-     * @return float
+     * @return float|null
      */
-    protected function resolvePrice(RateRequest $request, AbstractConfig $config, Pricingrule $pricingRule): float
+    protected function resolvePrice(RateRequest $request, AbstractConfig $config, Pricingrule $pricingRule): ?float
     {
         $weightTotal = (float)$request->getPackageWeight();
         $priceTotal = (float)$request->getPackageValue();

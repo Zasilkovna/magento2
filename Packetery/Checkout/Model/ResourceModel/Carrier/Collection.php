@@ -43,6 +43,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         $this->supportedOnly();
     }
 
+    /**
+     * @param bool $value
+     */
     private function wherePricingRuleEnabled(bool $value): void {
         $this->leftJoinPricingRules();
         $this->addFilter('pricingRules.enabled', $value);

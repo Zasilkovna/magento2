@@ -17,6 +17,19 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
     /** @var \Magento\Framework\App\RequestInterface */
     private $request;
 
+    /**
+     * @param \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
+     * @param \Magento\Framework\App\RequestInterface $request
+     * @param $mainTable
+     * @param null $resourceModel
+     * @param null $identifierName
+     * @param null $connectionName
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function __construct(
         EntityFactory $entityFactory,
         Logger $logger,

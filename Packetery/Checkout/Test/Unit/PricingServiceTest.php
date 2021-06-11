@@ -82,6 +82,42 @@ class PricingServiceTest extends BaseTest
             \Magento\Quote\Model\Quote\Address\RateRequest::class,
             [],
             [],
+            ['getPackageWeight' => 500000, 'getPackageValue' => 300, 'getDestCountryId' => 'CZ']
+        );
+
+        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
+        $config->method('getMaxWeight')->willReturn(10.0);
+        $config->method('getFreeShippingThreshold')->willReturn(null);
+        $config->method('getTitle')->willReturn('title');
+
+        $method = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
+        $result = $service->collectRates($request, AbstractBrain::PREFIX, $config, [
+            Methods::PICKUP_POINT_DELIVERY => $method->getLabelByValue(Methods::PICKUP_POINT_DELIVERY)
+        ]);
+        $this->assertNull($result); // cart weight exceeds all rules
+
+        $pricingRule = $this->createPricingRule(20000, 'CZ');
+        $weightRules = [
+            $this->createWeightRule(41, null),
+            $this->createWeightRule(44, 3),
+            $this->createWeightRule(58, 6),
+            $this->createWeightRule(76.88, 9),
+        ];
+
+        /** @var \Packetery\Checkout\Model\Pricing\Service|MockObject $service */
+        $service = $this->createProxy(
+            Pricing\Service::class,
+            [
+                'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
+                'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
+            ],
+            ['getWeightRulesByPricingRule' => $weightRules, 'resolvePricingRule' => $pricingRule]
+        );
+
+        $request = $this->createProxyWithMethods(
+            \Magento\Quote\Model\Quote\Address\RateRequest::class,
+            [],
+            [],
             ['getPackageWeight' => 5, 'getPackageValue' => 300, 'getDestCountryId' => 'CZ']
         );
 

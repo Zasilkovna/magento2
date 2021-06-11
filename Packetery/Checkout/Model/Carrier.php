@@ -74,13 +74,6 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
         return (string)$this->getData('country');
     }
 
-    /** Not in database
-     * @return string
-     */
-    public function getCountryId(): string {
-        return $this->getCountry();
-    }
-
     /**
      * @return bool
      */

@@ -9,5 +9,8 @@ namespace Packetery\Checkout\Model\Carrier\Config;
  */
 abstract class AbstractDynamicConfig extends AbstractConfig
 {
+    /**
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     */
     abstract public function getConfig(): AbstractConfig;
 }

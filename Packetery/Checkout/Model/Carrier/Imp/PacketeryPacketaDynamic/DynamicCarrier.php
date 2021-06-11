@@ -21,22 +21,37 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
         $this->model = $model;
     }
 
+    /**
+     * @return int
+     */
     public function getCarrierId(): int {
         return $this->model->getCarrierId();
     }
 
+    /**
+     * @return string
+     */
     public function getCountryId(): string {
-        return $this->model->getCountryId();
+        return $this->model->getCountry();
     }
 
+    /**
+     * @return bool
+     */
     public function getDeleted(): bool {
         return $this->model->getDeleted();
     }
 
+    /**
+     * @return string
+     */
     public function getFinalCarrierName(): string {
         return $this->model->getFinalCarrierName();
     }
 
+    /**
+     * @return array
+     */
     public function getMethods(): array {
         return [$this->model->getMethod()];
     }

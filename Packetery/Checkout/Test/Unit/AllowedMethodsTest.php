@@ -52,7 +52,12 @@ class AllowedMethodsTest extends \Packetery\Checkout\Test\BaseTest
         );
     }
 
-    private function assertFinals($userMethods, $dynamicMethods, array $resultMethods) {
+    /**
+     * @param array $userMethods
+     * @param array $dynamicMethods
+     * @param array $resultMethods
+     */
+    private function assertFinals(array $userMethods, array $dynamicMethods, array $resultMethods): void {
         /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain $proxy */
         $proxy = $this->createProxy(\Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::class, [], []);
 

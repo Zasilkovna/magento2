@@ -10,6 +10,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NotFoundException;
+use Packetery\Checkout\Model\Misc\ComboPhrase;
 
 class MultiSave extends Action implements HttpPostActionInterface
 {
@@ -55,12 +56,12 @@ class MultiSave extends Action implements HttpPostActionInterface
             $carrierEnabled = $carrierPriceRule['enabled'];
             $pricingRule = &$carrierPriceRule['pricing_rule'];
             $country = $pricingRule['country_id'];
+            $method = $pricingRule['method'];
             $pricingRule['enabled'] = (int)$carrierEnabled;
             $carrierCode = $pricingRule['carrier_code'];
             $carrierId = $pricingRule['carrier_id'] ?? null;
             $carrierId = $carrierId === null ? null : (int)$carrierId;
             $carrierName = $carrierPriceRule['carrier_name'] ?? null;
-            $carrierPublicName = $this->carrierFacade->getPublicName($carrierCode, $carrierId);
 
             if (!$carrierEnabled) {
                 if (isset($pricingRule['id'])) {
@@ -80,23 +81,22 @@ class MultiSave extends Action implements HttpPostActionInterface
                 $pricingRule['free_shipment'] = null; // empty string is casted to 0
             }
 
+            $hybridCarrier = $this->carrierFacade->createHybridCarrier($carrierCode, $carrierId, $method, $country);
+            $carrierPublicName = $hybridCarrier->getFieldsetTitle();
+
             try {
                 $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
             } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
-                $this->messageManager->addErrorMessage($carrierPublicName);
-                $this->messageManager->addErrorMessage(__('Price rule for specified country already exists'));
+                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Price rule for specified country already exists')], ' '));
                 return $this->createRedirect($country);
             } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
-                $this->messageManager->addErrorMessage($carrierPublicName);
-                $this->messageManager->addErrorMessage(__('The weight is invalid'));
+                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('The weight is invalid')], ' '));
                 return $this->createRedirect($country);
             } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
-                $this->messageManager->addErrorMessage($carrierPublicName);
-                $this->messageManager->addErrorMessage(__('Pricing rule not found'));
+                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Pricing rule not found')], ' '));
                 return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('pricingrule/carrierCountries');
             } catch (\Packetery\Checkout\Model\Exception\WeightRuleMissing $e) {
-                $this->messageManager->addErrorMessage($carrierPublicName);
-                $this->messageManager->addErrorMessage(__('Weight rule is missing'));
+                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Weight rule is missing')], ' '));
                 return $this->createRedirect($country);
             }
         }
