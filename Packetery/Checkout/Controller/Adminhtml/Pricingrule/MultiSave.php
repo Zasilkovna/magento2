@@ -88,16 +88,16 @@ class MultiSave extends Action implements HttpPostActionInterface
                 $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
             } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
                 $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Price rule for specified country already exists')], ' '));
-                return $this->createRedirect($country);
+                continue;
             } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
                 $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('The weight is invalid')], ' '));
-                return $this->createRedirect($country);
+                continue;
             } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
                 $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Pricing rule not found')], ' '));
-                return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('pricingrule/carrierCountries');
+                continue;
             } catch (\Packetery\Checkout\Model\Exception\WeightRuleMissing $e) {
                 $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Weight rule is missing')], ' '));
-                return $this->createRedirect($country);
+                continue;
             }
         }
 
