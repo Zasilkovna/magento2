@@ -72,6 +72,13 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
+     * @return bool
+     */
+    public function isAssignableToPricingRule(): bool {
+        return false;
+    }
+
+    /**
      * @param int|null $dynamicCarrierId
      * @return \Packetery\Checkout\Model\Carrier|null
      */

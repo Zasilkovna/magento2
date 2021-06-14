@@ -51,14 +51,6 @@ class Modifier implements ModifierInterface
     /**
      * @return \Packetery\Checkout\Model\HybridCarrier[]
      */
-    private function getCarriersByParams(): array {
-        $country = $this->request->getParam('country');
-        return $this->getCarriers($country);
-    }
-
-    /**
-     * @return \Packetery\Checkout\Model\HybridCarrier[]
-     */
     public function getCarriers(string $country): array {
         $hybridCarriers = [];
 
@@ -86,7 +78,7 @@ class Modifier implements ModifierInterface
                 // each hybrid carrier represent form fieldset as row
                 $carriers = $packeteryAbstractCarrierBrain->findConfigurableDynamicCarriers($country, [$method]);
 
-                if (empty($carriers)) {
+                if ($packeteryAbstractCarrierBrain->isAssignableToPricingRule()) {
                     // static carrier has no dynamic carriers
                     // static wrapping carriers are omitted
                     $availableCountries = $packeteryAbstractCarrierBrain->getAvailableCountries([$method]);
@@ -119,8 +111,7 @@ class Modifier implements ModifierInterface
      */
     public function modifyMeta(array $meta) {
         $countryId = $this->request->getParam('country');
-
-        $carriers = $this->getCarriersByParams();
+        $carriers = $this->getCarriers($countryId);
 
         $newMeta = [];
         foreach ($carriers as $carrier) {

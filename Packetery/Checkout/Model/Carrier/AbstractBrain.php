@@ -59,6 +59,13 @@ abstract class AbstractBrain
         return $config;
     }
 
+    /** Can pricing rule be attached to abstract carrier of this namespace
+     * @return bool
+     */
+    public function isAssignableToPricingRule(): bool {
+        return true;
+    }
+
     /**
      * @param string $carrierCode
      * @param mixed $scope
