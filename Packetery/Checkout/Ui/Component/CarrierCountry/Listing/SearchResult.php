@@ -6,6 +6,8 @@ namespace Packetery\Checkout\Ui\Component\CarrierCountry\Listing;
 
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\DB\Sql\ColumnValueExpression;
+use Magento\Framework\DB\Sql\UnionExpression;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Psr\Log\LoggerInterface as Logger;
 
@@ -13,12 +15,6 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
 {
     /** @var \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier */
     private $modifier;
-
-    /** @var \Magento\Framework\App\RequestInterface */
-    private $request;
-
-    /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier */
-    private $packeteryCarrier;
 
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
@@ -28,9 +24,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
-     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier
      * @param \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
-     * @param \Magento\Framework\App\RequestInterface $request
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      * @param $mainTable
      * @param null $resourceModel
@@ -43,9 +37,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         Logger $logger,
         FetchStrategy $fetchStrategy,
         EventManager $eventManager,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
         \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier,
-        \Magento\Framework\App\RequestInterface $request,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
         $mainTable,
         $resourceModel = null,
@@ -53,32 +45,8 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         $connectionName = null
     ) {
         $this->carrierFacade = $carrierFacade;
-        $this->packeteryCarrier = $packeteryCarrier;
-        parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel, $identifierName, $connectionName);
         $this->modifier = $modifier;
-        $this->request = $request;
-    }
-
-    /**
-     * @param string|array $field
-     * @param null|string|array $condition
-     * @return $this
-     */
-    public function addFieldToFilter($field, $condition = null) {
-        if ($field === 'availableName') {
-            return $this;
-        }
-
-        if (is_array($field) && in_array('availableName', $field)) {
-            unset($field[array_search('availableName', $field)]);
-            unset($condition[array_search('availableName', $field)]);
-
-            if (empty($field)) {
-                return $this;
-            }
-        }
-
-        return parent::addFieldToFilter($field, $condition);
+        parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel, $identifierName, $connectionName);
     }
 
     protected function _initSelect() {
@@ -86,24 +54,27 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         $assembledQueries = [];
 
         foreach ($neededCountries as $neededCountry) {
-            $neededCountry = (new \Zend_Db_Select($this->getSelect()->getAdapter()))
+            $options = $this->modifier->getCarriers($neededCountry);
+            $neededCountry = $this->getConnection()->select()
                 ->from(['main_table' => $this->getTable('setup_module')])
                 ->reset('columns')
                 ->columns(
                     [
-                        'country' => new \Zend_Db_Expr("'{$neededCountry}'"),
+                        'country' => new ColumnValueExpression($this->getConnection()->quote($neededCountry)),
+                        'available' => new ColumnValueExpression($this->getConnection()->quote(empty($options) ? 0 : 1)),
                     ]
                 );
 
-            $assembledQueries[] = $neededCountry->assemble();
+            $assembledQueries[] = $neededCountry;
         }
 
         $this->getSelect()
-            ->from(['main_table' => new \Zend_Db_Expr('(' . implode(' UNION ALL ', $assembledQueries) . ')')])
+            ->from(['main_table' => new UnionExpression($assembledQueries, $this->getSelect()::SQL_UNION, '(%s)')])
             ->reset('columns')
             ->columns(
                 [
                     'country',
+                    'available',
                 ]
             )
             ->group(
@@ -112,32 +83,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 ]
             );
 
-        return $this;
-    }
-
-    protected function _afterLoadData() {
-        parent::_afterLoadData();
-
-        $filters = $this->request->getParam('filters', []);
-
-        foreach ($this->_data as $key => &$item) {
-
-            $options = $this->modifier->getCarriers($item['country']);
-
-            if (!empty($options)) {
-                $item['available'] = '1';
-            } else {
-                $item['available'] = '0';
-            }
-
-            if (isset($filters['availableName'])) {
-                $value = $filters['availableName'];
-
-                if ($item['available'] !== $value) {
-                    unset($this->_data[$key]);
-                }
-            }
-        }
+        $this->addFilterToMap('availableName', 'available');
 
         return $this;
     }
