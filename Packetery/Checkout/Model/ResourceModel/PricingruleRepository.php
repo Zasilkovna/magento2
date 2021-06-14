@@ -176,11 +176,16 @@ class PricingruleRepository
         $rule->save();
     }
 
-    public function disablePricingRulesByDynamicCarriers(): void {
+    /**
+     * @param array $exclude
+     */
+    public function disablePricingRulesExcept(array $exclude): void {
+        if (empty($exclude)) {
+            return;
+        }
+
         $collection = $this->pricingRuleCollectionFactory->create();
-        $collection->join('packetery_carrier', 'main_table.carrier_id = packetery_carrier.carrier_id', '');
-        $collection->addFieldToFilter('packetery_carrier.deleted', ['eq' => 1]);
-        $collection->addFieldToFilter('main_table.enabled', ['eq' => 1]);
+        $collection->addFieldToFilter('main_table.id', ['nin' => $exclude]);
         $collection->setDataToAll('enabled', 0);
         $collection->save();
     }

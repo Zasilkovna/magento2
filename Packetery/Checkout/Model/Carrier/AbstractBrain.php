@@ -125,6 +125,22 @@ abstract class AbstractBrain
     }
 
     /**
+     * @param string $method
+     * @param string $countryId
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
+     * @return bool
+     */
+    protected function availableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+        if ($method !== Methods::PICKUP_POINT_DELIVERY) {
+            if ($this->resolvePointId($method, $countryId, $dynamicCarrier) === null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
@@ -144,10 +160,8 @@ abstract class AbstractBrain
 
         $methods = [];
         foreach ($this->getFinalAllowedMethods($config, $brain->getMethodSelect()) as $selectedMethod) {
-            if ($selectedMethod !== Methods::PICKUP_POINT_DELIVERY) {
-                if ($this->resolvePointId($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) === null) {
-                    continue;
-                }
+            if ($this->availableForCollection($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) === false) {
+                continue;
             }
 
             $methods[$selectedMethod] = $brain->getMethodSelect()->getLabelByValue($selectedMethod);
@@ -170,6 +184,24 @@ abstract class AbstractBrain
         }
 
         return true;
+    }
+
+    /** dynamic carriers visible in configuration
+     * @param bool $configurable
+     * @param string $country
+     * @param array $methods
+     * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
+     */
+    public function findConfigurableDynamicCarriers(string $country, array $methods): array {
+        return [];
+    }
+
+    /** Static + dynamic countries
+     * @param array $methods
+     * @return array
+     */
+    public function getAvailableCountries(array $methods): array {
+        return [];
     }
 
     /**

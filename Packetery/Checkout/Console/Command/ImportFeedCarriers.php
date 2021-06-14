@@ -26,23 +26,35 @@ class ImportFeedCarriers extends Command
     /** @var \Packetery\Checkout\Model\ResourceModel\PricingruleRepository */
     private $pricingRuleRepository;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
+    /** @var \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier */
+    private $modifier;
+
     /**
      * @param \GuzzleHttp\Client $client
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $collectionFactory
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingRuleRepository
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+     * @param \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
      */
     public function __construct(
         \GuzzleHttp\Client $client,
         \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $collectionFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingRuleRepository
+        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingRuleRepository,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
+        \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
     ) {
         parent::__construct();
         $this->client = $client;
         $this->collectionFactory = $collectionFactory;
         $this->scopeConfig = $scopeConfig;
         $this->pricingRuleRepository = $pricingRuleRepository;
+        $this->carrierFacade = $carrierFacade;
+        $this->modifier = $modifier;
     }
 
     /**
@@ -120,7 +132,12 @@ class ImportFeedCarriers extends Command
             }
         }
 
-        $this->pricingRuleRepository->disablePricingRulesByDynamicCarriers();
+        $rules = [];
+        foreach ($this->carrierFacade->getAllAvailableCountries() as $country) {
+            $rules = array_merge($rules, $this->modifier->getPricingRulesForCountry($country));
+        }
+
+        $this->pricingRuleRepository->disablePricingRulesExcept($rules);
 
         $output->writeln('Carrier feed import ended successfully');
     }

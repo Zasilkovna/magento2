@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
+use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
@@ -68,20 +69,48 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
+     * @param string $method
+     * @param string $countryId
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
+     * @return bool
+     */
+    protected function availableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+        $availableCountries = $this->getAvailableCountries([$method]);
+        return in_array($countryId, $availableCountries) && parent::availableForCollection($method, $countryId, $dynamicCarrier);
+    }
+
+    /**
      * @param array $methods
      * @return array
      */
     public function getAvailableCountries(array $methods): array {
-        if ($methods !== [Methods::PICKUP_POINT_DELIVERY]) {
-            throw new \InvalidArgumentException('Only PP method is supported');
+        if (!empty(array_diff($methods, [Methods::PICKUP_POINT_DELIVERY, Methods::ADDRESS_DELIVERY]))) {
+            throw new \InvalidArgumentException('Some method is unsupported');
         }
 
-        $fixedCountries = ['CZ', 'SK', 'HU', 'RO'];
+        $result = [];
 
-        $collection = $this->carrierCollectionFactory->create();
-        $collection->forDeliveryMethod(Methods::PICKUP_POINT_DELIVERY);
-        $countries = $collection->getColumnValues('country');
+        if (in_array(Methods::ADDRESS_DELIVERY, $methods)) {
+            $result = array_merge($result, array_keys($this->getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds'] ?? []));
+        }
 
-        return array_unique(array_merge($fixedCountries, $countries));
+        if (in_array(Methods::PICKUP_POINT_DELIVERY, $methods)) {
+            $fixedCountries = $this->getBaseCountries();
+
+            $collection = $this->carrierCollectionFactory->create();
+            $collection->forDeliveryMethod(Methods::PICKUP_POINT_DELIVERY);
+            $countries = $collection->getColumnValues('country');
+
+            $result = array_merge($result, array_unique(array_merge($fixedCountries, $countries)));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getBaseCountries(): array {
+        return ['CZ', 'SK', 'HU', 'RO'];
     }
 }

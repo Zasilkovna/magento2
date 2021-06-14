@@ -79,17 +79,28 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      * @param string $method
      */
     public function forDeliveryMethod(string $method): void {
-        if ($method === \Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY) {
-            $this->addFilter('main_table.is_pickup_points', 0);
-            return;
+        $this->forDeliveryMethods([$method]);
+    }
+
+    /**
+     * @param array $methods
+     */
+    public function forDeliveryMethods(array $methods): void {
+        $isPickupPointsValues = [];
+
+        if (in_array(\Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY, $methods)) {
+            $isPickupPointsValues[] = 0;
         }
 
-        if ($method === \Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY) {
-            $this->addFilter('main_table.is_pickup_points', 1);
-            return;
+        if (in_array(\Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY, $methods)) {
+            $isPickupPointsValues[] = 1;
         }
 
-        throw new \InvalidArgumentException("Method '{$method}' not supported");
+        if (!empty($isPickupPointsValues)) {
+            $this->addFieldToFilter('main_table.is_pickup_points', [
+                'in' => $isPickupPointsValues
+            ]);
+        }
     }
 
     private function leftJoinPricingRules(): void {

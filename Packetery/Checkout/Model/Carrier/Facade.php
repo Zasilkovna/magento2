@@ -14,13 +14,22 @@ class Facade
     /** @var \Magento\Shipping\Model\CarrierFactory */
     private $carrierFactory;
 
+    /** @var \Magento\Shipping\Model\Config */
+    private $shippingConfig;
+
     /**
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $dynamicCarrierCollectionFactory
      * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
+     * @param \Magento\Shipping\Model\Config $shippingConfig
      */
-    public function __construct(\Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $dynamicCarrierCollectionFactory, \Magento\Shipping\Model\CarrierFactory $carrierFactory) {
+    public function __construct(
+        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $dynamicCarrierCollectionFactory,
+        \Magento\Shipping\Model\CarrierFactory $carrierFactory,
+        \Magento\Shipping\Model\Config $shippingConfig
+    ) {
         $this->dynamicCarrierCollectionFactory = $dynamicCarrierCollectionFactory;
         $this->carrierFactory = $carrierFactory;
+        $this->shippingConfig = $shippingConfig;
     }
 
     /**
@@ -85,6 +94,35 @@ class Facade
         }
 
         return false;
+    }
+
+    /**
+     * @return AbstractCarrier[]
+     */
+    public function getPacketeryAbstractCarriers(): array {
+        $carriers = [];
+
+        foreach ($this->shippingConfig->getAllCarriers() as $carrier) {
+            if ($carrier instanceof AbstractCarrier) {
+                $carriers[] = $carrier;
+            }
+        }
+
+        return $carriers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllAvailableCountries(): array {
+        $countries = [];
+
+        foreach ($this->getPacketeryAbstractCarriers() as $packeteryAbstractCarrier) {
+            $carrierMethods = $packeteryAbstractCarrier->getPacketeryBrain()->getMethodSelect()->getMethods();
+            $countries = array_merge($countries, $packeteryAbstractCarrier->getPacketeryBrain()->getAvailableCountries($carrierMethods));
+        }
+
+        return array_unique($countries);
     }
 
     /**

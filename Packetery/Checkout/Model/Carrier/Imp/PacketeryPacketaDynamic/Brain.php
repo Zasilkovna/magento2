@@ -95,6 +95,27 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
+     * @param string $country
+     * @param array $methods
+     * @return DynamicCarrier[]
+     */
+    public function findConfigurableDynamicCarriers(string $country, array $methods): array {
+        /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
+        $collection = $this->carrierCollectionFactory->create();
+        $collection->configurableOnly();
+        $collection->whereCountry($country);
+        $collection->forDeliveryMethods($methods);
+        $items = $collection->getItems();
+
+        return array_map(
+            function (\Packetery\Checkout\Model\Carrier $carrier) {
+                return new DynamicCarrier($carrier);
+            },
+            $items
+        );
+    }
+
+    /**
      * @param string $method
      * @param string $countryId
      * @return int|null
@@ -120,10 +141,29 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         return $dynamicCarrier->getCarrierId();
     }
 
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
+     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     */
     public function createDynamicConfig(\Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
         return new DynamicConfig(
             $config,
             $dynamicCarrier
         );
+    }
+
+    /**
+     * @param array $methods
+     * @return array
+     */
+    public function getAvailableCountries(array $methods): array {
+        /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
+        $collection = $this->carrierCollectionFactory->create();
+
+//        $methodSelect = $this->getMethodSelect();
+//        $collection->forDeliveryMethods($methodSelect->getMethods());
+
+        return $collection->getColumnValues('country');
     }
 }

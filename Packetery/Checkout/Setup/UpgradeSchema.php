@@ -132,7 +132,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'enabled',
                 [
                     'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
-                    'default' => 1,
+                    'default' => 0,
                     'nullable' => false,
                     'comment' => 'Is rule enabled?',
                     'after' => 'carrier_id',

@@ -9,6 +9,7 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Packetery\Checkout\Model\Carrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\HybridCarrier;
+use Packetery\Checkout\Model\Pricingrule;
 
 /**
  * Modifies multi detail pricing rule form xml structure and provides data for the form
@@ -59,32 +60,49 @@ class Modifier implements ModifierInterface
      * @return \Packetery\Checkout\Model\HybridCarrier[]
      */
     public function getCarriers(string $country): array {
-        /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
-        $collection = $this->carrierCollectionFactory->create();
-        $collection->configurableOnly();
-        $collection->whereCountry($country);
-        $collection->forDeliveryMethod(Methods::ADDRESS_DELIVERY);
-        $carriers = $collection->getItems();
+        $hybridCarriers = [];
 
-        $carriers = array_map(
-            function (Carrier $carrier) {
-                return HybridCarrier::fromDynamic($carrier);
-            },
-            $carriers
-        );
+        $staticCarriers = $this->carrierFacade->getPacketeryAbstractCarriers();
+        usort($staticCarriers, function (Carrier\AbstractCarrier $staticCarrier) {
+            if ($staticCarrier instanceof Carrier\Imp\Packetery\Carrier) {
+                return 1; // Packetery is always first
+            }
 
-        if ($this->packeteryCarrier->getPacketeryBrain()->resolvePointId(Methods::ADDRESS_DELIVERY, $country)) {
-            $packetaCarrier = HybridCarrier::fromAbstract($this->packeteryCarrier, Methods::ADDRESS_DELIVERY, $country);
-            array_unshift($carriers, $packetaCarrier);
+            return 0;
+        });
+
+        foreach ($staticCarriers as $packeteryAbstractCarrier) {
+            $packeteryAbstractCarrierBrain = $packeteryAbstractCarrier->getPacketeryBrain();
+            $methods = $packeteryAbstractCarrierBrain->getMethodSelect()->getMethods();
+            usort($methods, function (string $method) {
+                if ($method === Methods::PICKUP_POINT_DELIVERY) {
+                    return 1; // PP methods are first in list
+                }
+
+                return 0;
+            });
+
+            foreach ($methods as $method) {
+                // each hybrid carrier represent form fieldset as row
+                $carriers = $packeteryAbstractCarrierBrain->findConfigurableDynamicCarriers($country, [$method]);
+
+                if (empty($carriers)) {
+                    // static carrier has no dynamic carriers
+                    // static wrapping carriers are omitted
+                    $availableCountries = $packeteryAbstractCarrierBrain->getAvailableCountries([$method]);
+                    if (in_array($country, $availableCountries)) {
+                        $packetaCarrier = HybridCarrier::fromAbstract($packeteryAbstractCarrier, $method, $country);
+                        array_unshift($hybridCarriers, $packetaCarrier);
+                    }
+                }
+
+                foreach ($carriers as $carrier) {
+                    $hybridCarriers[] = HybridCarrier::fromAbstractDynamic($packeteryAbstractCarrier, $carrier, $method, $country);
+                }
+            }
         }
 
-        $packeteryCarrierPPCountries = $this->packeteryCarrier->getPacketeryBrain()->getAvailableCountries([Methods::PICKUP_POINT_DELIVERY]);
-        if (in_array($country, $packeteryCarrierPPCountries)) {
-            $packetaCarrier = HybridCarrier::fromAbstract($this->packeteryCarrier, Methods::PICKUP_POINT_DELIVERY, $country);
-            array_unshift($carriers, $packetaCarrier);
-        }
-
-        return $carriers;
+        return $hybridCarriers;
     }
 
     /**
@@ -422,17 +440,32 @@ class Modifier implements ModifierInterface
     }
 
     /**
-     * @param array $data
+     * @param string $country
+     * @return int[]
+     */
+    public function getPricingRulesForCountry(string $country): array {
+        $data = $this->createData($country);
+
+        $pricingRules = [];
+        foreach ($data['shipping_methods'] as $shippingMethod) {
+            if ($shippingMethod['pricing_rule']['id'] ?? false) {
+                $pricingRules[] = $shippingMethod['pricing_rule']['id'];
+            }
+        }
+
+        return $pricingRules;
+    }
+
+    /**
+     * @param string $country
      * @return array
      */
-    public function modifyData(array $data) {
-        $country = $this->request->getParam('country');
-
+    public function createData(string $country): array {
         $result = [
             'shipping_methods' => [],
         ];
 
-        $carriers = $this->getCarriersByParams();
+        $carriers = $this->getCarriers($country);
         foreach ($carriers as $carrier) {
             $shippingMethod = [];
             $pricingRule = [];
@@ -442,7 +475,7 @@ class Modifier implements ModifierInterface
             $carrierId = $carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null;
 
             $shippingMethod['carrier_name'] = $carrier->getFinalCarrierName();
-            $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $carrier->getCountry(), $carrierCode, $carrierId);
+            $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $country, $carrierCode, $carrierId);
 
             $shippingMethod['enabled'] = '0';
             $pricingRule['carrier_code'] = $carrierCode;
@@ -466,6 +499,16 @@ class Modifier implements ModifierInterface
             $result['shipping_methods'][$this->getCarrierFieldName($carrier)] = $shippingMethod;
         }
 
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function modifyData(array $data) {
+        $country = $this->request->getParam('country');
+        $result = $this->createData($country);
         return [$country => $result];
     }
 }

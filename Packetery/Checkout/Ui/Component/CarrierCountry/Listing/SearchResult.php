@@ -17,13 +17,21 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
     /** @var \Magento\Framework\App\RequestInterface */
     private $request;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier */
+    private $packeteryCarrier;
+
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     /**
      * @param \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier
      * @param \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
      * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      * @param $mainTable
      * @param null $resourceModel
      * @param null $identifierName
@@ -35,13 +43,17 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         Logger $logger,
         FetchStrategy $fetchStrategy,
         EventManager $eventManager,
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
         \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier,
         \Magento\Framework\App\RequestInterface $request,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
         $mainTable,
         $resourceModel = null,
         $identifierName = null,
         $connectionName = null
     ) {
+        $this->carrierFacade = $carrierFacade;
+        $this->packeteryCarrier = $packeteryCarrier;
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel, $identifierName, $connectionName);
         $this->modifier = $modifier;
         $this->request = $request;
@@ -70,9 +82,25 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
     }
 
     protected function _initSelect() {
-        $packeteryCarrierTable = $this->getTable('packetery_carrier');
+        $neededCountries = $this->carrierFacade->getAllAvailableCountries();
+        $assembledQueries = [];
+
+        foreach ($neededCountries as $neededCountry) {
+            $neededCountry = (new \Zend_Db_Select($this->getSelect()->getAdapter()))
+                ->from(['main_table' => $this->getTable('setup_module')])
+                ->reset('columns')
+                ->columns(
+                    [
+                        'country' => new \Zend_Db_Expr("'{$neededCountry}'"),
+                    ]
+                );
+
+            $assembledQueries[] = $neededCountry->assemble();
+        }
+
         $this->getSelect()
-            ->from(['main_table' => $packeteryCarrierTable])
+            ->from(['main_table' => new \Zend_Db_Expr('(' . implode(' UNION ALL ', $assembledQueries) . ')')])
+            ->reset('columns')
             ->columns(
                 [
                     'country',
