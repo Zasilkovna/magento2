@@ -167,10 +167,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     public function getAvailableCountries(array $methods): array {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
-
-//        $methodSelect = $this->getMethodSelect();
-//        $collection->forDeliveryMethods($methodSelect->getMethods());
-
+        $collection->forDeliveryMethods($methods);
         return $collection->getColumnValues('country');
     }
 }

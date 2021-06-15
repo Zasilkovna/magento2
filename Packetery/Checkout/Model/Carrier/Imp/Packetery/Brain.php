@@ -69,25 +69,10 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
-     * @param string $method
-     * @param string $countryId
-     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
-     * @return bool
-     */
-    protected function availableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
-        $availableCountries = $this->getAvailableCountries([$method]);
-        return in_array($countryId, $availableCountries) && parent::availableForCollection($method, $countryId, $dynamicCarrier);
-    }
-
-    /**
      * @param array $methods
      * @return array
      */
     public function getAvailableCountries(array $methods): array {
-        if (!empty(array_diff($methods, [Methods::PICKUP_POINT_DELIVERY, Methods::ADDRESS_DELIVERY]))) {
-            throw new \InvalidArgumentException('Some method is unsupported');
-        }
-
         $result = [];
 
         if (in_array(Methods::ADDRESS_DELIVERY, $methods)) {

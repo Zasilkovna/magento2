@@ -118,7 +118,7 @@ class Facade
         $countries = [];
 
         foreach ($this->getPacketeryAbstractCarriers() as $packeteryAbstractCarrier) {
-            $carrierMethods = $packeteryAbstractCarrier->getPacketeryBrain()->getMethodSelect()->getMethods();
+            $carrierMethods = Methods::getAll();
             $countries = array_merge($countries, $packeteryAbstractCarrier->getPacketeryBrain()->getAvailableCountries($carrierMethods));
         }
 

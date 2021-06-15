@@ -137,14 +137,15 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return bool
      */
-    protected function availableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+    protected function isAvailableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
         if ($method !== Methods::PICKUP_POINT_DELIVERY) {
             if ($this->resolvePointId($method, $countryId, $dynamicCarrier) === null) {
                 return false;
             }
         }
 
-        return true;
+        $availableCountries = $this->getAvailableCountries([$method]);
+        return in_array($countryId, $availableCountries);
     }
 
     /**
@@ -167,7 +168,7 @@ abstract class AbstractBrain
 
         $methods = [];
         foreach ($this->getFinalAllowedMethods($config, $brain->getMethodSelect()) as $selectedMethod) {
-            if ($this->availableForCollection($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) === false) {
+            if ($this->isAvailableForCollection($selectedMethod, $request->getDestCountryId(), $dynamicCarrier) === false) {
                 continue;
             }
 

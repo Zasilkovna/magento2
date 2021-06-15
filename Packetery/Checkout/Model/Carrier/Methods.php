@@ -11,4 +11,14 @@ class Methods
 {
     public const PICKUP_POINT_DELIVERY = 'pickupPointDelivery';
     public const ADDRESS_DELIVERY = 'addressDelivery';
+
+    /**
+     * @return string[]
+     */
+    public static function getAll(): array {
+        return [
+            self::PICKUP_POINT_DELIVERY,
+            self::ADDRESS_DELIVERY
+        ];
+    }
 }
