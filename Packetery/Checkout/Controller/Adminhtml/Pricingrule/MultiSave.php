@@ -101,10 +101,6 @@ class MultiSave extends Action implements HttpPostActionInterface
             }
         }
 
-        $this->messageManager->addSuccessMessage(
-            __('Saved')
-        );
-
         return $this->createRedirect($country);
     }
 
