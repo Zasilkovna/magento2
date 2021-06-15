@@ -67,7 +67,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /**
      * @inheridoc
      */
-    protected function getResolvableDestinationData(): array {
+    protected static function getResolvableDestinationData(): array {
         return [];
     }
 
@@ -98,6 +98,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->resolvableOnly();
+        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedMordorIds());
         return $collection->getItems();
     }
 
@@ -112,6 +113,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         $collection->configurableOnly();
         $collection->whereCountry($country);
         $collection->forDeliveryMethods($methods);
+        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedMordorIds());
         $items = $collection->getItems();
 
         return array_map(

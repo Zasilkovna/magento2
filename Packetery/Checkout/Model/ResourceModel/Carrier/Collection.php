@@ -51,8 +51,18 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         $this->addFilter('pricingRules.enabled', $value);
     }
 
-    public function whereDeleted(bool $value) {
+    /**
+     * @param bool $value
+     */
+    public function whereDeleted(bool $value): void {
         $this->addFilter('main_table.deleted', $value);
+    }
+
+    /**
+     * @param int[] $excludeCarrierIds
+     */
+    public function whereCarrierIdNotIn(array $excludeCarrierIds): void {
+        $this->addFieldToFilter('main_table.carrier_id', ['nin' => $excludeCarrierIds]);
     }
 
     /**

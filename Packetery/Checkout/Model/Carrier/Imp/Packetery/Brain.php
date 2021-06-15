@@ -53,7 +53,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /**
      * @inheridoc
      */
-    protected function getResolvableDestinationData(): array {
+    protected static function getResolvableDestinationData(): array {
         return [
             Methods::ADDRESS_DELIVERY => [
                 'countryBranchIds' => [
@@ -68,6 +68,13 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
+     * @return array
+     */
+    public static function getImplementedMordorIds(): array {
+        return array_values(self::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds']);
+    }
+
+    /**
      * @param array $methods
      * @return array
      */
@@ -75,7 +82,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         $result = [];
 
         if (in_array(Methods::ADDRESS_DELIVERY, $methods)) {
-            $result = array_merge($result, array_keys($this->getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds'] ?? []));
+            $result = array_merge($result, array_keys($this::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds'] ?? []));
         }
 
         if (in_array(Methods::PICKUP_POINT_DELIVERY, $methods)) {

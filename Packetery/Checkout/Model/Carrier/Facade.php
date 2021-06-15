@@ -122,4 +122,24 @@ class Facade
     private function getMagentoCarrier(string $carrierCode): AbstractCarrier {
         return $this->carrierFactory->get($carrierCode);
     }
+
+    /**
+     * @return array
+     */
+    public static function getAllImplementedMordorIds(): array {
+        $mordorIds = [];
+        $dirs = glob(__DIR__ . '/Imp/*', GLOB_ONLYDIR);
+        foreach ($dirs as $dir) {
+            if ($dir === '.' || $dir === '..') {
+                continue;
+            }
+
+            $name = basename($dir);
+            /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain $className */
+            $className = '\\Packetery\\Checkout\\Model\\Carrier\\Imp\\' . $name . '\\Brain';
+            $mordorIds = array_merge($mordorIds, $className::getImplementedMordorIds());
+        }
+
+        return $mordorIds;
+    }
 }
