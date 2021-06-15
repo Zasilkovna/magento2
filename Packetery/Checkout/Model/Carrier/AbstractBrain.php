@@ -122,6 +122,12 @@ abstract class AbstractBrain
         return ($data[$method]['countryBranchIds'][$countryId] ?? null);
     }
 
+    /**
+     * @param string $carrierName
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
+     */
+    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {}
+
     /** Used only by Packeta Dynamic
      *
      * @param int $id

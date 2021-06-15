@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
-use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain

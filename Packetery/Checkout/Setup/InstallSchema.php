@@ -243,6 +243,7 @@ class InstallSchema implements InstallSchemaInterface
             'enabled' => [
                 'type' => Table::TYPE_BOOLEAN,
                 'attr' => [
+                    'default' => 0,
                     'nullable' => false,
                     'after' => 'carrier_id',
                 ],

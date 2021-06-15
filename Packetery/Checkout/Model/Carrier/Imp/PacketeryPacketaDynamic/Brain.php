@@ -153,6 +153,21 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
+     * @param string $carrierName
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
+     */
+    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {
+        $collection = $this->carrierCollectionFactory->create();
+        $collection->addFilter('carrier_id', $dynamicCarrier->getCarrierId());
+        $collection->setDataToAll(
+            [
+                'carrier_name' => $carrierName,
+            ]
+        );
+        $collection->save();
+    }
+
+    /**
      * @param string $method
      * @param string $countryId
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier

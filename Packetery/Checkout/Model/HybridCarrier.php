@@ -32,23 +32,6 @@ class HybridCarrier extends \Magento\Framework\DataObject
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Carrier $carrier
-     * @return static
-     */
-    public static function fromDynamic(Carrier $carrier): self {
-        $hybridCarrier = new self();
-        $hybridCarrier->setData('carrier_code', \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
-
-        foreach (['carrier_id', 'name', 'carrier_name', 'country'] as $key) {
-            $hybridCarrier->setData($key, $carrier->getData($key));
-        }
-
-        $hybridCarrier->setData('method', $carrier->getMethod());
-        $hybridCarrier->setData('method_code', (new MethodCode($hybridCarrier->getData('method'), $carrier->getCarrierId()))->toString());
-        return $hybridCarrier;
-    }
-
-    /**
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @param string $method
      * @param string $country
@@ -76,6 +59,34 @@ class HybridCarrier extends \Magento\Framework\DataObject
     }
 
     /**
+     * @param \Packetery\Checkout\Model\Pricingrule $pricingrule
+     * @return static
+     */
+    public static function fromPricingRule(Pricingrule $pricingrule): self {
+        $hybridCarrier = new self();
+        $hybridCarrier->setData('carrier_code', $pricingrule->getCarrierCode());
+        $hybridCarrier->setData('carrier_id', $pricingrule->getCarrierId());
+        $method = $pricingrule->getMethod();
+        $country = $pricingrule->getCountryId();
+
+        $postfix = '';
+        if (\Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY === $method) {
+            $postfix = 'HD';
+        }
+        if (\Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY === $method) {
+            $postfix = 'PP';
+        }
+
+        $name = implode(' - ', array_filter([$pricingrule->getCarrierCode(), $pricingrule->getCarrierId()]));
+        $hybridCarrier->setData('name', "$country {$name} $postfix");
+        $hybridCarrier->setData('carrier_name');
+        $hybridCarrier->setData('country', $country);
+        $hybridCarrier->setData('method', $method);
+        $hybridCarrier->setData('method_code', (new MethodCode($method, $pricingrule->getCarrierId()))->toString());
+        return $hybridCarrier;
+    }
+
+    /**
      * @param \Packetery\Checkout\Model\Pricingrule|null $pricingrule
      * @return string|\Packetery\Checkout\Model\Misc\ComboPhrase|null
      */
@@ -91,6 +102,17 @@ class HybridCarrier extends \Magento\Framework\DataObject
         }
 
         return $this->getData('name');
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string {
+        return sha1(implode('-', [
+            $this->getCarrierCode(),
+            $this->getMethodCode(),
+            $this->getCountry()
+        ]));
     }
 
     /**

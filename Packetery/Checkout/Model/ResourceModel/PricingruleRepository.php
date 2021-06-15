@@ -180,13 +180,24 @@ class PricingruleRepository
      * @param array $exclude
      */
     public function disablePricingRulesExcept(array $exclude): void {
-        if (empty($exclude)) {
-            return;
+        $collection = $this->pricingRuleCollectionFactory->create();
+
+        if (!empty($exclude)) {
+            $collection->addFieldToFilter('main_table.id', ['nin' => $exclude]);
         }
 
-        $collection = $this->pricingRuleCollectionFactory->create();
-        $collection->addFieldToFilter('main_table.id', ['nin' => $exclude]);
         $collection->setDataToAll('enabled', 0);
         $collection->save();
+    }
+
+    /**
+     * @param string $country
+     * @return \Packetery\Checkout\Model\Pricingrule[]
+     */
+    public function findBy(string $country, bool $enabled): array {
+        $collection = $this->pricingRuleCollectionFactory->create();
+        $collection->addFilter('main_table.country_id', $country);
+        $collection->addFilter('main_table.enabled', $enabled);
+        return $collection->getItems();
     }
 }

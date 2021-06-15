@@ -9,21 +9,14 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Packetery\Checkout\Model\Carrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\HybridCarrier;
-use Packetery\Checkout\Model\Pricingrule;
 
 /**
  * Modifies multi detail pricing rule form xml structure and provides data for the form
  */
 class Modifier implements ModifierInterface
 {
-    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
-    private $carrierCollectionFactory;
-
     /** @var \Magento\Framework\App\RequestInterface */
     private $request;
-
-    /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier */
-    private $packeteryCarrier;
 
     /** @var \Packetery\Checkout\Model\Pricing\Service */
     private $pricingService;
@@ -40,7 +33,13 @@ class Modifier implements ModifierInterface
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
-    public function __construct(\Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory, \Magento\Framework\App\RequestInterface $request, \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier, \Packetery\Checkout\Model\Pricing\Service $pricingService, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade) {
+    public function __construct(
+        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
+        \Magento\Framework\App\RequestInterface $request,
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+    ) {
         $this->carrierCollectionFactory = $carrierCollectionFactory;
         $this->request = $request;
         $this->packeteryCarrier = $packeteryCarrier;
@@ -55,24 +54,30 @@ class Modifier implements ModifierInterface
         $hybridCarriers = [];
 
         $staticCarriers = $this->carrierFacade->getPacketeryAbstractCarriers();
-        usort($staticCarriers, function (Carrier\AbstractCarrier $staticCarrier) {
-            if ($staticCarrier instanceof Carrier\Imp\Packetery\Carrier) {
-                return 1; // Packetery is always first
-            }
+        usort(
+            $staticCarriers,
+            function (Carrier\AbstractCarrier $staticCarrier) {
+                if ($staticCarrier instanceof Carrier\Imp\Packetery\Carrier) {
+                    return 1; // Packetery is always first
+                }
 
-            return 0;
-        });
+                return 0;
+            }
+        );
 
         foreach ($staticCarriers as $packeteryAbstractCarrier) {
             $packeteryAbstractCarrierBrain = $packeteryAbstractCarrier->getPacketeryBrain();
             $methods = $packeteryAbstractCarrierBrain->getMethodSelect()->getMethods();
-            usort($methods, function (string $method) {
-                if ($method === Methods::PICKUP_POINT_DELIVERY) {
-                    return 1; // PP methods are first in list
-                }
+            usort(
+                $methods,
+                function (string $method) {
+                    if ($method === Methods::PICKUP_POINT_DELIVERY) {
+                        return 1; // PP methods are first in list
+                    }
 
-                return 0;
-            });
+                    return 0;
+                }
+            );
 
             foreach ($methods as $method) {
                 // each hybrid carrier represent form fieldset as row
@@ -83,13 +88,14 @@ class Modifier implements ModifierInterface
                     // static wrapping carriers are omitted
                     $availableCountries = $packeteryAbstractCarrierBrain->getAvailableCountries([$method]);
                     if (in_array($country, $availableCountries)) {
-                        $packetaCarrier = HybridCarrier::fromAbstract($packeteryAbstractCarrier, $method, $country);
-                        array_unshift($hybridCarriers, $packetaCarrier);
+                        $hybridCarrier = HybridCarrier::fromAbstract($packeteryAbstractCarrier, $method, $country);
+                        array_unshift($hybridCarriers, $hybridCarrier);
                     }
                 }
 
                 foreach ($carriers as $carrier) {
-                    $hybridCarriers[] = HybridCarrier::fromAbstractDynamic($packeteryAbstractCarrier, $carrier, $method, $country);
+                    $hybridCarrier = HybridCarrier::fromAbstractDynamic($packeteryAbstractCarrier, $carrier, $method, $country);
+                    $hybridCarriers[] = $hybridCarrier;
                 }
             }
         }
@@ -233,7 +239,12 @@ class Modifier implements ModifierInterface
         return $meta;
     }
 
-    private function getPricingRuleFields($carrier, $countryId): array {
+    /**
+     * @param \Packetery\Checkout\Model\HybridCarrier $carrier
+     * @param string $countryId
+     * @return array
+     */
+    private function getPricingRuleFields(HybridCarrier $carrier, string $countryId): array {
         return [
             'id' => [
                 'arguments' => [
@@ -333,7 +344,7 @@ class Modifier implements ModifierInterface
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'addButtonLabel' => __('Add weight rule'),
+                        'addButtonLabel' => __('Add'),
                         'componentType' => 'dynamicRows',
                         'identificationProperty' => 'id',
                         'defaultRecord' => 'true',

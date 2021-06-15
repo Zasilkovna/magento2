@@ -8,9 +8,6 @@ use Packetery\Checkout\Model\HybridCarrier;
 
 class Facade
 {
-    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
-    private $dynamicCarrierCollectionFactory;
-
     /** @var \Magento\Shipping\Model\CarrierFactory */
     private $carrierFactory;
 
@@ -18,16 +15,13 @@ class Facade
     private $shippingConfig;
 
     /**
-     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $dynamicCarrierCollectionFactory
      * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
      * @param \Magento\Shipping\Model\Config $shippingConfig
      */
     public function __construct(
-        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $dynamicCarrierCollectionFactory,
         \Magento\Shipping\Model\CarrierFactory $carrierFactory,
         \Magento\Shipping\Model\Config $shippingConfig
     ) {
-        $this->dynamicCarrierCollectionFactory = $dynamicCarrierCollectionFactory;
         $this->carrierFactory = $carrierFactory;
         $this->shippingConfig = $shippingConfig;
     }
@@ -39,32 +33,15 @@ class Facade
      * @throws \Exception
      */
     public function updateCarrierName(string $carrierName, string $carrierCode, ?int $carrierId = null): void {
-        $this->assertValidIdentifiers($carrierCode, $carrierId);
+        $carrier = $this->getMagentoCarrier($carrierCode);
+        $dynamicCarrier = $this->getDynamicCarrier($carrier, $carrierId);
 
-        if ($this->isDynamicCarrier($carrierCode, $carrierId)) {
-            $dynamicCarrier = $this->getDynamicCarrier($carrierId);
-            $dynamicCarrier->setData('carrier_name', $carrierName);
-            $dynamicCarrier->save();
+        if ($dynamicCarrier !== null) {
+            $carrier->getPacketeryBrain()->updateDynamicCarrierName($carrierName, $dynamicCarrier);
             return;
         }
 
         throw new \InvalidArgumentException('Not implemented');
-    }
-
-    /**
-     * @param string $carrierCode
-     * @param $carrierId
-     * @throws \Exception
-     */
-    private function assertValidIdentifiers(string $carrierCode, $carrierId): void {
-        $isDynamicWrapper = $carrierCode === \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic();
-        if ($isDynamicWrapper && is_numeric($carrierId)) {
-            return;
-        }
-
-        if (is_numeric($carrierId)) {
-            throw new \Exception('Invalid identifiers. Missing or unexpected code.');
-        }
     }
 
     /**
@@ -75,11 +52,14 @@ class Facade
      * @return \Packetery\Checkout\Model\HybridCarrier
      */
     public function createHybridCarrier(string $carrierCode, ?int $carrierId, string $method, string $country): HybridCarrier {
-        if ($this->isDynamicCarrier($carrierCode, $carrierId)) {
-            return HybridCarrier::fromDynamic($this->getDynamicCarrier($carrierId));
+        $carrier = $this->getMagentoCarrier($carrierCode);
+        $dynamicCarrier = $this->getDynamicCarrier($carrier, $carrierId);
+
+        if ($dynamicCarrier !== null) {
+            return HybridCarrier::fromAbstractDynamic($carrier, $dynamicCarrier, $method, $country);
         }
 
-        return HybridCarrier::fromAbstract($this->getMagentoCarrier($carrierCode), $method, $country);
+        return HybridCarrier::fromAbstract($carrier, $method, $country);
     }
 
     /**
@@ -88,8 +68,10 @@ class Facade
      * @return bool
      */
     public function isDynamicCarrier(string $carrierCode, $carrierId): bool {
-        $isDynamicWrapper = $carrierCode === \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic();
-        if ($isDynamicWrapper && is_numeric($carrierId)) {
+        $carrier = $this->getMagentoCarrier($carrierCode);
+        $dynamicCarrier = $this->getDynamicCarrier($carrier, is_numeric($carrierId) ? (int)$carrierId : null);
+
+        if ($dynamicCarrier !== null) {
             return true;
         }
 
@@ -127,17 +109,17 @@ class Facade
 
     /**
      * @param int $carrierId
-     * @return \Packetery\Checkout\Model\Carrier
+     * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null
      */
-    private function getDynamicCarrier(int $carrierId): \Packetery\Checkout\Model\Carrier {
-        return $this->dynamicCarrierCollectionFactory->create()->getItemByColumnValue('carrier_id', $carrierId);
+    private function getDynamicCarrier(AbstractCarrier $carrier, ?int $carrierId): ?AbstractDynamicCarrier {
+        return $carrier->getPacketeryBrain()->getDynamicCarrierById($carrierId);
     }
 
     /**
      * @param string $carrierCode
      * @return \Packetery\Checkout\Model\Carrier\AbstractCarrier
      */
-    private function getMagentoCarrier(string $carrierCode): \Packetery\Checkout\Model\Carrier\AbstractCarrier {
+    private function getMagentoCarrier(string $carrierCode): AbstractCarrier {
         return $this->carrierFactory->get($carrierCode);
     }
 }
