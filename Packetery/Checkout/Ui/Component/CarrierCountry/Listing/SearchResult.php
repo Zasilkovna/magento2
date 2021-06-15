@@ -6,7 +6,6 @@ namespace Packetery\Checkout\Ui\Component\CarrierCountry\Listing;
 
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
-use Magento\Framework\DB\Sql\ColumnValueExpression;
 use Magento\Framework\DB\Sql\UnionExpression;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Psr\Log\LoggerInterface as Logger;
@@ -55,17 +54,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
 
         foreach ($neededCountries as $neededCountry) {
             $options = $this->modifier->getCarriers($neededCountry);
-            $neededCountry = $this->getConnection()->select()
-                ->from(['main_table' => $this->getTable('setup_module')])
-                ->reset('columns')
-                ->columns(
-                    [
-                        'country' => new ColumnValueExpression($this->getConnection()->quote($neededCountry)),
-                        'available' => new ColumnValueExpression($this->getConnection()->quote(empty($options) ? 0 : 1)),
-                    ]
-                );
-
-            $assembledQueries[] = $neededCountry;
+            $assembledQueries[] = " SELECT {$this->getConnection()->quote($neededCountry)} AS {$this->getConnection()->quoteIdentifier('country')}, {$this->getConnection()->quote(empty($options) ? 0 : 1)} AS {$this->getConnection()->quoteIdentifier('available')} ";
         }
 
         $this->getSelect()
