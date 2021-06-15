@@ -132,6 +132,14 @@ abstract class AbstractBrain
     }
 
     /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier
+     * @return bool
+     */
+    public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+        return true;
+    }
+
+    /**
      * @param string $method
      * @param string $countryId
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
@@ -145,7 +153,7 @@ abstract class AbstractBrain
         }
 
         $availableCountries = $this->getAvailableCountries([$method]);
-        return in_array($countryId, $availableCountries);
+        return in_array($countryId, $availableCountries) && $this->validateDynamicCarrier($method, $countryId, $dynamicCarrier);
     }
 
     /**

@@ -130,18 +130,10 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      */
     public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int {
         if ($dynamicCarrier === null) {
-            throw new \Exception('Invalid usage');
+            throw new \Exception('Dynamic carrier was not passed');
         }
 
-        if ($dynamicCarrier->getDeleted() === true) {
-            return null;
-        }
-
-        if ($dynamicCarrier->getCountryId() !== $countryId) {
-            return null;
-        }
-
-        if (in_array($method, $dynamicCarrier->getMethods()) === false) {
+        if ($this->validateDynamicCarrier($method, $countryId, $dynamicCarrier) === false) {
             return null;
         }
 
@@ -158,6 +150,28 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
             $config,
             $dynamicCarrier
         );
+    }
+
+    /**
+     * @param string $method
+     * @param string $countryId
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier
+     * @return bool
+     */
+    public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+        if ($dynamicCarrier->getDeleted() === true) {
+            return false;
+        }
+
+        if ($dynamicCarrier->getCountryId() !== $countryId) {
+            return false;
+        }
+
+        if (in_array($method, $dynamicCarrier->getMethods()) === false) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
