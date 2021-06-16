@@ -70,7 +70,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /**
      * @return array
      */
-    public static function getImplementedMordorIds(): array {
+    public static function getImplementedBranchIds(): array {
         return array_values(self::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds']);
     }
 

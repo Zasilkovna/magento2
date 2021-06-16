@@ -148,7 +148,7 @@ abstract class AbstractBrain
     /** What Mordor branch ids does carrier implement
      * @return array
      */
-    public static function getImplementedMordorIds(): array {
+    public static function getImplementedBranchIds(): array {
         return [];
     }
 

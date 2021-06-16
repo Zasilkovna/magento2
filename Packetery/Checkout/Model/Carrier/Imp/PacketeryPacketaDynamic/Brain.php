@@ -98,7 +98,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->resolvableOnly();
-        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedMordorIds());
+        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
         return $collection->getItems();
     }
 
@@ -113,7 +113,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         $collection->configurableOnly();
         $collection->whereCountry($country);
         $collection->forDeliveryMethods($methods);
-        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedMordorIds());
+        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
         $items = $collection->getItems();
 
         return array_map(

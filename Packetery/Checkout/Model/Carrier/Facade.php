@@ -126,8 +126,8 @@ class Facade
     /**
      * @return array
      */
-    public static function getAllImplementedMordorIds(): array {
-        $mordorIds = [];
+    public static function getAllImplementedBranchIds(): array {
+        $branchIds = [];
         $dirs = glob(__DIR__ . '/Imp/*', GLOB_ONLYDIR);
         foreach ($dirs as $dir) {
             if ($dir === '.' || $dir === '..') {
@@ -137,9 +137,9 @@ class Facade
             $name = basename($dir);
             /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain $className */
             $className = '\\Packetery\\Checkout\\Model\\Carrier\\Imp\\' . $name . '\\Brain';
-            $mordorIds = array_merge($mordorIds, $className::getImplementedMordorIds());
+            $branchIds = array_merge($branchIds, $className::getImplementedBranchIds());
         }
 
-        return $mordorIds;
+        return $branchIds;
     }
 }
