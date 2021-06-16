@@ -443,13 +443,21 @@ class Modifier implements ModifierInterface
 
     /**
      * @param string $country
-     * @return int[]
+     * @param bool|null $enabled
+     * @return array
      */
-    public function getPricingRulesForCountry(string $country): array {
+    public function getPricingRulesForCountry(string $country, ?bool $enabled = null): array {
         $data = $this->createData($country);
 
         $pricingRules = [];
         foreach ($data['shipping_methods'] as $shippingMethod) {
+            if ($enabled !== null) {
+                $enabledValue = $enabled ? '1' : '0';
+                if ($enabledValue !== $shippingMethod['enabled']) {
+                    continue;
+                }
+            }
+
             if ($shippingMethod['pricing_rule']['id'] ?? false) {
                 $pricingRules[] = $shippingMethod['pricing_rule']['id'];
             }

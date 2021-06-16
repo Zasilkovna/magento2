@@ -54,7 +54,12 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
 
         foreach ($neededCountries as $neededCountry) {
             $options = $this->modifier->getCarriers($neededCountry);
-            $assembledQueries[] = " SELECT {$this->getConnection()->quote($neededCountry)} AS {$this->getConnection()->quoteIdentifier('country')}, {$this->getConnection()->quote(empty($options) ? 0 : 1)} AS {$this->getConnection()->quoteIdentifier('available')} ";
+            if (empty($options)) {
+                continue; // do not show country if no carriers are available for user configuration
+            }
+
+            $items = $this->modifier->getPricingRulesForCountry($neededCountry, true);
+            $assembledQueries[] = " SELECT {$this->getConnection()->quote($neededCountry)} AS {$this->getConnection()->quoteIdentifier('country')}, {$this->getConnection()->quote(empty($items) ? 0 : 1)} AS {$this->getConnection()->quoteIdentifier('available')} ";
         }
 
         $this->getSelect()
