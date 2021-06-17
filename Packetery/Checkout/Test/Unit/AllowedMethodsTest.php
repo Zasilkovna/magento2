@@ -47,8 +47,8 @@ class AllowedMethodsTest extends \Packetery\Checkout\Test\BaseTest
 
         $this->assertFinals(
             [],
-            [Methods::ADDRESS_DELIVERY],
-            [Methods::ADDRESS_DELIVERY] // because of allowed methods
+            [Methods::DIRECT_ADDRESS_DELIVERY],
+            [Methods::DIRECT_ADDRESS_DELIVERY] // because of allowed methods
         );
     }
 
