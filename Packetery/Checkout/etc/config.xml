@@ -20,7 +20,7 @@
 				<title>Packeta Feed Carriers</title>
 				<specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
 				<sallowspecific>0</sallowspecific>
-				<max_weight>10</max_weight>
+				<max_weight>30</max_weight>
 			</packeteryPacketaDynamic>
 		</carriers>
 	</default>
