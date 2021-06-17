@@ -85,8 +85,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function forDeliveryMethods(array $methods): void {
         $isPickupPointsValues = [];
 
-        // todo allow BDS?
-
         if (in_array(\Packetery\Checkout\Model\Carrier\Methods::DIRECT_ADDRESS_DELIVERY, $methods)) {
             $isPickupPointsValues[] = 0;
         }

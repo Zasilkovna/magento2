@@ -140,8 +140,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-        // todo version increase?
-
         $setup->endSetup();
     }
 }
