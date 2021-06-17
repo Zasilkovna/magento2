@@ -74,6 +74,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
             return;
         }
 
+        $this->addFieldToFilter('main_table.name', ['nlike' => '% večerní doručení %']); // todo implement ZIP code logic
         $this->addFilter('main_table.disallows_cod', 0); // todo implement payment method filter
         $this->addFilter('main_table.customs_declarations', 0); // todo what does it require? New order edit form fields?
     }
