@@ -36,6 +36,13 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
     }
 
     /**
+     * @return float|null
+     */
+    public function getMaxWeight(): ?float {
+        return $this->model->getMaxWeight();
+    }
+
+    /**
      * @return bool
      */
     public function getDeleted(): bool {

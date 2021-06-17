@@ -17,6 +17,11 @@ abstract class AbstractDynamicCarrier
     abstract public function getCountryId(): string;
 
     /**
+     * @return float|null
+     */
+    abstract public function getMaxWeight(): ?float;
+
+    /**
      * @return bool
      */
     abstract public function getDeleted(): bool;

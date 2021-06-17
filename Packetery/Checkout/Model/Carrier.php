@@ -75,6 +75,13 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
     }
 
     /**
+     * @return float
+     */
+    public function getMaxWeight(): float {
+        return (float)$this->getData('max_weight');
+    }
+
+    /**
      * @return bool
      */
     public function getDeleted(): bool {

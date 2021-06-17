@@ -61,6 +61,7 @@ class MultiSave extends Action implements HttpPostActionInterface
             $carrierCode = $pricingRule['carrier_code'];
             $carrierId = $pricingRule['carrier_id'] ?? null;
             $carrierId = $carrierId === null ? null : (int)$carrierId;
+            $pricingRule['carrier_id'] = $carrierId;
             $carrierName = $carrierPriceRule['carrier_name'] ?? null;
 
             if (!$carrierEnabled) {
@@ -90,7 +91,7 @@ class MultiSave extends Action implements HttpPostActionInterface
                 $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Price rule for specified country already exists')], ' '));
                 continue;
             } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
-                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('The weight is invalid')], ' '));
+                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('The weight is invalid', $this->carrierFacade->getMaxWeight($carrierCode, $carrierId))], ' '));
                 continue;
             } catch (\Packetery\Checkout\Model\Exception\PricingRuleNotFound $e) {
                 $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Pricing rule not found')], ' '));

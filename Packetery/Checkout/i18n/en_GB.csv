@@ -51,7 +51,7 @@
 "Payment methods","Payment methods"
 "The payment methods selected above will be considered as cash on delivery (for Packeta).","The payment methods selected above will be considered as cash on delivery (for Packeta)."
 "Some prices are not filled","Some prices are not filled"
-"The weight is invalid","The weight is invalid. Enter unique weight values."
+"The weight is invalid","The weight is invalid. Enter unique weight values and weight must not be greater than max weight (%1)."
 "The API key length must have %d characters!","The API key length must have %d characters!"
 "The specified API key is not valid!","The specified API key is not valid!"
 "Select pick-up point","Select pick-up point"

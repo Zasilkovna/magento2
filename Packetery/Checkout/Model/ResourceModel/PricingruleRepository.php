@@ -21,6 +21,9 @@ class PricingruleRepository
     /** @var \Packetery\Checkout\Model\Pricing\Service */
     private $pricingService;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     /**
      * PricingruleRepository constructor.
      *
@@ -29,14 +32,16 @@ class PricingruleRepository
      * @param \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory
      * @param \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
-    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory, \Packetery\Checkout\Model\Pricing\Service $pricingService)
+    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory, \Packetery\Checkout\Model\Pricing\Service $pricingService, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade)
     {
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
         $this->pricingruleFactory = $pricingruleFactory;
         $this->weightRuleCollectionFactory = $weightRuleCollectionFactory;
         $this->weightruleFactory = $weightruleFactory;
         $this->pricingService = $pricingService;
+        $this->carrierFacade = $carrierFacade;
     }
 
     /**
@@ -61,9 +66,10 @@ class PricingruleRepository
 
     /**
      * @param array $weightRules as assoc array
+     * @param float|null $maxWeight
      * @return bool
      */
-    public function validatePricingRuleMaxWeight(array $weightRules): bool
+    public function validatePricingRuleMaxWeight(array $weightRules, ?float $maxWeight = null): bool
     {
         $usedWeights = [];
         foreach ($weightRules as $weightRule) {
@@ -75,6 +81,13 @@ class PricingruleRepository
             }
 
             $usedWeights[$key] = 1;
+
+            if ($maxWeight !== null) {
+                if ($weight > $maxWeight) {
+                    // weight is assumed to be always set
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -95,7 +108,8 @@ class PricingruleRepository
             throw new \Packetery\Checkout\Model\Exception\DuplicateCountry();
         }
 
-        if (!$this->validatePricingRuleMaxWeight($weightRules)) {
+        $maxWeight = $this->carrierFacade->getMaxWeight($postData['carrier_code'], $postData['carrier_id']);
+        if (!$this->validatePricingRuleMaxWeight($weightRules, $maxWeight)) {
             throw new \Packetery\Checkout\Model\Exception\InvalidMaxWeight();
         }
 

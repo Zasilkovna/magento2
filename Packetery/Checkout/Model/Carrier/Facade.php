@@ -142,4 +142,15 @@ class Facade
 
         return $branchIds;
     }
+
+    /**
+     * @param string $carrierCode
+     * @param int|null $carrierId
+     * @return float|null
+     */
+    public function getMaxWeight(string $carrierCode, ?int $carrierId): ?float {
+        $carrier = $this->getMagentoCarrier($carrierCode);
+        $dynamicCarrier = $this->getDynamicCarrier($carrier, $carrierId);
+        return $carrier->getPacketeryDynamicConfig($dynamicCarrier)->getMaxWeight();
+    }
 }
