@@ -36,7 +36,7 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
             return \Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY;
         }
 
-        return \Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY;
+        return \Packetery\Checkout\Model\Carrier\Methods::DIRECT_ADDRESS_DELIVERY;
     }
 
     /**

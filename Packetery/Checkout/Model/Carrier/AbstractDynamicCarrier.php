@@ -29,6 +29,11 @@ abstract class AbstractDynamicCarrier
     /**
      * @return string
      */
+    abstract public function getName(): string;
+
+    /**
+     * @return string
+     */
     abstract public function getFinalCarrierName(): string;
 
     /**

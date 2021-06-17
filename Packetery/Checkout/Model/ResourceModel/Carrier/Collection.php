@@ -32,7 +32,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function resolvableOnly(): void {
         $this->whereDeleted(false);
         $this->supportedOnly();
-        $this->wherePricingRuleEnabled(true);
     }
 
     /**
@@ -41,14 +40,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function configurableOnly(): void {
         $this->whereDeleted(false);
         $this->supportedOnly();
-    }
-
-    /**
-     * @param bool $value
-     */
-    private function wherePricingRuleEnabled(bool $value): void {
-        $this->leftJoinPricingRules();
-        $this->addFilter('pricingRules.enabled', $value);
     }
 
     /**
@@ -94,7 +85,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function forDeliveryMethods(array $methods): void {
         $isPickupPointsValues = [];
 
-        if (in_array(\Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY, $methods)) {
+        // todo allow BDS?
+
+        if (in_array(\Packetery\Checkout\Model\Carrier\Methods::DIRECT_ADDRESS_DELIVERY, $methods)) {
             $isPickupPointsValues[] = 0;
         }
 
@@ -106,11 +99,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
             $this->addFieldToFilter('main_table.is_pickup_points', [
                 'in' => $isPickupPointsValues
             ]);
+            return;
         }
-    }
 
-    private function leftJoinPricingRules(): void {
-        // cols has to be empty otherwise setDataToAll wont work
-        $this->getSelect()->joinLeft(['pricingRules' => $this->getTable('packetery_pricing_rule')], 'main_table.carrier_id = pricingRules.carrier_id', '');
+        $this->getSelect()->where('0'); // no results will be returns
     }
 }

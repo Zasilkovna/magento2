@@ -43,7 +43,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier->setData('carrier_id');
 
         $postfix = '';
-        if (\Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY === $method) {
+        if (\Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($method)) {
             $postfix = 'HD';
         }
         if (\Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY === $method) {
@@ -70,7 +70,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $country = $pricingrule->getCountryId();
 
         $postfix = '';
-        if (\Packetery\Checkout\Model\Carrier\Methods::ADDRESS_DELIVERY === $method) {
+        if (\Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($method)) {
             $postfix = 'HD';
         }
         if (\Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY === $method) {
