@@ -69,7 +69,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      * dynamic carriers with attributes not supported by Packetery extension are omitted
      */
     private function supportedOnly(): void {
-        $this->addFieldToFilter('main_table.name', ['nlike' => '% večerní doručení %']); // todo implement ZIP code logic
+        $this->addFieldToFilter('main_table.name', ['nin' => [257, 136, 134, 132]]); // večerní doručení todo implement ZIP code logic
         $this->addFilter('main_table.disallows_cod', 0); // todo implement payment method filter
         $this->addFilter('main_table.customs_declarations', 0); // todo what does it require? New order edit form fields?
     }
