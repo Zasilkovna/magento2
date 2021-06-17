@@ -23,8 +23,8 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier = new self();
         $hybridCarrier->setData('carrier_code', $carrier->getCarrierCode());
         $hybridCarrier->setData('carrier_id', $dynamicCarrier->getCarrierId());
-        $hybridCarrier->setData('name', $dynamicCarrier->getFinalCarrierName());
-        $hybridCarrier->setData('carrier_name');
+        $hybridCarrier->setData('name', $dynamicCarrier->getName());
+        $hybridCarrier->setData('carrier_name', $dynamicCarrier->getFinalCarrierName());
         $hybridCarrier->setData('country', $country);
         $hybridCarrier->setData('method', $method);
         $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getCarrierId()))->toString());
