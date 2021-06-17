@@ -106,7 +106,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
                     $carrier->getPacketeryBrain()->getDynamicCarrierById($deliveryMethod->getDynamicCarrierId())
                 );
 
-                $pointName = $deliveryMethod->getMethod(); // translated on demand
+                $pointName = '';
             }
         }
         else
