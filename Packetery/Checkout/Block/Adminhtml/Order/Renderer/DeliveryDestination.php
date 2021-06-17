@@ -58,10 +58,10 @@ class DeliveryDestination extends \Magento\Backend\Block\Widget\Grid\Column\Rend
         $methodCode = MethodCode::fromString($shippingMethod->getData('method'));
         $carrier = $this->carrierFacade->createHybridCarrier($carrierCode, $methodCode->getDynamicCarrierId(), $methodCode->getMethod(), $shippingAddress->getCountryId());
 
+        $branchName = (string)$row->getData('point_name');
+        $branchId = $row->getData('point_id');
         $methodContent = $this->methodSelect->getLabelByValue($methodCode->getMethod());
-        if ($methodCode->getMethod() === Methods::PICKUP_POINT_DELIVERY) {
-            $branchName = (string)$row->getData('point_name');
-            $branchId = $row->getData('point_id');
+        if ($branchId && $methodCode->getMethod() === Methods::PICKUP_POINT_DELIVERY) {
             $methodContent = sprintf("%s (%s)", $branchName, $branchId);
         }
 
