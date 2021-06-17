@@ -42,24 +42,18 @@ and save the settings pressing the **Save config** button.
 #### Price rules
 
 ##### Global settings
-- **default price** - the shipping price applies if the country-specific default price is not filled
 - **Maximum weight** - for orders with a larger weight, the Packeta shipping method will not be offered in the cart
 - **free shipping** - if the order price is higher, free shipping
 
-##### Rules - other countries
+##### Rules
 
-These rules are not currently applied. They will be removed in the next version of the module.
+Enter prices and shipping pricing rules for each supported country here. Only kilograms are supported.
 
-##### Rules CZ (SK, PL, HU, RO)
-
-Enter prices and shipping pricing rules for each supported country here.
-
-- **default price** - the price will be applied if you do not fill in the pricing rules, or the order weight exceeds the set weighting rules for a particular country
 - **free shipping** - if the order price is higher, free shipping
 - **price rules** - here you can add more pricing rules for different weight ranges.
     - to create a new rule click on the button * Add Rule *
     - click the * Delete * button to delete the rule
-    - fill in the fields * Weight from *, * Weight to * and * Price * for each rule
+    - fill in the fields * Weight to * and * Price * for each rule
 
 #### Cash on delivery
 
@@ -137,24 +131,18 @@ a nastavení uložte kliknutím na tlačítko **Save Config**
 #### Cenová pravidla
 
 ##### Globální nastavení
-- **Výchozí cena** - cena za přepravu se použije v případě, že není vyplněna výchozí cena u konkrétní země
 - **Maximální váha** - u objednávek s větší hmotnostní nebude v košíku přepravní metoda Zásilkovna nabízena
 - **Doprava zdarma** - pokud bude cena objednávky vyšší bude doprava zdarma
 
-##### Pravidla - ostatní země
+##### Pravidla
 
-Tato pravidla se v současné době nepoužívají.  V příští verzi modulu budou odstraněna.
+Zde zadejte ceny a pravidla pro výpočet ceny přepravy pro každou podporovanou zemi zvlášť. Podporované jsou pouze váhy v kilogramech.
 
-##### Pravidla CZ (SK, PL, HU, RO)
-
-Zde zadejte ceny a pravidla pro výpočet ceny přepravy pro každou podporovanou zemi zvlášť.
-
-- **Výchozí cena** - cena se použije pokud nevyplníte cenová pravidla, nebo hmotnost objednávky přesáhne nastavená váhová pravidla pro konkrétní zemi
 - **Doprava zdarma** - pokud bude cena objednávky vyšší bude doprava zdarma
 - **Cenová pravidla** - zde můžete přidat více cenových pravidel, pro různá váhová rozmezí.  
     - pro vytvoření nového pravidla klikněte na tlačítko *Přidat pravidlo*
     - pro smazání pravidla klikněte na ikonu popelnice
-    - u každého pravidla vyplňte pole *Hmotnost od*, *Hmotnost do* a *Cena*
+    - u každého pravidla vyplňte pole *Hmotnost do* a *Cena*
 
 #### Dobírka
 
