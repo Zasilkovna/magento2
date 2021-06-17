@@ -37,6 +37,7 @@
         <column name="countryName" class="Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Column\Country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="label" xsi:type="string" translate="true">Country</item>
                 </item>
             </argument>
@@ -55,6 +56,7 @@
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Filter\AvailableSelect</item>
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="indexField" xsi:type="string">available</item>
