@@ -9,6 +9,7 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Packetery\Checkout\Model\Carrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\HybridCarrier;
+use Packetery\Checkout\Model\Misc\ComboPhrase;
 
 /**
  * Modifies multi detail pricing rule form xml structure and provides data for the form
@@ -332,14 +333,16 @@ class Modifier implements ModifierInterface
                     ],
                 ],
             ],
-            'weight_rules' => $this->getWeightRules(),
+            'weight_rules' => $this->getWeightRules($carrier),
         ];
     }
 
     /**
      * @return array
      */
-    private function getWeightRules(): array {
+    private function getWeightRules(HybridCarrier $carrier): array {
+        $weightUpperlimit = $this->carrierFacade->getMaxWeight($carrier->getCarrierCode(), $carrier->getCarrierId());
+
         $configRow = [
             'arguments' => [
                 'data' => [
@@ -385,7 +388,13 @@ class Modifier implements ModifierInterface
                                     'config' => [
                                         'componentType' => Form\Field::NAME,
                                         'dataType' => Form\Element\DataType\Text::NAME,
-                                        'label' => __('Max. weight'),
+                                        'label' => new ComboPhrase(
+                                            [
+                                                __('Max. weight'),
+                                                $weightUpperlimit === null ? '' : new ComboPhrase(['(max ', $weightUpperlimit, ')']),
+                                            ],
+                                            ' '
+                                        ),
                                         'visible' => true,
                                         'formElement' => Form\Element\Input::NAME,
                                         'dataScope' => 'max_weight',
