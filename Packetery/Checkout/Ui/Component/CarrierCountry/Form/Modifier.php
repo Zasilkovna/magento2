@@ -390,9 +390,8 @@ class Modifier implements ModifierInterface
                                         'formElement' => Form\Element\Input::NAME,
                                         'dataScope' => 'max_weight',
                                         'fit' => false,
-                                        'notice' => __('Empty value is going to fallback to global max weight'),
                                         'validation' => [
-                                            'required-entry' => false,
+                                            'required-entry' => true,
                                             'validate-number' => true,
                                             'validate-greater-than-zero' => true,
                                         ],

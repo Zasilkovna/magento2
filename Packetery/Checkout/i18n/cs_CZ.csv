@@ -1,4 +1,3 @@
-"Empty value is going to fallback to global max weight","Prázdná hodnota bude modulem vnímána jako maximální váha nastavená u dopravce"
 "Weight rule is missing","Chybí váhové pravidlo"
 "Pricing rule not found","Cenové pravidlo nebylo nalezeno"
 "Add pricing rule","Přidat cenové pravidlo"
