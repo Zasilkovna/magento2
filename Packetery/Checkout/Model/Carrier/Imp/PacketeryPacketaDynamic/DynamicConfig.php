@@ -42,14 +42,6 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
     }
 
     /**
-     * @return float|null
-     */
-    public function getMaxWeight(): ?float {
-        $values = array_filter([$this->carrier->getMaxWeight(), parent::getMaxWeight()]);
-        return $values ? min($values) : null;
-    }
-
-    /**
      * @return array
      */
     public function getAllowedMethods(): array {
