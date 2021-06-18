@@ -22,6 +22,7 @@ Installation and registration of the module is done by CLI utility, which is par
 
 ## Upgrading
 
+- set Packeta configuration in administration for default scope even if Packeta carrier is inactive
 - enable maintenance mode
 - remove all previous source files (remove app/code/Packetery folder)
 - next steps are same as during installation
@@ -111,6 +112,7 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 
 ### Aktualizace modulu
 
+- nastavte v administraci přepravce Zásilkovna pro výchozí kontext (scope), ikdyž je přepravce neaktivní
 - zapnout režim údržby
 - smazat zdrojové soubory (smazat složku app/code/Packetery)
 - další postup stejný jako při instalaci

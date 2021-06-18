@@ -104,6 +104,9 @@ class MigratePriceRules extends Command
             ];
 
             $pricingRule = [
+                'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
+                'carrier_id' => null,
+                'enabled' => false,
                 'free_shipment' => (is_numeric($countryFreeShipping) ? (float)$countryFreeShipping : null),
                 'country_id' => strtoupper($country),
                 'method' => Methods::PICKUP_POINT_DELIVERY,

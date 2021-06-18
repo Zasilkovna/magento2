@@ -98,6 +98,9 @@ class MigrateDefaultPrice extends Command
 
                 if ($resolvedPricingRule === null) {
                     $pricingRule = [
+                        'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
+                        'carrier_id' => null,
+                        'enabled' => false,
                         'free_shipment' => null,
                         'country_id' => $country,
                         'method' => $allowedMethod,
