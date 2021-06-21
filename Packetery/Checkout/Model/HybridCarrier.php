@@ -58,7 +58,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         return $hybridCarrier;
     }
 
-    /**
+    /** todo rm
      * @param \Packetery\Checkout\Model\Pricingrule $pricingrule
      * @return static
      */
@@ -104,7 +104,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         return $this->getData('name');
     }
 
-    /**
+    /** todo rm
      * @return string
      */
     public function getId(): string {

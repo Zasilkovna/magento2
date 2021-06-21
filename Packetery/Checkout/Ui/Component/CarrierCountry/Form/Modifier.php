@@ -527,6 +527,6 @@ class Modifier implements ModifierInterface
     public function modifyData(array $data) {
         $country = $this->request->getParam('country');
         $result = $this->createData($country);
-        return [$country => $result];
+        return [$country => $result]; // see packetery_pricingrule_multiDetail.xml DataProvider
     }
 }
