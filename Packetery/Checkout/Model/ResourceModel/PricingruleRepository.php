@@ -50,7 +50,7 @@ class PricingruleRepository
      */
     public function validateDuplicateCountry(array $postData): bool
     {
-        $carrierId = isset($postData['carrier_id']) ? (int)$postData['carrier_id'] : null;
+        $carrierId = (isset($postData['carrier_id']) ? (int)$postData['carrier_id'] : null);
         $resolvedPricingRule = $this->pricingService->resolvePricingRule($postData['method'], $postData['country_id'], $postData['carrier_code'], $carrierId);
 
         if (isset($postData['id']) && $resolvedPricingRule !== null && $resolvedPricingRule->getId() == $postData['id']) {

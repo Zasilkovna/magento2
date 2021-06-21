@@ -69,7 +69,7 @@ class Facade
      */
     public function isDynamicCarrier(string $carrierCode, $carrierId): bool {
         $carrier = $this->getMagentoCarrier($carrierCode);
-        $dynamicCarrier = $this->getDynamicCarrier($carrier, is_numeric($carrierId) ? (int)$carrierId : null);
+        $dynamicCarrier = $this->getDynamicCarrier($carrier, (is_numeric($carrierId) ? (int)$carrierId : null));
 
         if ($dynamicCarrier !== null) {
             return true;

@@ -63,7 +63,7 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
     {
         $rc = new \ReflectionClass($className);
         $constructor = $rc->getConstructor();
-        $params = $constructor ? $constructor->getParameters() : [];
+        $params = ($constructor ? $constructor->getParameters() : []);
 
         $args = [];
         foreach ($params as $param) {

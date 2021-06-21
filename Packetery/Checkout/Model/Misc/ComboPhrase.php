@@ -30,10 +30,10 @@ class ComboPhrase extends Phrase
      */
     public function render(): string {
         return implode(
-            $this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator,
+            ($this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator),
             array_map(
                 function ($phrase) {
-                    return $phrase instanceof Phrase ? $phrase->render() : (string)$phrase;
+                    return ($phrase instanceof Phrase ? $phrase->render() : (string)$phrase);
                 },
                 $this->phrases
             )
@@ -45,10 +45,10 @@ class ComboPhrase extends Phrase
      */
     public function getText(): string {
         return implode(
-            $this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator,
+            ($this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator),
             array_map(
                 function ($phrase) {
-                    return $phrase instanceof Phrase ? $phrase->getText() : (string)$phrase;
+                    return ($phrase instanceof Phrase ? $phrase->getText() : (string)$phrase);
                 },
                 $this->phrases
             )

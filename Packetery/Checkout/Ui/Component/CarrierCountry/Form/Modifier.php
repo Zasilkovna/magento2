@@ -460,7 +460,7 @@ class Modifier implements ModifierInterface
         $pricingRules = [];
         foreach ($data['shipping_methods'] as $shippingMethod) {
             if ($enabled !== null) {
-                $enabledValue = $enabled ? '1' : '0';
+                $enabledValue = ($enabled ? '1' : '0');
                 if ($enabledValue !== $shippingMethod['enabled']) {
                     continue;
                 }
@@ -490,7 +490,7 @@ class Modifier implements ModifierInterface
 
             $carrierCode = $carrier->getData('carrier_code');
             $method = $carrier->getData('method');
-            $carrierId = $carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null;
+            $carrierId = ($carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null);
 
             $shippingMethod['carrier_name'] = $carrier->getFinalCarrierName();
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $country, $carrierCode, $carrierId);
