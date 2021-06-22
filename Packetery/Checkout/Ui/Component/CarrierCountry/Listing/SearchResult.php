@@ -25,10 +25,10 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
-     * @param $mainTable
-     * @param null $resourceModel
-     * @param null $identifierName
-     * @param null $connectionName
+     * @param string $mainTable
+     * @param null|string $resourceModel
+     * @param null|string $identifierName
+     * @param null|string $connectionName
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
