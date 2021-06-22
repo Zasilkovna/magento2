@@ -4,7 +4,7 @@
 
 ### Download module
 
-[Current version 2.0.5](https://github.com/Zasilkovna/magento2/archive/v2.0.5.zip)
+[Current version 2.1.0](https://github.com/Zasilkovna/magento2/archive/v2.1.0.zip)
 
 ### Installation
 
@@ -77,24 +77,27 @@ Multiple payment methods can be selected by holding the "Ctrl" button and clicki
 
 #### Supported versions:
 
-- Magento 2.2 and newer
-- If you have a problem using the Magento 2 module (eg 2.0), please contact us at [support@packeta.com](mailto:support@packeta.com)
+- Magento 2.3 and newer
+- If you have a problem using the module, please contact us by email: [support@packeta.com](mailto:support@packeta.com)
 
 #### Supported features:
 
-- integration of widget v6 for pickup points selections in the eshop cart
-- external carrier pickup point support
-- address delivery support (in cz, sk, hu, pl and ro via "Home delivery HD")
-- set different prices for different target countries
-- setting prices according to weighting rules
-- free shipping from the specified price or weight of the order
-- export orders to a csv file that can be imported in [client section](https://client.packeta.com/)
+- integration of widget v6 in the cart
+- support for external carriers' pickup points
+- delivery to an address via external carriers
+- setting different prices for each carrier
+- free shipping from the specified price
+- export shipments to a csv file that can be imported in [client section](https://client.packeta.com/)
+
+#### Restrictions:
+
+- currently the module does not support: delivery to non-EU addresses, carriers who have prohibited cash on delivery (list of carriers), evening delivery Prague, Brno, Ostrava, Bratislava
 
 # Modul pro Magento 2
 
 ### Stažení modulu
 
-[Aktuální verze 2.0.5](https://github.com/Zasilkovna/magento2/archive/v2.0.5.zip)
+[Aktuální verze 2.1.0](https://github.com/Zasilkovna/magento2/archive/v2.1.0.zip)
 
 ### Instalace
 
@@ -167,15 +170,18 @@ Vybrat více platebních metod je možné přidržením tlačítka "Ctrl" a klik
 
 #### Podporované verze:
 
-- Magento 2.2 a vyšší
-- Při problému s použitím modulu u nižší verze Magento 2 (např. 2.0) nás kontaktujte na adrese [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz)
+- Magento 2.3 a vyšší
+- Při problému s použitím modulu nás kontaktujte na emailu: [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz)
 
 #### Poskytované funkce:
 
 - integrace widgetu v6 v košíku eshopu
 - podpora výdejních míst externích dopravců
-- podpora doručení zásilek na adresu (v cz, sk, hu, pl a ro přes dopravce “Doručení na adresu HD”)
-- nastavení různé ceny pro různé cílové země
-- nastavení cen podle váhových pravidel
-- doprava zdarma od zadané ceny nebo hmotnosti objednávky
+- doručení na adresu přes externí dopravce Zásilkovny
+- nastavení různé ceny pro jednotlivé dopravce
+- doprava zdarma od zadané ceny
 - export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/)
+
+#### Omezení:
+
+- v současné době modul nepodporuje: doručení na adresu mimo EU, dopravce kteří mají zakázanou dobírku (seznam dopravců), večerní doručení Praha, Brno, Ostrava, Bratislava
