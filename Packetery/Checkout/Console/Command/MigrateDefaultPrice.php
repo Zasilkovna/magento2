@@ -93,6 +93,9 @@ class MigrateDefaultPrice extends Command
 
         foreach ($allowedMethods as $allowedMethod) {
             foreach ($countries as $country) {
+                if (empty($country)) {
+                    continue;
+                }
 
                 $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country, \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
 
@@ -113,7 +116,16 @@ class MigrateDefaultPrice extends Command
                         ],
                     ];
 
-                    $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
+                    try {
+                        $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
+                    } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
+                        $output->writeln("Duplicate country for country $country and method $allowedMethod with fallback weight price $defaultPrice");
+                        continue;
+                    } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
+                        $output->writeln("Invalid weight for country $country and method $allowedMethod with fallback weight price $defaultPrice");
+                        continue;
+                    }
+
                     $output->writeln("New pricing rule inserted for country $country and method $allowedMethod with fallback weight price $defaultPrice");
                 }
             }
