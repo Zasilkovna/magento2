@@ -48,7 +48,7 @@ class UpgradeData implements UpgradeDataInterface
             $this->migratePriceRulesCommand->run(new ArrayInput([]), new NullOutput());
         }
 
-        if (version_compare($context->getVersion(), "2.0.6", "<")) {
+        if (version_compare($context->getVersion(), "2.1.0", "<")) {
             $this->migrateDefaultPriceCommand->run(new ArrayInput([]), new NullOutput());
 
             $configModel = $this->configFactory->create();

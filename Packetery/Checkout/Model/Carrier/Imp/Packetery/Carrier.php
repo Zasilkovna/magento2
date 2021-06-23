@@ -28,4 +28,11 @@ class Carrier extends \Packetery\Checkout\Model\Carrier\AbstractCarrier
     ) {
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $brain, $data);
     }
+
+    /**
+     * @return \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain
+     */
+    public function getPacketeryBrain(): \Packetery\Checkout\Model\Carrier\AbstractBrain {
+        return $this->packeteryBrain;
+    }
 }

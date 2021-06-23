@@ -11,6 +11,9 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect */
     private $methodSelect;
 
+    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
+    private $carrierCollectionFactory;
+
     /**
      * Brain constructor.
      *
@@ -18,15 +21,18 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect
+     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect,
+        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
     ) {
         parent::__construct($httpRequest, $pricingService, $scopeConfig);
         $this->methodSelect = $methodSelect;
+        $this->carrierCollectionFactory = $carrierCollectionFactory;
     }
 
     /**
@@ -47,7 +53,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /**
      * @inheridoc
      */
-    protected function getResolvableDestinationData(): array {
+    protected static function getResolvableDestinationData(): array {
         return [
             Methods::ADDRESS_DELIVERY => [
                 'countryBranchIds' => [
@@ -59,5 +65,43 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
                 ],
             ],
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getImplementedBranchIds(): array {
+        return array_values(self::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds']);
+    }
+
+    /**
+     * @param array $methods
+     * @return array
+     */
+    public function getAvailableCountries(array $methods): array {
+        $result = [];
+
+        if (in_array(Methods::ADDRESS_DELIVERY, $methods)) {
+            $result = array_merge($result, array_keys($this::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds'] ?? []));
+        }
+
+        if (in_array(Methods::PICKUP_POINT_DELIVERY, $methods)) {
+            $fixedCountries = $this->getBaseCountries();
+
+            $collection = $this->carrierCollectionFactory->create();
+            $collection->forDeliveryMethod(Methods::PICKUP_POINT_DELIVERY);
+            $countries = $collection->getColumnValues('country');
+
+            $result = array_merge($result, array_unique(array_merge($fixedCountries, $countries)));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getBaseCountries(): array {
+        return ['CZ', 'SK', 'HU', 'RO'];
     }
 }

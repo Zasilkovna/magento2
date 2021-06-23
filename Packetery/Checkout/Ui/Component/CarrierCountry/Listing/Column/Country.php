@@ -2,35 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Ui\Component\Pricingrule\Listing\Column;
+namespace Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Column;
 
+use Magento\Directory\Model\CountryFactory;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
-class FreeShipment extends Column
+class Country extends Column
 {
-    /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory  */
-    protected $pricingRuleCollectionFactory;
+    /** @var \Magento\Directory\Model\CountryFactory  */
+    protected $_countryFactory;
 
     /**
-     * Price constructor.
+     * Country constructor.
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
+     * @param \Magento\Directory\Model\CountryFactory $countryFactory
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory,
+        CountryFactory $countryFactory,
         array $components = [],
         array $data = []
     ) {
+        $this->_countryFactory = $countryFactory;
         parent::__construct($context, $uiComponentFactory, $components, $data);
-        $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
     }
 
     /**
@@ -41,11 +42,8 @@ class FreeShipment extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                if (is_numeric($item["free_shipment"])) {
-                    $item[$this->getData('name')] = $item["free_shipment"];
-                } else {
-                    $item[$this->getData('name')] = '';
-                }
+                $country = $this->_countryFactory->create()->loadByCode($item["country"]);
+                $item[$this->getData('name')] = $country->getName();
             }
         }
 

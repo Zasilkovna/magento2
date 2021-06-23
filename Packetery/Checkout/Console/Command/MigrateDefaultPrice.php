@@ -93,11 +93,17 @@ class MigrateDefaultPrice extends Command
 
         foreach ($allowedMethods as $allowedMethod) {
             foreach ($countries as $country) {
+                if (empty($country)) {
+                    continue;
+                }
 
-                $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country);
+                $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country, \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
 
                 if ($resolvedPricingRule === null) {
                     $pricingRule = [
+                        'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
+                        'carrier_id' => null,
+                        'enabled' => false,
                         'free_shipment' => null,
                         'country_id' => $country,
                         'method' => $allowedMethod,
@@ -110,7 +116,16 @@ class MigrateDefaultPrice extends Command
                         ],
                     ];
 
-                    $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
+                    try {
+                        $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
+                    } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {
+                        $output->writeln("Duplicate country for country $country and method $allowedMethod with fallback weight price $defaultPrice");
+                        continue;
+                    } catch (\Packetery\Checkout\Model\Exception\InvalidMaxWeight $e) {
+                        $output->writeln("Invalid weight for country $country and method $allowedMethod with fallback weight price $defaultPrice");
+                        continue;
+                    }
+
                     $output->writeln("New pricing rule inserted for country $country and method $allowedMethod with fallback weight price $defaultPrice");
                 }
             }

@@ -12,8 +12,9 @@ class MethodSelect extends AbstractMethodSelect implements \Magento\Framework\Da
     protected function createOptions(): array
     {
         return [
-            ['value' => Methods::PICKUP_POINT_DELIVERY, 'label' => __('Pickup Point Delivery Method')],
-            ['value' => Methods::ADDRESS_DELIVERY, 'label' => __('Address Delivery Method')],
+            ['value' => Methods::PICKUP_POINT_DELIVERY, 'label' => __('Pickup Point Delivery')],
+            ['value' => Methods::ADDRESS_DELIVERY, 'label' => __('Best Address Delivery')],
+            ['value' => Methods::DIRECT_ADDRESS_DELIVERY, 'label' => __('Address Delivery')],
         ];
     }
 }

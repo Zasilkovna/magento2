@@ -2,39 +2,52 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Ui\Component\Pricingrule\Listing\Column;
+namespace Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Column;
 
-use Magento\Directory\Model\CountryFactory;
-use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\Url;
 use Magento\Ui\Component\Listing\Columns\Column;
 
-class Country extends Column
+class Actions extends Column
 {
-    /** @var \Magento\Directory\Model\CountryFactory  */
-    protected $_countryFactory;
+    /**
+     * @var UrlInterface
+     */
+    protected $_urlBuilder;
 
     /**
-     * Country constructor.
+     * @var string
+     */
+    protected $_viewUrl;
+
+    /**
+     * Constructor
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Magento\Directory\Model\CountryFactory $countryFactory
+     * @param \Magento\Framework\Url $urlBuilder
+     * @param string $viewUrl
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        CountryFactory $countryFactory,
+        \Magento\Backend\Model\UrlInterface $urlBuilder,
+        $viewUrl = '',
         array $components = [],
         array $data = []
     ) {
-        $this->_countryFactory = $countryFactory;
+        $this->_urlBuilder = $urlBuilder;
+        $this->_viewUrl    = $viewUrl;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
     /**
+     * Prepare Data Source
+     *
      * @param array $dataSource
      * @return array
      */
@@ -42,11 +55,13 @@ class Country extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                $country = $this->_countryFactory->create()->loadByCode($item["country_id"]);
-                $item[$this->getData('name')] = $country->getName();
+                $name = $this->getData('name');
+                $item[$name]['view'] = [
+                    'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['country' => $item['country']]),
+                    'label' => __('Detail')
+                ];
             }
         }
-
         return $dataSource;
     }
 }
