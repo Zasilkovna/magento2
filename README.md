@@ -77,7 +77,7 @@ Multiple payment methods can be selected by holding the "Ctrl" button and clicki
 
 #### Supported versions:
 
-- Magento 2.3 and newer
+- Magento 2.3, 2.4
 - If you have a problem using the module, please contact us by email: [support@packeta.com](mailto:support@packeta.com)
 
 #### Supported features:
@@ -88,10 +88,11 @@ Multiple payment methods can be selected by holding the "Ctrl" button and clicki
 - setting different prices for each carrier
 - free shipping from the specified price
 - export shipments to a csv file that can be imported in [client section](https://client.packeta.com/)
+- possibility to change the pickup point for an existing order in the administration
 
 #### Restrictions:
 
-- currently the module does not support: delivery to non-EU addresses, carriers who have prohibited cash on delivery (list of carriers), evening delivery Prague, Brno, Ostrava, Bratislava
+- currently the module does not support: delivery to non-EU addresses, carriers who have prohibited cash on delivery, evening delivery Prague, Brno, Ostrava, Bratislava
 
 # Modul pro Magento 2
 
@@ -170,7 +171,7 @@ Vybrat více platebních metod je možné přidržením tlačítka "Ctrl" a klik
 
 #### Podporované verze:
 
-- Magento 2.3 a vyšší
+- Magento 2.3, 2.4
 - Při problému s použitím modulu nás kontaktujte na emailu: [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz)
 
 #### Poskytované funkce:
@@ -181,7 +182,8 @@ Vybrat více platebních metod je možné přidržením tlačítka "Ctrl" a klik
 - nastavení různé ceny pro jednotlivé dopravce
 - doprava zdarma od zadané ceny
 - export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/)
+- možnost změny výdejního místa u existující objednávky v administraci
 
 #### Omezení:
 
-- v současné době modul nepodporuje: doručení na adresu mimo EU, dopravce kteří mají zakázanou dobírku (seznam dopravců), večerní doručení Praha, Brno, Ostrava, Bratislava
+- v současné době modul nepodporuje: doručení na adresu mimo EU, dopravce kteří mají zakázanou dobírku, večerní doručení Praha, Brno, Ostrava, Bratislava
