@@ -31,44 +31,7 @@ Installation and registration of the module is done by CLI utility, which is par
 - disable maintenance mode
 - check configuration
 
-### Configuration
-
-Login to the administration, in the left menu select **Stores**. Then select in the newly expanded menu **Settings** / **Configuration**.
-Module configuration can be found in section **Packeta** - configuration.
-The configuration is  divided into several parts: *Widget configuration*, *Price rules*, *Cash on delivery*. In each part fill in required informations.
-and save the settings pressing the **Save config** button.
-
-#### Widget configuration
-
-- **API key** - you can find it in [client section](https://client.packeta.com/en/support/) » Client support
-
-#### Price rules
-
-##### Global settings
-- **Maximum weight** - for orders with a larger weight, the Packeta shipping method will not be offered in the cart
-- **free shipping** - if the order price is higher, free shipping
-
-##### Rules
-
-Enter prices and shipping pricing rules for each supported country here. Only kilograms are supported.
-
-- **free shipping** - if the order price is higher, free shipping
-- **price rules** - here you can add more pricing rules for different weight ranges.
-    - to create a new rule click on the button * Add Rule *
-    - click the * Delete * button to delete the rule
-    - fill in the fields * Weight to * and * Price * for each rule
-
-#### Cash on delivery
-
-Under * Cash on delivery * - * Payment methods *, select the payment methods that will be considered as cash on delivery (for Packeta).
-Multiple payment methods can be selected by holding the "Ctrl" button and clicking on the required payment methods
-
-### List of orders
-
-- To enter the order list, select in the left menu **Packeta**.
-- Export orders to the CSV file:
-    - Select the orders you want to export to CSV file.
-    - Above the list of orders you will find the ** Actions ** drop-down menu where you select ** CSV export ** and click ** Search **
+### Configuration and how to guide
 
 ### Informations about the module
 
@@ -127,44 +90,7 @@ Instalace a registrace modulu se provádí CLI utilitou, která je součástí M
 - vypnout režim údržby
 - zkontrolovat konfiguraci
 
-### Konfigurace
-
-Přihlašte se do administrace, v levém menu vyberte **Stores**.  Poté v nově rozbaleném menu vyberte položku **Settings** / **Configuration**.
-Konfiguraci modulu najdete v sekci **Zásilkovna** konfigurační stránky.
-Konfigurace je rozdělena do několika částí:  *Nastavení widgetu*, *Cenová pravidla*, *Dobírka*.   V každé části je vyplňte požadované údaje 
-a nastavení uložte kliknutím na tlačítko **Save Config**
-
-#### Nastavení widgetu 
-
-- **API klíč** - naleznete jej v [klientské sekci](https://client.packeta.com/cs/support/) » Klientská podpora
-
-#### Cenová pravidla
-
-##### Globální nastavení
-- **Maximální váha** - u objednávek s větší hmotnostní nebude v košíku přepravní metoda Zásilkovna nabízena
-- **Doprava zdarma** - pokud bude cena objednávky vyšší bude doprava zdarma
-
-##### Pravidla
-
-Zde zadejte ceny a pravidla pro výpočet ceny přepravy pro každou podporovanou zemi zvlášť. Podporované jsou pouze váhy v kilogramech.
-
-- **Doprava zdarma** - pokud bude cena objednávky vyšší bude doprava zdarma
-- **Cenová pravidla** - zde můžete přidat více cenových pravidel, pro různá váhová rozmezí.  
-    - pro vytvoření nového pravidla klikněte na tlačítko *Přidat pravidlo*
-    - pro smazání pravidla klikněte na ikonu popelnice
-    - u každého pravidla vyplňte pole *Hmotnost do* a *Cena*
-
-#### Dobírka
-
-V části *Dobírka* - *Platební metody* vyberte platební metody, které budou považovány za platební metody na dobírku (pro Zásikovnu).
-Vybrat více platebních metod je možné přidržením tlačítka "Ctrl" a kliknutím na jednotlivé požadované platební metody
-
-### Seznam objednávek
-
-- Pro vstup do seznamu objednávek Zásilkovny zvolte v levém menu položku **Zásilkovna**.
-- Export zásilek do CSV souboru:
-    - Označte objednávky které chcete exportovat do CSV souboru.
-    - Nad seznamem objednávek naleznete rozbalovací menu **Actions** kde vyberete **CSV export** a kliknete na tlačítko **Search**
+### Konfigurace a návod k použití
 
 ### Informace o modulu
 
