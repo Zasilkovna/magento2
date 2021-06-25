@@ -8,7 +8,8 @@
 
 ### Installation
 
-Installation and registration of the module is done by CLI utility, which is part of Magento 2. This utility is available in Magento installation directory as "/bin/magento".
+Installation and registration of the module are done by CLI utility, which is part of Magento 2.
+This utility is available in Magento installation directory as "/bin/magento".
 
 - copy directory 'Packetery' to directory: `/app/code`
 - enable module using CLI utility: `bin/magento module:enable Packetery_Checkout --clear-static-content`
@@ -25,15 +26,15 @@ Installation and registration of the module is done by CLI utility, which is par
 - set Packeta configuration in administration for default scope even if Packeta carrier is inactive
 - enable maintenance mode
 - remove all previous source files (remove app/code/Packetery folder)
-- next steps are same as during installation
+- next steps are the same as during the installation
 - (optional) migrate configuration from 2.0.1 and 2.0.2 structure: `bin/magento packetery:migrate-price-rules`
 - (optional) migrate global price from structure of versions up to 2.0.5: `bin/magento packetery:migrate-default-price`
 - disable maintenance mode
 - check configuration
 
-### Configuration and how to guide
+### Configuration and "How to" guide
 
-### Informations about the module
+### Information about the module
 
 #### Supported languages:
 
@@ -52,12 +53,13 @@ Installation and registration of the module is done by CLI utility, which is par
 - delivery to an address via external carriers
 - setting different prices for each carrier
 - free shipping from the specified price
-- export shipments to a csv file that can be imported in [client section](https://client.packeta.com/)
+- export shipments to a CSV file that can be imported in [client section](https://client.packeta.com/)
 - possibility to change the pickup point for an existing order in the administration
 
 #### Restrictions:
 
-- currently the module does not support: delivery to non-EU addresses, carriers who have prohibited cash on delivery, evening delivery Prague, Brno, Ostrava, Bratislava
+- currently, the module does not support: delivery to non-EU addresses, carriers who have prohibited cash on delivery,
+  evening delivery Prague, Brno, Ostrava, Bratislava
 
 # Modul pro Magento 2
 
