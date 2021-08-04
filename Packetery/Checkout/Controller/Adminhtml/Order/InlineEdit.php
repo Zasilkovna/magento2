@@ -35,17 +35,13 @@ class InlineEdit extends Action implements HttpPostActionInterface
      */
     public function execute() {
         $postItems = $this->getRequest()->getParam('items', []);
-        foreach (array_keys($postItems) as $modelId) {
+        foreach ($postItems as $modelId => $postItem) {
             $orderCollection = $this->orderCollectionFactory->create();
             $orderCollection->addFilter($orderCollection->getIdFieldName(), $modelId);
-            $orderCollection->setDataToAll($postItems[$modelId]);
+            $orderCollection->setDataToAll($postItem);
             $orderCollection->save();
         }
 
-        $responseContent = [
-            'status' => 'ok'
-        ];
-
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($responseContent);
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData([]);
     }
 }
