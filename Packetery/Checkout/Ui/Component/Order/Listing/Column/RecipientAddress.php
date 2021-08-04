@@ -24,10 +24,12 @@ class RecipientAddress extends Column
                         [
                             implode(
                                 ' ',
-                                [
-                                    $item['recipient_street'],
-                                    $item['recipient_house_number'],
-                                ]
+                                array_filter(
+                                    [
+                                        $item['recipient_street'],
+                                        $item['recipient_house_number'],
+                                    ]
+                                )
                             ),
                             $item['recipient_city'],
                             $item['recipient_zip'],
