@@ -24,6 +24,7 @@
         </argument>
     </dataSource>
     <listingToolbar>
+        <columnsControls name="columns_controls"/>
         <filters name="listing_filters"/>
     </listingToolbar>
     <columns name="spinner_columns">
