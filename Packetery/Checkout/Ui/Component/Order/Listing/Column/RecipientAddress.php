@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Component\Order\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
-use Packetery\Checkout\Ui\Component\Order\Listing\ByFieldColumnTrait;
 
 class RecipientAddress extends Column
 {
-    use ByFieldColumnTrait;
-
     /**
      * @param array $dataSource
      * @return array
