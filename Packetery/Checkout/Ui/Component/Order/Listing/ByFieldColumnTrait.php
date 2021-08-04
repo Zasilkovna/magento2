@@ -14,25 +14,4 @@ trait ByFieldColumnTrait
     private function getByField(): string {
         return $this->getData('packetery/byField') ?? $this->getData('name');
     }
-
-    /**
-     * Apply sorting
-     *
-     * @return void
-     */
-    protected function applyByFieldSorting(): void
-    {
-        $sorting = $this->getContext()->getRequestParam('sorting');
-        $isSortable = $this->getData('config/sortable');
-        if ($isSortable !== false
-            && !empty($sorting['field'])
-            && !empty($sorting['direction'])
-            && $sorting['field'] === $this->getName()
-        ) {
-            $this->getContext()->getDataProvider()->addOrder(
-                $this->getByField(),
-                strtoupper($sorting['direction'])
-            );
-        }
-    }
 }

@@ -23,6 +23,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                  {$mainTableQuoted}.value AS value_transformed,
                  IF({$mainTableQuoted}.cod > 0, 1, 0) AS cod_transformed,
                  {$mainTableQuoted}.exported AS exported_transformed,
+                 {$mainTableQuoted}.exported_at AS exported_at_transformed,
                  sales_order.status AS order_status,
                  {$mainTableQuoted}.*
                  FROM {$packeteryOrderTable} AS {$mainTableQuoted}

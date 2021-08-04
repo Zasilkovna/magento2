@@ -60,13 +60,4 @@ class Value extends Column
 
         return $dataSource;
     }
-
-    /**
-     * Apply sorting
-     *
-     * @return void
-     */
-    protected function applySorting() {
-        $this->applyByFieldSorting();
-    }
 }

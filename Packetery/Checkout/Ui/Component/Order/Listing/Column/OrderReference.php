@@ -59,25 +59,4 @@ class OrderReference extends Column
 
         return $dataSource;
     }
-
-    /**
-     * Apply sorting
-     *
-     * @return void
-     */
-    protected function applySorting()
-    {
-        $sorting = $this->getContext()->getRequestParam('sorting');
-        $isSortable = $this->getData('config/sortable');
-        if ($isSortable !== false
-            && !empty($sorting['field'])
-            && !empty($sorting['direction'])
-            && $sorting['field'] === $this->getName()
-        ) {
-            $this->getContext()->getDataProvider()->addOrder(
-                'order_number',
-                strtoupper($sorting['direction'])
-            );
-        }
-    }
 }

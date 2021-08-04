@@ -61,15 +61,6 @@ class DateTime extends Column
     }
 
     /**
-     * Apply sorting
-     *
-     * @return void
-     */
-    protected function applySorting() {
-        $this->applyByFieldSorting();
-    }
-
-    /**
      * Retrieve formatting date
      *
      * @param null|string|\DateTimeInterface $date
