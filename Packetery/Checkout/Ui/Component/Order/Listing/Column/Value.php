@@ -8,9 +8,12 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
+use Packetery\Checkout\Ui\Component\Order\Listing\ByFieldColumnTrait;
 
 class Value extends Column
 {
+    use ByFieldColumnTrait;
+
     /** @var \Magento\Directory\Model\CurrencyFactory */
     private $currencyFactory;
 
@@ -41,7 +44,7 @@ class Value extends Column
     public function prepareDataSource(array $dataSource): array {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                $value = $item[$this->getData('name')];
+                $value = $item[$this->getByField()];
                 if (!$value) {
                     continue;
                 }
@@ -58,7 +61,12 @@ class Value extends Column
         return $dataSource;
     }
 
+    /**
+     * Apply sorting
+     *
+     * @return void
+     */
     protected function applySorting() {
-        // no DB select sorting
+        $this->applyByFieldSorting();
     }
 }

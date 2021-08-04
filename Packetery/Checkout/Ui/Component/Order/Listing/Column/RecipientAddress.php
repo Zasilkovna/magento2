@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Component\Order\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
+use Packetery\Checkout\Ui\Component\Order\Listing\ByFieldColumnTrait;
 
 class RecipientAddress extends Column
 {
+    use ByFieldColumnTrait;
+
     /**
      * @param array $dataSource
      * @return array
@@ -37,7 +40,12 @@ class RecipientAddress extends Column
         return $dataSource;
     }
 
+    /**
+     * Apply sorting
+     *
+     * @return void
+     */
     protected function applySorting() {
-        // no DB select sorting
+        $this->applyByFieldSorting();
     }
 }

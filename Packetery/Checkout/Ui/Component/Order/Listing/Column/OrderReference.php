@@ -22,8 +22,8 @@ class OrderReference extends Column
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Magento\Framework\Url $urlBuilder
-     * @param string $viewUrl
+     * @param \Magento\Backend\Model\UrlInterface $urlBuilder
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param array $components
      * @param array $data
      */
@@ -58,5 +58,26 @@ class OrderReference extends Column
         }
 
         return $dataSource;
+    }
+
+    /**
+     * Apply sorting
+     *
+     * @return void
+     */
+    protected function applySorting()
+    {
+        $sorting = $this->getContext()->getRequestParam('sorting');
+        $isSortable = $this->getData('config/sortable');
+        if ($isSortable !== false
+            && !empty($sorting['field'])
+            && !empty($sorting['direction'])
+            && $sorting['field'] === $this->getName()
+        ) {
+            $this->getContext()->getDataProvider()->addOrder(
+                'order_number',
+                strtoupper($sorting['direction'])
+            );
+        }
     }
 }

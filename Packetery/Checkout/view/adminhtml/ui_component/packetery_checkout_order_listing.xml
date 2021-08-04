@@ -54,19 +54,10 @@
                 </item>
             </argument>
         </selectionsColumn>
-        <column name="id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">textRange</item>
-                    <item name="sorting" xsi:type="string">asc</item>
-                    <item name="label" xsi:type="string" translate="true">ID</item>
-                </item>
-            </argument>
-        </column>
         <column name="order_number_reference" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\OrderReference">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Order number</item>
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
@@ -76,6 +67,7 @@
         <column name="created_at" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\CreatedDate">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">date</item>
                     <item name="label" xsi:type="string" translate="true">Purchase Date</item>
                 </item>
@@ -84,6 +76,7 @@
         <column name="order_status" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\OrderStatus">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Order status</item>
                 </item>
@@ -97,11 +90,15 @@
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Full name</item>
                 </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">recipient_lastname</item>
+                </item>
             </argument>
         </column>
         <column name="recipient_company">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Recipient company</item>
                 </item>
@@ -110,6 +107,7 @@
         <column name="recipient_email">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Recipient Email</item>
                 </item>
@@ -118,6 +116,7 @@
         <column name="recipient_phone">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Recipient phone number</item>
                 </item>
@@ -126,16 +125,24 @@
         <column name="recipient_address" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\RecipientAddress">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Recipient address</item>
                 </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">recipient_street</item>
+                </item>
             </argument>
         </column>
-        <column name="cod" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\YesNo">
+        <column name="cod_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\YesNo">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Cash on delivery</item>
+                </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">cod</item>
                 </item>
             </argument>
         </column>
@@ -148,24 +155,28 @@
                 </item>
             </argument>
         </column>
-        <column name="value" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Value">
+        <column name="value_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Value">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="sortable" xsi:type="boolean">true</item>
-                    <item name="indexField" xsi:type="string">value</item>
-                    <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Total price</item>
+                </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">value</item>
                 </item>
             </argument>
         </column>
-        <column name="weight" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Value">
+        <column name="weight">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="editor" xsi:type="array">
                         <item name="editorType" xsi:type="string">text</item>
                         <item name="validation" xsi:type="array">
                             <item name="required-entry" xsi:type="boolean">true</item>
+                            <item name="validate-number" xsi:type="boolean">true</item>
+                            <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">Weight</item>
@@ -175,24 +186,35 @@
         <column name="delivery_destination" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\DeliveryDestination">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Pickup point address</item>
                 </item>
             </argument>
         </column>
-        <column name="exported" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\YesNo">
+        <column name="exported_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\YesNo">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
+                    <item name="indexField" xsi:type="string">exported</item>
+                    <item name="index" xsi:type="string">exported</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Exported</item>
                 </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">exported</item>
+                </item>
             </argument>
         </column>
-        <column name="exported_at" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\DateTime">
+        <column name="exported_at_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\DateTime">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">date</item>
                     <item name="label" xsi:type="string" translate="true">Export date</item>
+                </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">exported_at</item>
                 </item>
             </argument>
         </column>

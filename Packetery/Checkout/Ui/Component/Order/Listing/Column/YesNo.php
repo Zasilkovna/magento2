@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Component\Order\Listing\Column;
 
 use Magento\Ui\Component\Listing\Columns\Column;
+use Packetery\Checkout\Ui\Component\Order\Listing\ByFieldColumnTrait;
 
 class YesNo extends Column
 {
+    use ByFieldColumnTrait;
+
     /**
      * @param array $dataSource
      * @return array
@@ -15,15 +18,26 @@ class YesNo extends Column
     public function prepareDataSource(array $dataSource): array {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                $value = $item[$this->getData('name')];
-                $item[$this->getData('name')] = ($value ? __('Yes') : __('No'));
+                $value = $item[$this->getByField()];
+
+                if (is_numeric($value)) {
+                    $value = (float)$value;
+                }
+
+                $item[$this->getData('name')] = (!empty($value) ? __('Yes') : __('No'));
             }
         }
 
         return $dataSource;
     }
 
-    protected function applySorting() {
-        // no DB select sorting
+    /**
+     * Apply sorting
+     *
+     * @return void
+     */
+    protected function applySorting()
+    {
+        $this->applyByFieldSorting();
     }
 }

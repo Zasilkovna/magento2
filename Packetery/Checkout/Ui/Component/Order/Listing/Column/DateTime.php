@@ -8,9 +8,12 @@ use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
+use Packetery\Checkout\Ui\Component\Order\Listing\ByFieldColumnTrait;
 
 class DateTime extends Column
 {
+    use ByFieldColumnTrait;
+
     /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface */
     protected $localeDate;
 
@@ -47,7 +50,7 @@ class DateTime extends Column
     public function prepareDataSource(array $dataSource): array {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                $value = $item[$this->getData('name')];
+                $value = $item[$this->getByField()];
                 if ($value) {
                     $item[$this->getData('name')] = $this->formatDate($value, \IntlDateFormatter::MEDIUM, true);
                 }
@@ -57,8 +60,13 @@ class DateTime extends Column
         return $dataSource;
     }
 
+    /**
+     * Apply sorting
+     *
+     * @return void
+     */
     protected function applySorting() {
-        // no DB select sorting
+        $this->applyByFieldSorting();
     }
 
     /**
