@@ -4,7 +4,7 @@
 
 ### Download module
 
-[Current version 2.1.0](https://github.com/Zasilkovna/magento2/archive/v2.1.0.zip)
+[Current version 2.2.0](https://github.com/Zasilkovna/magento2/archive/v2.2.0.zip)
 
 ### Installation
 
@@ -84,7 +84,7 @@ Price rules are created as unavailable, without set maximum weight.
 
 ### Stažení modulu
 
-[Aktuální verze 2.1.0](https://github.com/Zasilkovna/magento2/archive/v2.1.0.zip)
+[Aktuální verze 2.2.0](https://github.com/Zasilkovna/magento2/archive/v2.2.0.zip)
 
 ### Instalace
 
