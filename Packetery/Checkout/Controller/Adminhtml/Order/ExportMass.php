@@ -1,43 +1,56 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Packetery\Checkout\Controller\Adminhtml\Order;
+
+use Packetery\Checkout\Model\Export\ConvertToCsvCustom;
 
 class ExportMass extends \Magento\Backend\App\Action
 {
-
-    protected $_fileFactory;
-    protected $_response;
-    protected $_view;
-    protected $directory;
-    protected $converter;
-    protected $resultPageFactory;
-    protected $directory_list;
+    /** @var \Magento\Framework\View\Result\PageFactory */
+    private $resultPageFactory;
 
     /** @var \Packetery\Checkout\Helper\Data */
     private $data;
 
-    /** @var \Magento\Backend\App\Action\Context */
-    private $context;
-
     /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
     private $orderCollectionFactory;
 
+    /** @var ConvertToCsvCustom */
+    private $converter;
+
+    /**
+     * ExportMass constructor.
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Packetery\Checkout\Helper\Data $data
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+     * @param \Packetery\Checkout\Model\Export\ConvertToCsvCustom $converter
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context  $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Packetery\Checkout\Helper\Data $data,
-        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+        ConvertToCsvCustom $converter
     ) {
         parent::__construct($context);
 
         $this->resultPageFactory  = $resultPageFactory;
         $this->data = $data;
-        $this->context = $context;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->converter = $converter;
     }
 
+    /**
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function execute()
     {
-        $orderIds = $this->getRequest()->getParam('order_id');
+        $orderIds = $this->converter->getItemIds();
 
         if (empty($orderIds))
         {
