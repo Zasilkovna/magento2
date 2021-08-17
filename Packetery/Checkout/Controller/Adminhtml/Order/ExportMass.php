@@ -88,7 +88,12 @@ class ExportMass extends \Magento\Backend\App\Action
         $this->_sendUploadResponse($this->data->getExportFileName(), $content);
     }
 
-    protected function _sendUploadResponse($fileName, $content, $contentType = 'application/octet-stream') {
+    /**
+     * @param string $fileName
+     * @param string|null $content
+     * @param string $contentType
+     */
+    protected function _sendUploadResponse(string $fileName, ?string $content, string $contentType = 'application/octet-stream') {
         $this->_response->setHttpResponseCode(200)
             ->setHeader('Pragma', 'public', true)
             ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
