@@ -23,9 +23,33 @@
             </argument>
         </argument>
     </dataSource>
-    <listingToolbar>
+    <listingToolbar name="listing_top">
         <columnsControls name="columns_controls"/>
         <filters name="listing_filters"/>
+        <exportButton name="export_button" class="Packetery\Checkout\Ui\Component\ExportButton">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="selectProvider" xsi:type="string">packetery_checkout_order_listing.packetery_checkout_order_listing.spinner_columns.ids</item>
+                    <item name="options" xsi:type="array">
+                        <item name="csv_unexported" xsi:type="array">
+                            <item name="value" xsi:type="string">csv_unexported</item>
+                            <item name="label" xsi:type="string" translate="true">CSV - only not exported</item>
+                            <item name="url" xsi:type="string">packetery/order/exportPacketeryCsv</item>
+                        </item>
+                        <item name="csv_selected" xsi:type="array">
+                            <item name="value" xsi:type="string">csv_selected</item>
+                            <item name="label" xsi:type="string" translate="true">CSV - selected only</item>
+                            <item name="url" xsi:type="string">packetery/order/exportMass</item>
+                        </item>
+                        <item name="csv_all" xsi:type="array">
+                            <item name="value" xsi:type="string">csv_all</item>
+                            <item name="label" xsi:type="string" translate="true">CSV - all records</item>
+                            <item name="url" xsi:type="string">packetery/order/exportPacketeryCsvAll</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </exportButton>
     </listingToolbar>
     <columns name="spinner_columns">
         <settings>
