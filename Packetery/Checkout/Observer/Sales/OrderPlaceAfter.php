@@ -72,11 +72,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             $street = $streetMatches[1];
         }
 
-        $weight = 0;
-        foreach ($order->getAllItems() as $item)
-        {
-            $weight += ($item->getWeight() * $item->getQtyOrdered());
-        }
+        $weight = $this->getOrderWeight($order);
 
         $postData = json_decode(file_get_contents("php://input"));
         $pointId = NULL;
@@ -152,6 +148,66 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
         $this->saveData($data);
 
+    }
+
+    /**
+     * Returns total weight of ordered items.
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return float
+     */
+    private function getOrderWeight(\Magento\Sales\Model\Order $order): float {
+        $productWeights = [];
+        $totalWeight = 0.0;
+        /** @var \Magento\Sales\Model\Order\Item[] $allVisibleItems */
+        $allVisibleItems = $order->getAllVisibleItems();
+
+        foreach ($allVisibleItems as $item) {
+            if ($item->getProductType() === 'configurable') {
+                $configurableProduct = $item->getProduct();
+                if ($configurableProduct->isVirtual()) {
+                    $configurableWeight = 0.0;
+                } else {
+                    $configurableWeight = $configurableProduct->getWeight();
+                }
+
+                /** @var \Magento\Sales\Model\Order\Item[] $children */
+                $children = $item->getChildrenItems(); // contains only ordered items
+                foreach ($children as $child) {
+                    $childProduct = $child->getProduct();
+                    if ($childProduct->isVirtual()) {
+                        $productWeights[$childProduct->getId()] = 0.0;
+                        continue;
+                    }
+
+                    if (is_numeric($childProduct->getWeight())) {
+                        $childWeight = $childProduct->getWeight();
+                    } else {
+                        $childWeight = $configurableWeight;
+                    }
+
+                    $productWeights[$childProduct->getId()] = $childWeight * $item->getQtyOrdered();
+                }
+            }
+        }
+
+        foreach ($allVisibleItems as $item) {
+            $product = $item->getProduct();
+            if ($item->getProductType() === 'simple' && !array_key_exists($product->getId(), $productWeights)) {
+                if ($product->isVirtual()) {
+                    $productWeights[$product->getId()] = 0.0;
+                    continue;
+                }
+
+                $productWeights[$product->getId()] = $product->getWeight() * $item->getQtyOrdered();
+            }
+        }
+
+        foreach ($productWeights as $itemWeight) {
+            $totalWeight += (float)$itemWeight;
+        }
+
+        return $totalWeight;
     }
 
     private function getRealOrderPacketery($order)
