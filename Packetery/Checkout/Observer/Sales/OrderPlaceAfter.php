@@ -28,6 +28,16 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     /** @var \Packetery\Checkout\Model\Weight\Calculator */
     private $weightCalculator;
 
+    /**
+     * OrderPlaceAfter constructor.
+     *
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+     * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
+     * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
+     */
     public function __construct(
         CheckoutSession $checkoutSession,
         \Magento\Store\Model\StoreManagerInterface $storeManager,

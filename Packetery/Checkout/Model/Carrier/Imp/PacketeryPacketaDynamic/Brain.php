@@ -26,6 +26,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect $methodSelect
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+     * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
