@@ -200,6 +200,10 @@ abstract class AbstractBrain
             $dynamicCarrier
         );
 
+        if ($request->getDestCountryId() === null) {
+            return null;
+        }
+
         if (!$brain->isCollectionPossible($config)) {
             return null;
         }
