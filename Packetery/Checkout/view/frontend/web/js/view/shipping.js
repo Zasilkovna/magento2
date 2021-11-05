@@ -4,19 +4,56 @@ define(
         'mage/translate',
         'mage/storage',
         'mage/url',
-        'ko'
+        'ko',
+        'Magento_Checkout/js/model/url-builder'
     ], function(
         quote,
         $t,
         storage,
         url,
-        ko) {
+        ko,
+        urlBuilder
+    ) {
         'use strict';
 
         var config = null;
         var mixin = {
             isStoreConfigLoaded: ko.observable(false),
             pickedDeliveryPlace: ko.observable(''),
+            pickedValidatedAddress: ko.observable(''), // address from widget
+            shippingMethodConfig: ko.observable(null), // extra config for selected delivery method
+
+            getDestinationAddress: function() {
+                var destinationAddress = window.packetaValidatedAddress || quote.shippingAddress() || quote.billingAddress();
+                return {
+                    country: (destinationAddress.countryId).toLocaleLowerCase(),
+                    countryId: destinationAddress.countryId,
+                    houseNumber: destinationAddress.houseNumber,
+                    postcode: destinationAddress.postcode,
+                    street: destinationAddress.street.join(' '),
+                    city: destinationAddress.city
+                };
+            },
+
+            loadShippingMethodConfig: function() {
+                // var methodCode = shippingMethod['method_code']; // e.g.: directAddressDelivery-106
+                // var carrierCode = shippingMethod['carrier_code']; // packetery
+
+                // if(shippingMethod && shippingMethod['method_code'] === 'pickupPointDelivery') {
+
+                mixin.shippingMethodConfig(null); // make sure old data is not used
+
+                setTimeout(function() {
+                    var data = {
+                        shippingMethod: quote.shippingMethod(),
+                        config: {
+                            carrierId: 131
+                        } // todo dynamically fill with extension extra data
+                    };
+
+                    mixin.shippingMethodConfig(data);
+                }, 1000);
+            },
 
             packetaButtonClick: function() {
                 if(config === null) {
@@ -36,6 +73,25 @@ define(
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
             },
 
+            packetaHDButtonClick: function() {
+                var packetaApiKey = config.apiKey;
+                var destinationAddress = mixin.getDestinationAddress();
+                var shippingMethodConfig = mixin.shippingMethodConfig();
+
+                var options = {
+                    country: destinationAddress.country,
+                    language: config.packetaOptions.language,
+                    layout: 'hd',
+                    street: destinationAddress.street,
+                    city: destinationAddress.city,
+                    postcode: destinationAddress.postcode,
+                    houseNumber: destinationAddress.houseNumber || '',
+                    carrierId: shippingMethodConfig.config.carrierId, // todo
+                };
+
+                PacketaHD.Widget.pick(packetaApiKey, showSelectedAddress, options);
+            },
+
             validateShippingInformation: function() {
                 var packetaPoint = window.packetaPoint || {};
                 if(packeteryPickupPointSelected() && !packetaPoint.pointId) {
@@ -46,6 +102,11 @@ define(
 
                 return this._super();
             },
+
+            getShippingMethodCode: function(shippingMethod) {
+                shippingMethod = shippingMethod || {};
+                return shippingMethod.carrier_code + '_' + shippingMethod.method_code; // todo use in html
+            }
         };
 
         var resetPickedPacketaPoint = function() {
@@ -57,6 +118,11 @@ define(
                 carrierId: null,
                 carrierPickupPointId: null
             };
+        };
+
+        var resetPickedValidatedAddress = function() {
+            mixin.pickedValidatedAddress('');
+            window.packetaValidatedAddress = null;
         };
 
         var createChangeSubscriber = function(callback, comparator) {
@@ -77,7 +143,16 @@ define(
 
         resetPickedPacketaPoint();
         quote.shippingAddress.subscribe(createChangeSubscriber(resetPickedPacketaPoint, function(lastValue, value) {
-            return lastValue.countryId !== value.countryId
+            return lastValue.countryId !== value.countryId;
+        }));
+
+        resetPickedValidatedAddress();
+        quote.shippingAddress.subscribe(createChangeSubscriber(resetPickedValidatedAddress, function(lastValue, value) {
+            return lastValue.countryId !== value.countryId;
+        }));
+
+        quote.shippingMethod.subscribe(createChangeSubscriber(mixin.loadShippingMethodConfig, function(lastValue, value) {
+            return mixin.getShippingMethodCode(lastValue) !== mixin.getShippingMethodCode(value);
         }));
 
         var packeteryPickupPointSelected = function() {
@@ -107,6 +182,45 @@ define(
             }
         }
 
+        var showSelectedAddress = function(result) {
+            console.log(result);
+
+            if (!result) {
+                mixin.errorValidationMessage($t("Address validation is out of order."));
+                return;
+            }
+
+            if (!result.address) {
+                return; // widget closed
+            }
+
+            resetPickedValidatedAddress();
+            var destinationAddress = mixin.getDestinationAddress();
+            var address = result.address;
+
+            if (address.country !== destinationAddress.country) {
+                mixin.errorValidationMessage($t("Please select address from specified country."));
+                return;
+            }
+
+            // todo override shipping address with validated address
+
+            mixin.pickedValidatedAddress([ address.street, address.houseNumber, address.city ].filter(function(value) {
+                return !!value;
+            }).join(' '));
+
+            window.packetaValidatedAddress = {
+                city: address.city,
+                street: [ address.street ],
+                houseNumber: address.houseNumber,
+                postcode: address.postcode,
+                countryId: destinationAddress.countryId,
+                county: address.county,
+                longitude: address.longitude,
+                latitude: address.latitude,
+            };
+        }
+
         var loadStoreConfig = function(onSuccess) {
             var serviceUrl = url.build('packetery/config/storeconfig');
             storage.get(serviceUrl).done(
@@ -123,6 +237,28 @@ define(
             );
         };
 
+        var loadShippingRateConfig = function(onSuccess) {
+            var serviceUrl = url.build('packetery/config/shippingRateConfig');
+            storage.post(
+                serviceUrl,
+                JSON.stringify({
+                    countryId: 'CZ',
+                })
+            ).done(
+                function(response) {
+                    if(response.success) {
+                        config = JSON.parse(response.value);
+                        onSuccess(config);
+                    }
+                }
+            ).fail(
+                function(response) {
+                    return response.value
+                }
+            );
+        };
+
+        // todo load rate config
         loadStoreConfig(function() {
             mixin.isStoreConfigLoaded(true);
         });

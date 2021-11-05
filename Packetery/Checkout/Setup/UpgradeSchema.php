@@ -140,6 +140,21 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), '2.3.0', '<')) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_pricing_rule'),
+                'address_validation',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'default' => 'none',
+                    'nullable' => false,
+                    'length' => '10',
+                    'comment' => 'Address validation',
+                    'after' => 'carrier_id'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 }

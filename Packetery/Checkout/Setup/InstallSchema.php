@@ -248,6 +248,16 @@ class InstallSchema implements InstallSchemaInterface
                     'after' => 'carrier_id',
                 ],
             ],
+            'address_validation' => [
+                'type' => Table::TYPE_TEXT,
+                'attr' => [
+                    'default' => 'none',
+                    'nullable' => false,
+                    'length' => '10',
+                    'comment' => 'Address validation',
+                    'after' => 'carrier_id'
+                ]
+            ],
         ]);
 
         $table->setComment('Packetery pricing rules. Relates to packetery_weight_rules.');

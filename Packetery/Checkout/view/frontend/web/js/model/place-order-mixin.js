@@ -10,7 +10,8 @@ define([
         return wrapper.wrap(placeOrderAction, function (originalAction, serviceUrl, payload, messageContainer) {
 
             payload.packetery = {
-                point: window.packetaPoint
+                point: window.packetaPoint,
+                validatedAddress: window.packetaValidatedAddress
             };
 
             return originalAction(serviceUrl, payload, messageContainer);
