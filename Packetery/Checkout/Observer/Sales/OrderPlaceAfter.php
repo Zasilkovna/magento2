@@ -116,7 +116,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
                 $validatedAddress = $postData->packetery->validatedAddress;
                 if (!$validatedAddress && $relatedPricingRule->getAddressValidation() === AddressValidationSelect::REQUIRED) {
-                    throw new InputException(__('You must select address via Packeta widget'));
+                    throw new InputException(__('Please select address via Packeta widget'));
                 }
 
                 if ($validatedAddress) {

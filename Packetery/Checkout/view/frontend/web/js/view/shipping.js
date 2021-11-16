@@ -1,30 +1,41 @@
 define(
     [
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/shipping-service',
+        'Magento_Checkout/js/model/full-screen-loader',
         'mage/translate',
         'mage/storage',
         'mage/url',
-        'ko',
-        'Magento_Checkout/js/model/url-builder'
+        'ko'
     ], function(
         quote,
+        shippingService,
+        fullScreenLoader,
         $t,
         storage,
         url,
-        ko,
-        urlBuilder
+        ko
     ) {
         'use strict';
 
         var config = null;
+
+        var getSelectedRateConfig = function() {
+            var selectedShippingRateCode = mixin.getShippingRateCode(quote.shippingMethod());
+            var config = mixin.shippingRatesConfig();
+            return config[selectedShippingRateCode]; // rates config must be loaded at this time
+        };
+
         var mixin = {
             isStoreConfigLoaded: ko.observable(false),
             pickedDeliveryPlace: ko.observable(''),
             pickedValidatedAddress: ko.observable(''), // address from widget
             shippingMethodConfig: ko.observable(null), // extra config for selected delivery method
+            shippingRatesConfig: ko.observable(null),
+            errorValidationMessage: ko.observable(''),
 
             getDestinationAddress: function() {
-                var destinationAddress = window.packetaValidatedAddress || quote.shippingAddress() || quote.billingAddress();
+                var destinationAddress = window.packetaValidatedAddress || quote.shippingAddress() || quote.billingAddress(); // todo window not needed if shippingAddress will override
                 return {
                     country: (destinationAddress.countryId).toLocaleLowerCase(),
                     countryId: destinationAddress.countryId,
@@ -33,26 +44,6 @@ define(
                     street: destinationAddress.street.join(' '),
                     city: destinationAddress.city
                 };
-            },
-
-            loadShippingMethodConfig: function() {
-                // var methodCode = shippingMethod['method_code']; // e.g.: directAddressDelivery-106
-                // var carrierCode = shippingMethod['carrier_code']; // packetery
-
-                // if(shippingMethod && shippingMethod['method_code'] === 'pickupPointDelivery') {
-
-                mixin.shippingMethodConfig(null); // make sure old data is not used
-
-                setTimeout(function() {
-                    var data = {
-                        shippingMethod: quote.shippingMethod(),
-                        config: {
-                            carrierId: 131
-                        } // todo dynamically fill with extension extra data
-                    };
-
-                    mixin.shippingMethodConfig(data);
-                }, 1000);
             },
 
             packetaButtonClick: function() {
@@ -76,7 +67,7 @@ define(
             packetaHDButtonClick: function() {
                 var packetaApiKey = config.apiKey;
                 var destinationAddress = mixin.getDestinationAddress();
-                var shippingMethodConfig = mixin.shippingMethodConfig();
+                var shippingRateConfig = getSelectedRateConfig();
 
                 var options = {
                     country: destinationAddress.country,
@@ -86,7 +77,7 @@ define(
                     city: destinationAddress.city,
                     postcode: destinationAddress.postcode,
                     houseNumber: destinationAddress.houseNumber || '',
-                    carrierId: shippingMethodConfig.config.carrierId, // todo
+                    carrierId: shippingRateConfig.directionId,
                 };
 
                 PacketaHD.Widget.pick(packetaApiKey, showSelectedAddress, options);
@@ -100,12 +91,23 @@ define(
                     return false;
                 }
 
+                var selectedShippingRateConfig = getSelectedRateConfig();
+                if(packeteryHDSelected() && selectedShippingRateConfig.addressValidation === 'required' && !window.packetaValidatedAddress) {
+                    this.errorValidationMessage($t("Please select address via Packeta widget"));
+                    return false;
+                }
+
                 return this._super();
             },
 
-            getShippingMethodCode: function(shippingMethod) {
-                shippingMethod = shippingMethod || {};
-                return shippingMethod.carrier_code + '_' + shippingMethod.method_code; // todo use in html
+            getShippingRateCode: function(shippingRate) {
+                shippingRate = shippingRate || {};
+                return shippingRate.carrier_code + '_' + shippingRate.method_code;
+            },
+
+            getRateConfig: function(method) {
+                var config = mixin.shippingRatesConfig();
+                return config[mixin.getShippingRateCode(method)] || {};
             }
         };
 
@@ -151,13 +153,45 @@ define(
             return lastValue.countryId !== value.countryId;
         }));
 
-        quote.shippingMethod.subscribe(createChangeSubscriber(mixin.loadShippingMethodConfig, function(lastValue, value) {
-            return mixin.getShippingMethodCode(lastValue) !== mixin.getShippingMethodCode(value);
+        // when selected shipping method changes reset picked validated address because different carrier related to different rate may not support such address
+        // it is up to widget to decide what address is valid for given carrierId
+        // TODO: implement selected address history
+        quote.shippingMethod.subscribe(createChangeSubscriber(resetPickedValidatedAddress, function(lastValue, value) {
+            return lastValue !== value;
         }));
+
+        var updateShippingRates = function(rates) {
+            mixin.shippingRatesConfig(null);
+            loadShippingRatesConfig(rates,function (responseValue) {
+                mixin.shippingRatesConfig(responseValue.rates);
+            });
+        };
+
+        var getShippingRateCollectionIdentificator = function(rates) {
+            return rates.map(function(item) {
+                return mixin.getShippingRateCode(item);
+            }).join('+');
+        };
+
+        var shippingRatesSubscriber = createChangeSubscriber(updateShippingRates, function(lastValue, value) {
+            return getShippingRateCollectionIdentificator(lastValue) !== getShippingRateCollectionIdentificator(value);
+        });
+
+        shippingService.getShippingRates().subscribe(shippingRatesSubscriber);
 
         var packeteryPickupPointSelected = function() {
             var shippingMethod = quote.shippingMethod();
-            if(shippingMethod && shippingMethod['method_code'] === 'pickupPointDelivery') {
+            var selectedRateConfig = getSelectedRateConfig();
+            if(shippingMethod && selectedRateConfig && selectedRateConfig.isPacketaRate && shippingMethod['method_code'] === 'pickupPointDelivery') {
+                return true;
+            }
+
+            return false;
+        };
+
+        var packeteryHDSelected = function() {
+            var selectedRateConfig = getSelectedRateConfig();
+            if(selectedRateConfig && selectedRateConfig.isPacketaRate && selectedRateConfig.isAnyAddressDelivery) {
                 return true;
             }
 
@@ -183,10 +217,10 @@ define(
         }
 
         var showSelectedAddress = function(result) {
-            console.log(result);
+            mixin.errorValidationMessage('');
 
             if (!result) {
-                mixin.errorValidationMessage($t("Address validation is out of order."));
+                mixin.errorValidationMessage($t("Address validation is out of order"));
                 return;
             }
 
@@ -199,7 +233,7 @@ define(
             var address = result.address;
 
             if (address.country !== destinationAddress.country) {
-                mixin.errorValidationMessage($t("Please select address from specified country."));
+                mixin.errorValidationMessage($t("Please select address from specified country"));
                 return;
             }
 
@@ -222,6 +256,7 @@ define(
         }
 
         var loadStoreConfig = function(onSuccess) {
+            fullScreenLoader.startLoader();
             var serviceUrl = url.build('packetery/config/storeconfig');
             storage.get(serviceUrl).done(
                 function(response) {
@@ -232,36 +267,52 @@ define(
                 }
             ).fail(
                 function(response) {
-                    return response.value
+                    return response.value;
+                }
+            ).always(
+                function() {
+                    fullScreenLoader.stopLoader();
                 }
             );
         };
 
-        var loadShippingRateConfig = function(onSuccess) {
-            var serviceUrl = url.build('packetery/config/shippingRateConfig');
+        var loadShippingRatesConfig = function(rates, onSuccess) {
+            fullScreenLoader.startLoader();
+            var serviceUrl = url.build('packetery/config/shippingRatesConfig');
             storage.post(
                 serviceUrl,
                 JSON.stringify({
-                    countryId: 'CZ',
+                    rates: rates.map(function(rate) {
+                        return {
+                            rateCode: mixin.getShippingRateCode(rate),
+                            carrierCode: rate.carrier_code,
+                            methodCode: rate.method_code,
+                            countryId: quote.shippingAddress().countryId, // countryId that Magento uses to collect shipping rates
+                        };
+                    }),
                 })
             ).done(
                 function(response) {
                     if(response.success) {
-                        config = JSON.parse(response.value);
-                        onSuccess(config);
+                        onSuccess(response.value);
                     }
                 }
             ).fail(
                 function(response) {
-                    return response.value
+                    return response.value;
+                }
+            ).always(
+                function() {
+                    fullScreenLoader.stopLoader();
                 }
             );
         };
 
-        // todo load rate config
         loadStoreConfig(function() {
             mixin.isStoreConfigLoaded(true);
         });
+
+        shippingRatesSubscriber(shippingService.getShippingRates()()); // shippingService.getShippingRates() returns observable object
 
         return function(target) { // target == Result that Magento_Ui/.../default returns.
             return target.extend(mixin); // new result that all other modules receive
