@@ -14,9 +14,9 @@ class AddressValidationSelect implements OptionSourceInterface
 
     public function toOptionArray() {
         return [
-            ['value' => self::NONE, 'label' => __('None')],
-            ['value' => self::OPTIONAL, 'label' => __('Optional')],
-            ['value' => self::REQUIRED, 'label' => __('Required')],
+            ['value' => self::NONE, 'label' => __('None address validation')],
+            ['value' => self::OPTIONAL, 'label' => __('Optional address validation')],
+            ['value' => self::REQUIRED, 'label' => __('Required address validation')],
         ];
     }
 }

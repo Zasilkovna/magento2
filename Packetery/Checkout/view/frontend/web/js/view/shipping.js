@@ -3,6 +3,8 @@ define(
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/shipping-service',
         'Magento_Checkout/js/model/full-screen-loader',
+        'Magento_Checkout/js/model/step-navigator',
+        'Packetery_Checkout/js/model/service',
         'mage/translate',
         'mage/storage',
         'mage/url',
@@ -11,6 +13,8 @@ define(
         quote,
         shippingService,
         fullScreenLoader,
+        stepNavigator,
+        packeteryService,
         $t,
         storage,
         url,
@@ -26,16 +30,71 @@ define(
             return config[selectedShippingRateCode]; // rates config must be loaded at this time
         };
 
+        var formatMagentoLikeAddress = function(address) {
+            if (!address) {
+                return '';
+            }
+
+            return [ address.street.join(' '), address.houseNumber, address.city ].filter(function(value) {
+                return !!value;
+            }).join(' ');
+        };
+
         var mixin = {
             isStoreConfigLoaded: ko.observable(false),
-            pickedDeliveryPlace: ko.observable(''),
-            pickedValidatedAddress: ko.observable(''), // address from widget
-            shippingMethodConfig: ko.observable(null), // extra config for selected delivery method
+            pickedDeliveryPlace: ko.observable(packeteryService.getPacketaValidatedAddress({name: ''}).name),
+            pickedValidatedAddress: ko.observable(formatMagentoLikeAddress(packeteryService.getPacketaValidatedAddress(false))),
             shippingRatesConfig: ko.observable(null),
             errorValidationMessage: ko.observable(''),
+            stepNavigatorReady: ko.observable(false),
+
+            initialize: function() {
+                this._super();
+
+                mixin.stepNavigatorReady.subscribe(function() {
+                    if (!stepNavigator.isProcessed('shipping')) {
+                        resetPickedPacketaPoint();
+                        resetPickedValidatedAddress();
+                    }
+
+                    var createCallbackForShippingStep = function(callback) {
+                        return function() {
+                            if (!stepNavigator.isProcessed('shipping')) {
+                                callback.apply(null, arguments);
+                            }
+                        }
+                    };
+
+                    quote.shippingAddress.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedPacketaPoint), function(lastValue, value) {
+                        return lastValue.countryId !== value.countryId;
+                    }, quote.shippingAddress()));
+
+                    quote.shippingAddress.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedValidatedAddress), function(lastValue, value) {
+                        return lastValue.countryId !== value.countryId;
+                    }, quote.shippingAddress()));
+
+                    // TODO: implement selected address history
+                    quote.shippingMethod.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedValidatedAddress), function(lastValue, value) {
+                        return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
+                    }, quote.shippingMethod()));
+                });
+
+                var stepNavigatorIntervalHandler = setInterval(function() {
+                    stepNavigator.steps().sort(stepNavigator.sortItems).some(function (element) {
+                        if (element.isVisible()) {
+                            mixin.stepNavigatorReady(true);
+                            clearInterval(stepNavigatorIntervalHandler);
+                            return true;
+                        }
+
+                        return false;
+                    });
+                }, 200);
+            },
 
             getDestinationAddress: function() {
-                var destinationAddress = window.packetaValidatedAddress || quote.shippingAddress() || quote.billingAddress(); // todo window not needed if shippingAddress will override
+                var destinationAddress = packeteryService.getPacketaValidatedAddress(false) || quote.shippingAddress() || quote.billingAddress();
+
                 return {
                     country: (destinationAddress.countryId).toLocaleLowerCase(),
                     countryId: destinationAddress.countryId,
@@ -84,7 +143,7 @@ define(
             },
 
             validateShippingInformation: function() {
-                var packetaPoint = window.packetaPoint || {};
+                var packetaPoint = packeteryService.getPacketaPoint({});
                 if(packeteryPickupPointSelected() && !packetaPoint.pointId) {
                     var message = $t("Please select pickup point");
                     this.errorValidationMessage(message);
@@ -92,7 +151,7 @@ define(
                 }
 
                 var selectedShippingRateConfig = getSelectedRateConfig();
-                if(packeteryHDSelected() && selectedShippingRateConfig.addressValidation === 'required' && !window.packetaValidatedAddress) {
+                if(packeteryHDSelected() && selectedShippingRateConfig.addressValidation === 'required' && !packeteryService.getPacketaValidatedAddress(false)) {
                     this.errorValidationMessage($t("Please select address via Packeta widget"));
                     return false;
                 }
@@ -113,52 +172,30 @@ define(
 
         var resetPickedPacketaPoint = function() {
             mixin.pickedDeliveryPlace('');
-            window.packetaPoint = {
+            localStorage.packetaPoint = JSON.stringify({
                 pointId: null,
                 name: null,
                 pickupPointType: null,
                 carrierId: null,
                 carrierPickupPointId: null
-            };
+            });
         };
 
         var resetPickedValidatedAddress = function() {
             mixin.pickedValidatedAddress('');
-            window.packetaValidatedAddress = null;
+            localStorage.packetaValidatedAddress = '';
         };
 
-        var createChangeSubscriber = function(callback, comparator) {
-            var lastVal = null;
-            var init = true;
-
+        var createChangeSubscriber = function(callback, comparator, lastVal) {
             return function (value) {
-                if(init || comparator(lastVal, value)) {
-                    init = false;
+                if(comparator(lastVal, value)) {
                     lastVal = value;
                     callback(value);
                 }
 
-                init = false;
                 lastVal = value;
             };
         };
-
-        resetPickedPacketaPoint();
-        quote.shippingAddress.subscribe(createChangeSubscriber(resetPickedPacketaPoint, function(lastValue, value) {
-            return lastValue.countryId !== value.countryId;
-        }));
-
-        resetPickedValidatedAddress();
-        quote.shippingAddress.subscribe(createChangeSubscriber(resetPickedValidatedAddress, function(lastValue, value) {
-            return lastValue.countryId !== value.countryId;
-        }));
-
-        // when selected shipping method changes reset picked validated address because different carrier related to different rate may not support such address
-        // it is up to widget to decide what address is valid for given carrierId
-        // TODO: implement selected address history
-        quote.shippingMethod.subscribe(createChangeSubscriber(resetPickedValidatedAddress, function(lastValue, value) {
-            return lastValue !== value;
-        }));
 
         var updateShippingRates = function(rates) {
             mixin.shippingRatesConfig(null);
@@ -168,6 +205,10 @@ define(
         };
 
         var getShippingRateCollectionIdentificator = function(rates) {
+            if (!rates) {
+                return '';
+            }
+
             return rates.map(function(item) {
                 return mixin.getShippingRateCode(item);
             }).join('+');
@@ -175,7 +216,7 @@ define(
 
         var shippingRatesSubscriber = createChangeSubscriber(updateShippingRates, function(lastValue, value) {
             return getShippingRateCollectionIdentificator(lastValue) !== getShippingRateCollectionIdentificator(value);
-        });
+        }, shippingService.getShippingRates()());
 
         shippingService.getShippingRates().subscribe(shippingRatesSubscriber);
 
@@ -204,13 +245,13 @@ define(
                 mixin.pickedDeliveryPlace(point ? point.name : "");
 
                 // nastavíme, aby si pak pro založení objednávky převzal place-order.js, resp. OrderPlaceAfter.php
-                window.packetaPoint = {
+                localStorage.packetaPoint = JSON.stringify({
                     pointId: pointId ? pointId : null,
                     name: point.name ? point.name : null,
                     pickupPointType: point.pickupPointType ? point.pickupPointType : null,
                     carrierId: point.carrierId ? point.carrierId : null,
                     carrierPickupPointId: point.carrierPickupPointId ? point.carrierPickupPointId : null
-                };
+                });
             } else {
                 resetPickedPacketaPoint();
             }
@@ -239,11 +280,7 @@ define(
 
             // todo override shipping address with validated address
 
-            mixin.pickedValidatedAddress([ address.street, address.houseNumber, address.city ].filter(function(value) {
-                return !!value;
-            }).join(' '));
-
-            window.packetaValidatedAddress = {
+            localStorage.packetaValidatedAddress = JSON.stringify({
                 city: address.city,
                 street: [ address.street ],
                 houseNumber: address.houseNumber,
@@ -252,7 +289,9 @@ define(
                 county: address.county,
                 longitude: address.longitude,
                 latitude: address.latitude,
-            };
+            });
+
+            mixin.pickedValidatedAddress(formatMagentoLikeAddress(packeteryService.getPacketaValidatedAddress('')));
         }
 
         var loadStoreConfig = function(onSuccess) {
