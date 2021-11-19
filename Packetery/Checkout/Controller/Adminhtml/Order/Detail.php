@@ -59,7 +59,7 @@ class Detail extends \Magento\Backend\App\Action
         $magentoOrder = $this->orderFactory->create()->loadByIncrementId($order->getData('order_number'));
         $shippingMethod = $magentoOrder->getShippingMethod(true);
 
-        if (!$shippingMethod || ($shippingMethod->getData('method') !== Methods::PICKUP_POINT_DELIVERY && $shippingMethod->getData('method') !== 'packetery')) {
+        if (!$shippingMethod) {
             $this->messageManager->addErrorMessage(__('Page not found'));
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }

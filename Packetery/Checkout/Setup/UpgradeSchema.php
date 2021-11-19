@@ -153,6 +153,54 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'after' => 'carrier_id'
                 ]
             );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_order'),
+                'address_validated',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                    'nullable' => false,
+                    'default' => 0,
+                    'comment' => 'Is recipient address validated?',
+                    'after' => 'delayed_delivery'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_order'),
+                'recipient_county',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'length' => '128',
+                    'comment' => 'Recipient county',
+                    'after' => 'recipient_zip'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_order'),
+                'recipient_longitude',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'nullable' => true,
+                    'length' => '11,8',
+                    'comment' => 'Longitude',
+                    'after' => 'recipient_county'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_order'),
+                'recipient_latitude',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'nullable' => true,
+                    'length' => '10,8',
+                    'comment' => 'Latitude',
+                    'after' => 'recipient_longitude'
+                ]
+            );
         }
 
         $setup->endSetup();

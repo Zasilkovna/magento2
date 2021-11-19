@@ -87,6 +87,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $pointName = NULL;
         $point = NULL;
         $isCarrier = false;
+        $addressValidated = false;
         $carrierPickupPoint = null;
         $destinationAddress = Address::fromShippingAddress($order->getShippingAddress());
 
@@ -121,6 +122,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
                 if ($validatedAddress) {
                     $destinationAddress = Address::fromValidatedAddress($validatedAddress);
+                    $addressValidated = true;
                 }
 
                 /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier */
@@ -168,10 +170,14 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             'is_carrier' => $isCarrier,
             'carrier_pickup_point' => $carrierPickupPoint,
             'sender_label' => $this->getLabel(),
+            'address_validated' => $addressValidated,
             'recipient_street' => $destinationAddress->getStreet(),
             'recipient_house_number' => $destinationAddress->getHouseNumber(),
             'recipient_city' => $destinationAddress->getCity(),
             'recipient_zip' => $destinationAddress->getZip(),
+            'recipient_county' => $destinationAddress->getCounty(),
+            'recipient_longitude' => $destinationAddress->getLongitude(),
+            'recipient_latitude' => $destinationAddress->getLatitude(),
             'exported' => 0,
         ];
 

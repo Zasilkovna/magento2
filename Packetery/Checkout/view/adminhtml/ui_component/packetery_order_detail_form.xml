@@ -154,6 +154,27 @@
                 </item>
             </argument>
         </field>
+        <fieldset name="extra">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="collapsible" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Extra</item>
+                    <item name="visible" xsi:type="boolean">1</item>
+                </item>
+            </argument>
+            <field name="validated_address">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" xsi:type="string" translate="true">Validated address</item>
+                        <item name="visible" xsi:type="boolean">true</item>
+                        <item name="disabled" xsi:type="boolean">true</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="dataScope" xsi:type="string">validated_address</item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
         <fieldset name="misc">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

@@ -1,4 +1,4 @@
-<div visible="element.isStoreConfigLoaded()" class="primary">
+<div visible="element.isStoreConfigLoaded() && element.isPickupPointDelivery()" class="primary">
     <button type="button" click="element.packetaButtonClick">
         <span data-bind="i18n: 'Choose Pickup Point'"></span>
     </button>

@@ -109,3 +109,5 @@
 "Address validation is out of order","Address validation is out of order"
 "Pricing rule was not found. Please choose delivery method.","Pricing rule was not found. Please choose delivery method."
 "Please select pickup point","Please select pickup point"
+"Address was not validated","Address was not validated"
+"Validated address","Validated address"

@@ -109,3 +109,5 @@
 "Address validation is out of order","Validace adres je mimo provoz"
 "Pricing rule was not found. Please choose delivery method.","Nebylo nalezeno pravidlo pro tvorbu cen. Zvolte prosím způsob doručení."
 "Please select pickup point","Zvolte prosím výdejní místo"
+"Address was not validated","Adresa pro doručení nebyla ověřena"
+"Validated address","Zvalidovaná adresa"

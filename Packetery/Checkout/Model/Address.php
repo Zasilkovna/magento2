@@ -21,6 +21,15 @@ class Address
     /** @var string|null */
     private $countryId;
 
+    /** @var string|null */
+    private $county;
+
+    /** @var string|null */
+    private $longitude;
+
+    /** @var string|null */
+    private $latitude;
+
     public static function fromValidatedAddress($validatedAddress): self {
         $address = new self();
         $address->setStreet(implode(' ', $validatedAddress->street));
@@ -28,6 +37,9 @@ class Address
         $address->setCity($validatedAddress->city);
         $address->setZip($validatedAddress->postcode);
         $address->setCountryId($validatedAddress->countryId);
+        $address->setCounty($validatedAddress->county);
+        $address->setLongitude($validatedAddress->longitude);
+        $address->setLatitude($validatedAddress->latitude);
         return $address;
     }
 
@@ -93,5 +105,29 @@ class Address
 
     public function setCountryId(?string $countryId): void {
         $this->countryId = $countryId;
+    }
+
+    public function getCounty(): ?string {
+        return $this->county;
+    }
+
+    public function setCounty(?string $county): void {
+        $this->county = $county;
+    }
+
+    public function getLongitude(): ?string {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): void {
+        $this->longitude = $longitude;
+    }
+
+    public function getLatitude(): ?string {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): void {
+        $this->latitude = $latitude;
     }
 }
