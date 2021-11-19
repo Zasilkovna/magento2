@@ -35,7 +35,7 @@ class CollectionFactory
     /**
      * Create class instance with specified parameters
      *
-     * @param array $data
+     * @param array $data Class constructor arguments to override auto-wiring or specify non-service arguments.
      * @return \Packetery\Checkout\Model\ResourceModel\Order\Collection
      */
     public function create(array $data = [])

@@ -23,6 +23,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
      * @param Logger $logger
      * @param FetchStrategy $fetchStrategy
      * @param EventManager $eventManager
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param string $mainTable
      * @param null|string $resourceModel
      * @param null|string $identifierName

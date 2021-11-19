@@ -131,10 +131,10 @@ class Facade
         $classNames = self::getAllBrainClasses();
 
         foreach ($classNames as $className) {
-            $branchIds = array_merge($branchIds, $className::getImplementedBranchIds());
+            $branchIds[] = $className::getImplementedBranchIds();
         }
 
-        return $branchIds;
+        return array_merge([], ...$branchIds);
     }
 
     /**
@@ -150,7 +150,6 @@ class Facade
             }
 
             $name = basename($dir);
-            /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain $className */
             $classNames[] = '\\Packetery\\Checkout\\Model\\Carrier\\Imp\\' . $name . '\\Brain';
         }
 

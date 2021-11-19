@@ -25,7 +25,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 
         $carrierCodesConditions = [];
         foreach ($carrierCodes as $carrierCode) {
-            $carrierCodesConditions[] = "sales_order.shipping_method LIKE " . $this->getConnection()->quote($carrierCode . '\_%', 'STRING');
+            $carrierCodesConditions[] = "`sales_order`.`shipping_method` LIKE " . $this->getConnection()->quote($carrierCode . '\_%', 'STRING');
         }
         $carrierCodesImploded = implode(' OR ', $carrierCodesConditions);
         if (empty($carrierCodesImploded)) {
@@ -40,6 +40,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function joinSalesOrder(): void {
         $carrierCodesImploded = $this->createSalesOrderCarrierCodeCondition();
-        $this->join(['sales_order' => 'sales_order'],  "main_table.order_number = sales_order.increment_id AND ($carrierCodesImploded)", '');
+        $this->join(['sales_order' => 'sales_order'],  "`main_table`.`order_number` = `sales_order`.`increment_id` AND ($carrierCodesImploded)", '');
     }
 }
