@@ -64,6 +64,10 @@ class Detail extends \Magento\Backend\App\Action
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
 
+        $addressDetailBlock = $resultPage->getLayout()->getBlock('packetery_order_address_detail');
+        $addressDetailBlock->setData('order', $order);
+        $addressDetailBlock->setData('magentoOrder', $magentoOrder);
+
         return $resultPage;
     }
 }
