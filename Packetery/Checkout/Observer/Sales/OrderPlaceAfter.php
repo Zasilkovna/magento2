@@ -89,7 +89,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $isCarrier = false;
         $addressValidated = false;
         $carrierPickupPoint = null;
-        $destinationAddress = Address::fromShippingAddress($order->getShippingAddress());
+        $magentoShippingAddress = $order->getShippingAddress();
+        $destinationAddress = Address::fromShippingAddress($magentoShippingAddress);
 
         if ($postData)
         {
@@ -156,11 +157,11 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
         $data = [
             'order_number' => $order->getIncrementId(),
-            'recipient_firstname' => $order->getShippingAddress()->getFirstname(),
-            'recipient_lastname' => $order->getShippingAddress()->getLastname(),
-            'recipient_company' => $order->getShippingAddress()->getCompany(),
-            'recipient_email' => $order->getShippingAddress()->getEmail(),
-            'recipient_phone' => $order->getShippingAddress()->getTelephone(),
+            'recipient_firstname' => $magentoShippingAddress->getFirstname(),
+            'recipient_lastname' => $magentoShippingAddress->getLastname(),
+            'recipient_company' => $magentoShippingAddress->getCompany(),
+            'recipient_email' => $magentoShippingAddress->getEmail(),
+            'recipient_phone' => $magentoShippingAddress->getTelephone(),
             'cod' => ($this->isCod($paymentMethod) ? $order->getGrandTotal() : 0),
             'currency' => $order->getOrderCurrencyCode(),
             'value' => $order->getGrandTotal(),
@@ -183,6 +184,16 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
         $this->saveData($data);
 
+        if ($addressValidated) {
+            $magentoShippingAddress->setCity($destinationAddress->getCity());
+            $magentoShippingAddress->setStreet([$destinationAddress->getStreet(), $destinationAddress->getHouseNumber()]);
+            $magentoShippingAddress->setCountryId($destinationAddress->getCountryId());
+            $magentoShippingAddress->setPostcode($destinationAddress->getZip());
+            $magentoShippingAddress->setRegion($destinationAddress->getCounty());
+            $magentoShippingAddress->setRegionCode(null);
+            $magentoShippingAddress->setRegionId(null);
+            $magentoShippingAddress->save();
+        }
     }
 
     private function getRealOrderPacketery($order)

@@ -30,12 +30,12 @@ define(
             return config[selectedShippingRateCode]; // rates config must be loaded at this time
         };
 
-        var formatMagentoLikeAddress = function(address) {
+        var formatPacketaAddress = function(address) {
             if (!address) {
                 return '';
             }
 
-            return [ address.street.join(' '), address.houseNumber, address.city ].filter(function(value) {
+            return [ address.street, address.houseNumber, address.city ].filter(function(value) {
                 return !!value;
             }).join(' ');
         };
@@ -43,7 +43,7 @@ define(
         var mixin = {
             isStoreConfigLoaded: ko.observable(false),
             pickedDeliveryPlace: ko.observable(packeteryService.getPacketaValidatedAddress({name: ''}).name),
-            pickedValidatedAddress: ko.observable(formatMagentoLikeAddress(packeteryService.getPacketaValidatedAddress(false))),
+            pickedValidatedAddress: ko.observable(formatPacketaAddress(packeteryService.getPacketaValidatedAddress(false))),
             shippingRatesConfig: ko.observable(null),
             errorValidationMessage: ko.observable(''),
             stepNavigatorReady: ko.observable(false),
@@ -93,16 +93,30 @@ define(
             },
 
             getDestinationAddress: function() {
-                var destinationAddress = packeteryService.getPacketaValidatedAddress(false) || quote.shippingAddress() || quote.billingAddress();
+                var destinationAddress = quote.shippingAddress() || quote.billingAddress();
 
-                return {
+                var data = {
                     country: (destinationAddress.countryId).toLocaleLowerCase(),
                     countryId: destinationAddress.countryId,
-                    houseNumber: destinationAddress.houseNumber,
+                    houseNumber: null,
                     postcode: destinationAddress.postcode,
                     street: destinationAddress.street.join(' '),
                     city: destinationAddress.city
                 };
+
+                destinationAddress = packeteryService.getPacketaValidatedAddress(false);
+                if (destinationAddress) {
+                    data = Object.assign(data, {
+                        country: (destinationAddress.countryId).toLocaleLowerCase(),
+                        countryId: destinationAddress.countryId,
+                        houseNumber: destinationAddress.houseNumber,
+                        postcode: destinationAddress.postcode,
+                        street: destinationAddress.street,
+                        city: destinationAddress.city
+                    });
+                }
+
+                return data;
             },
 
             packetaButtonClick: function() {
@@ -283,7 +297,7 @@ define(
 
             localStorage.packetaValidatedAddress = JSON.stringify({
                 city: address.city || null,
-                street: [ address.street || '' ],
+                street: address.street || null,
                 houseNumber: address.houseNumber || null,
                 postcode: address.postcode || null,
                 countryId: destinationAddress.countryId,
@@ -292,7 +306,17 @@ define(
                 latitude: address.latitude || null,
             });
 
-            mixin.pickedValidatedAddress(formatMagentoLikeAddress(packeteryService.getPacketaValidatedAddress('')));
+            mixin.pickedValidatedAddress(formatPacketaAddress(packeteryService.getPacketaValidatedAddress('')));
+            console.log(quote.shippingAddress());
+            quote.shippingAddress(Object.assign(quote.shippingAddress(), {
+                city: address.city || null,
+                street: [ address.street || '', address.houseNumber || '' ],
+                postcode: address.postcode || null,
+                countryId: destinationAddress.countryId,
+                region: address.county || null,
+                regionCode: null,
+                regionId: null
+            }));
         }
 
         var loadStoreConfig = function(onSuccess) {

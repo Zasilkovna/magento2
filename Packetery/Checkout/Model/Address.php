@@ -32,7 +32,7 @@ class Address
 
     public static function fromValidatedAddress($validatedAddress): self {
         $address = new self();
-        $address->setStreet(implode(' ', $validatedAddress->street));
+        $address->setStreet($validatedAddress->street);
         $address->setHouseNumber($validatedAddress->houseNumber);
         $address->setCity($validatedAddress->city);
         $address->setZip($validatedAddress->postcode);
