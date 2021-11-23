@@ -49,21 +49,7 @@ class DataProvider extends AbstractDataProvider
         foreach ($this->collection->getItems() as $item) {
             $result[$item->getId()]['general'] = $item->getData(); // princing rules
             $orderNumber = $result[$item->getId()]['general']['order_number'];
-//            $addressValidated = $result[$item->getId()]['general']['address_validated'] === '1';
-//            $recipientStreet = $result[$item->getId()]['general']['recipient_street'];
-//            $recipientHouseNumber = $result[$item->getId()]['general']['recipient_house_number'];
-//            $recipientCity = $result[$item->getId()]['general']['recipient_city'];
-//            $recipientZip = $result[$item->getId()]['general']['recipient_zip'];
-//            $recipientCounty = $result[$item->getId()]['general']['recipient_county'];
-//            $recipientLongitude = $result[$item->getId()]['general']['recipient_longitude'];
-//            $recipientLatitude = $result[$item->getId()]['general']['recipient_latitude'];
             $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
-
-//            if ($addressValidated) {
-//                $result[$item->getId()]['general']['extra']['validated_address'] = $recipientStreet . ' ' . $recipientHouseNumber . ', ' . $recipientCity . ', ' . $recipientCounty . ', ' . $recipientZip;
-//            } else {
-//                $result[$item->getId()]['general']['extra']['validated_address'] = __('Address was not validated');
-//            }
 
             $shippingAddress = $order->getShippingAddress();
             if ($shippingAddress) {
