@@ -135,9 +135,12 @@ define(
                     street: destinationAddress.street,
                     city: destinationAddress.city,
                     postcode: destinationAddress.postcode,
-                    houseNumber: destinationAddress.houseNumber || '',
                     carrierId: shippingRateConfig.directionId,
                 };
+
+                if (destinationAddress.houseNumber) {
+                    options.houseNumber = destinationAddress.houseNumber;
+                }
 
                 PacketaHD.Widget.pick(packetaApiKey, showSelectedAddress, options);
             },
@@ -278,17 +281,15 @@ define(
                 return;
             }
 
-            // todo override shipping address with validated address
-
             localStorage.packetaValidatedAddress = JSON.stringify({
-                city: address.city,
-                street: [ address.street ],
-                houseNumber: address.houseNumber,
-                postcode: address.postcode,
+                city: address.city || null,
+                street: [ address.street || '' ],
+                houseNumber: address.houseNumber || null,
+                postcode: address.postcode || null,
                 countryId: destinationAddress.countryId,
-                county: address.county,
-                longitude: address.longitude,
-                latitude: address.latitude,
+                county: address.county || null,
+                longitude: address.longitude || null,
+                latitude: address.latitude || null,
             });
 
             mixin.pickedValidatedAddress(formatMagentoLikeAddress(packeteryService.getPacketaValidatedAddress('')));
