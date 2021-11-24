@@ -33,6 +33,9 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     /** @var \Packetery\Checkout\Model\Pricing\Service */
     private $pricingService;
 
+    /** @var \Magento\Sales\Model\Order\AddressRepository */
+    private $orderAddressRepository;
+
     /**
      * OrderPlaceAfter constructor.
      *
@@ -43,6 +46,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
      * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Magento\Sales\Model\Order\AddressRepository $orderAddressRepository
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -51,7 +55,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Shipping\Model\CarrierFactory $carrierFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
-        \Packetery\Checkout\Model\Pricing\Service $pricingService
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Magento\Sales\Model\Order\AddressRepository $orderAddressRepository
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -60,6 +65,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $this->carrierFactory = $carrierFactory;
         $this->weightCalculator = $weightCalculator;
         $this->pricingService = $pricingService;
+        $this->orderAddressRepository = $orderAddressRepository;
     }
 
     /**
@@ -192,7 +198,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             $magentoShippingAddress->setRegion($destinationAddress->getCounty());
             $magentoShippingAddress->setRegionCode(null);
             $magentoShippingAddress->setRegionId(null);
-            $magentoShippingAddress->save();
+            $this->orderAddressRepository->save($magentoShippingAddress);
         }
     }
 
