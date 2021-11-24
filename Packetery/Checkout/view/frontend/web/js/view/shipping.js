@@ -307,7 +307,6 @@ define(
             });
 
             mixin.pickedValidatedAddress(formatPacketaAddress(packeteryService.getPacketaValidatedAddress('')));
-            console.log(quote.shippingAddress());
             quote.shippingAddress(Object.assign(quote.shippingAddress(), {
                 city: address.city || null,
                 street: [ address.street || '', address.houseNumber || '' ],
