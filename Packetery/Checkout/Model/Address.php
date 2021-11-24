@@ -45,7 +45,7 @@ class Address
 
     public static function fromShippingAddress(\Magento\Sales\Model\Order\Address $shippingAddress): self {
         $address = new self();
-        $address->setStreet($shippingAddress->getStreet()[0]);
+        $address->setStreet(implode(' ', $shippingAddress->getStreet()));
         $address->setCity($shippingAddress->getCity());
         $address->setZip($shippingAddress->getPostcode());
         $address->setCountryId($shippingAddress->getCountryId());
