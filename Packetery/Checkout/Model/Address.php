@@ -44,26 +44,12 @@ class Address
     }
 
     public static function fromShippingAddress(\Magento\Sales\Model\Order\Address $shippingAddress): self {
-        $streetMatches = [];
-        $match = preg_match('/^(.*[^0-9]+) (([1-9][0-9]*)\/)?([1-9][0-9]*[a-cA-C]?)$/', $shippingAddress->getStreet()[0], $streetMatches);
-
-        if (!$match) {
-            $houseNumber = null;
-            $street = $shippingAddress->getStreet()[0];
-        } elseif (!isset($streetMatches[4])) {
-            $houseNumber = null;
-            $street = $streetMatches[1];
-        } else {
-            $houseNumber = (!empty($streetMatches[3])) ? $streetMatches[3] . "/" . $streetMatches[4] : $streetMatches[4];
-            $street = $streetMatches[1];
-        }
-
         $address = new self();
-        $address->setStreet($street);
-        $address->setHouseNumber($houseNumber);
+        $address->setStreet($shippingAddress->getStreet()[0]);
         $address->setCity($shippingAddress->getCity());
         $address->setZip($shippingAddress->getPostcode());
         $address->setCountryId($shippingAddress->getCountryId());
+        $address->setCounty(($shippingAddress->getRegion() ?: null));
         return $address;
     }
 
