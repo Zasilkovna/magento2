@@ -129,6 +129,10 @@ class InstallSchema implements InstallSchemaInterface
             "type" => Table::TYPE_TEXT,
             'size'    => '32'
         ],
+        "recipient_country_id" => [
+            "type" => Table::TYPE_TEXT,
+            'size'    => '2'
+        ],
         "recipient_county" => [
             "type" => Table::TYPE_TEXT,
             'size'    => '128'

@@ -182,6 +182,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             'recipient_house_number' => $destinationAddress->getHouseNumber(),
             'recipient_city' => $destinationAddress->getCity(),
             'recipient_zip' => $destinationAddress->getZip(),
+            'recipient_country_id' => $destinationAddress->getCountryId(),
             'recipient_county' => $destinationAddress->getCounty(),
             'recipient_longitude' => $destinationAddress->getLongitude(),
             'recipient_latitude' => $destinationAddress->getLatitude(),

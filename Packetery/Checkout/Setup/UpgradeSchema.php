@@ -168,13 +168,25 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             $setup->getConnection()->addColumn(
                 $setup->getTable('packetery_order'),
+                'recipient_country_id',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'length' => '2',
+                    'comment' => 'Recipient country',
+                    'after' => 'recipient_zip'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_order'),
                 'recipient_county',
                 [
                     'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                     'nullable' => true,
                     'length' => '128',
                     'comment' => 'Recipient county',
-                    'after' => 'recipient_zip'
+                    'after' => 'recipient_country_id'
                 ]
             );
 

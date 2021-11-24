@@ -42,10 +42,10 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
         $address->setHouseNumber($this->getData('recipient_house_number'));
         $address->setCity($this->getData('recipient_city'));
         $address->setZip($this->getData('recipient_zip'));
+        $address->setCountryId($this->getData('recipient_country_id'));
         $address->setCounty($this->getData('recipient_county'));
         $address->setLongitude($this->getData('recipient_longitude'));
         $address->setLatitude($this->getData('recipient_latitude'));
-        // countryId is not filled
         return $address;
     }
 }
