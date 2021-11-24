@@ -28,6 +28,7 @@ $methodCode = \Packetery\Checkout\Model\Carrier\MethodCode::fromString($shipping
                         <p><strong><?= $block->escapeHtml(__('Street')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getStreet()); ?></p>
                         <p><strong><?= $block->escapeHtml(__('House number')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getHouseNumber()); ?></p>
                         <p><strong><?= $block->escapeHtml(__('City')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getCity()); ?></p>
+                        <p><strong><?= $block->escapeHtml(__('Country Code')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getCountryId()); ?></p>
                         <p><strong><?= $block->escapeHtml(__('County')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getCounty()); ?></p>
                         <p><strong><?= $block->escapeHtml(__('Zip')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getZip()); ?></p>
                         <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= $block->escapeHtml($packeteryAddress->getLatitude()); ?>,<?= $block->escapeHtml($packeteryAddress->getLongitude()); ?>"><?= $block->escapeHtml(__('GPS coordinates')); ?></a>
