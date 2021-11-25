@@ -77,6 +77,19 @@ define(
                     quote.shippingMethod.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedValidatedAddress), function(lastValue, value) {
                         return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
                     }, quote.shippingMethod()));
+
+                    var address = packeteryService.getPacketaValidatedAddress(null);
+                    if (address) {
+                        quote.shippingAddress(Object.assign(quote.shippingAddress(), {
+                            city: address.city || null,
+                            street: [ address.street || '', address.houseNumber || '' ],
+                            postcode: address.postcode || null,
+                            countryId: address.countryId,
+                            region: address.county || null,
+                            regionCode: null,
+                            regionId: null
+                        }));
+                    }
                 });
 
                 var stepNavigatorReadinessChecker = function() {
