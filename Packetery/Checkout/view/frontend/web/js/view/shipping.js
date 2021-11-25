@@ -79,17 +79,35 @@ define(
                     }, quote.shippingMethod()));
                 });
 
-                var stepNavigatorIntervalHandler = setInterval(function() {
+                var stepNavigatorReadinessChecker = function() {
+                    if (mixin.stepNavigatorReady() === true) {
+                        return;
+                    }
+
                     stepNavigator.steps().sort(stepNavigator.sortItems).some(function (element) {
                         if (element.isVisible()) {
                             mixin.stepNavigatorReady(true);
-                            clearInterval(stepNavigatorIntervalHandler);
                             return true;
                         }
 
                         return false;
                     });
-                }, 200);
+                };
+
+                stepNavigator.steps.subscribe(function(steps) {
+                    for(var stepKey in steps) {
+                        if (!steps.hasOwnProperty(stepKey)) {
+                            continue;
+                        }
+
+                        var element = steps[stepKey];
+                        element.isVisible.subscribe(stepNavigatorReadinessChecker);
+                    }
+
+                    stepNavigatorReadinessChecker();
+                });
+
+                stepNavigatorReadinessChecker();
             },
 
             getDestinationAddress: function() {
