@@ -42,7 +42,7 @@ define(
 
         var mixin = {
             isStoreConfigLoaded: ko.observable(false),
-            pickedDeliveryPlace: ko.observable(packeteryService.getPacketaValidatedAddress({name: ''}).name),
+            pickedDeliveryPlace: ko.observable(packeteryService.getPacketaPoint({name: ''}).name || ''),
             pickedValidatedAddress: ko.observable(formatPacketaAddress(packeteryService.getPacketaValidatedAddress(false))),
             shippingRatesConfig: ko.observable(null),
             errorValidationMessage: ko.observable(''),
