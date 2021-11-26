@@ -54,7 +54,6 @@ class Save extends Action implements HttpPostActionInterface
                 'point_name' => $postData['point_name'],
                 'is_carrier' => (bool)$postData['is_carrier'],
                 'carrier_pickup_point' => ($carrierPickupPoint ?: null),
-                // TODO: add recipient fields
             ]
         );
         $collection->save();

@@ -27,7 +27,7 @@ define(
         var getSelectedRateConfig = function() {
             var selectedShippingRateCode = mixin.getShippingRateCode(quote.shippingMethod());
             var config = mixin.shippingRatesConfig();
-            return config[selectedShippingRateCode]; // rates config must be loaded at this time
+            return config[selectedShippingRateCode];
         };
 
         var formatPacketaAddress = function(address) {

@@ -47,12 +47,6 @@ define([
         },
 
         packetaButtonClick: function() {
-            var method = uiRegistry.get('inputName = general[misc][method]').value();
-            var isPickupPointDelivery = method === 'pickupPointDelivery' || method === 'packetery';
-            if (!isPickupPointDelivery) {
-                return; // TODO: do it differently
-            }
-
             var packetaApiKey = config.apiKey;
             var countryId = uiRegistry.get('inputName = general[misc][country_id]').value();
 

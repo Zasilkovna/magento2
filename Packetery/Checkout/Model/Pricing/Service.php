@@ -189,9 +189,6 @@ class Service
 
         $method->setCost($price);
         $method->setPrice($price);
-        $method->setData('packeta', 'xxx');
-        $method->setAvailable(false);
-        $method->setErrorMessage('my error message ' . microtime());
 
         return $method;
     }
