@@ -3,7 +3,4 @@
 	<event name="sales_order_place_after">
 		<observer instance="Packetery\Checkout\Observer\Sales\OrderPlaceAfter" name="packetery_checkout_observer_sales_orderplaceafter_sales_order_place_after"/>
 	</event>
-	<event name="admin_sales_order_address_update">
-		<observer instance="Packetery\Checkout\Observer\Sales\AddressPlaceAfter" name="packetery_checkout_observer_sales_addressplaceafter_admin_sales_order_address_update"/>
-	</event>
 </config>

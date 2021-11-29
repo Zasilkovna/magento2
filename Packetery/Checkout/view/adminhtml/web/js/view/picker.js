@@ -41,6 +41,11 @@ define([
     var mixin = {
         isStoreConfigLoaded: ko.observable(false),
 
+        isPickupPointDelivery: function() {
+            var method = uiRegistry.get('inputName = general[misc][method]').value();
+            return method === 'pickupPointDelivery' || method === 'packetery';
+        },
+
         packetaButtonClick: function() {
             var packetaApiKey = config.apiKey;
             var countryId = uiRegistry.get('inputName = general[misc][country_id]').value();
