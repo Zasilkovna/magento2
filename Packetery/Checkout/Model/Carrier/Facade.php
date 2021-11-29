@@ -128,19 +128,47 @@ class Facade
      */
     public static function getAllImplementedBranchIds(): array {
         $branchIds = [];
-        $dirs = glob(__DIR__ . '/Imp/*', GLOB_ONLYDIR);
+        $classNames = self::getAllBrainClasses();
+
+        foreach ($classNames as $className) {
+            $branchIds[] = $className::getImplementedBranchIds();
+        }
+
+        return array_merge([], ...$branchIds);
+    }
+
+    /**
+     * @return array<class-string<\Packetery\Checkout\Model\Carrier\AbstractBrain>>
+     */
+    public static function getAllBrainClasses(): array {
+        $classNames = [];
+        $dirs = glob(__DIR__ . '/Imp/*', GLOB_ONLYDIR|GLOB_NOSORT);
+
         foreach ($dirs as $dir) {
             if ($dir === '.' || $dir === '..') {
                 continue;
             }
 
             $name = basename($dir);
-            /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain $className */
-            $className = '\\Packetery\\Checkout\\Model\\Carrier\\Imp\\' . $name . '\\Brain';
-            $branchIds = array_merge($branchIds, $className::getImplementedBranchIds());
+            $classNames[] = '\\Packetery\\Checkout\\Model\\Carrier\\Imp\\' . $name . '\\Brain';
         }
 
-        return $branchIds;
+        return $classNames;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAllCarrierCodes(): array {
+        $carrierCodes = [];
+        /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain[] $classNames */
+        $classNames = self::getAllBrainClasses();
+
+        foreach ($classNames as $className) {
+            $carrierCodes[] = $className::getCarrierCodeStatic();
+        }
+
+        return $carrierCodes;
     }
 
     /**
