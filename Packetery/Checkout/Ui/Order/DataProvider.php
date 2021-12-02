@@ -60,7 +60,8 @@ class DataProvider extends AbstractDataProvider
 
             $shippingMethod = $order->getShippingMethod(true);
             if ($shippingMethod) {
-                $result[$item->getId()]['general']['misc']['method'] = $shippingMethod->getData('method');
+                $methodCode = \Packetery\Checkout\Model\Carrier\MethodCode::fromString($shippingMethod->getData('method'));
+                $result[$item->getId()]['general']['misc']['method'] = $methodCode->getMethod();
             } else {
                 $result[$item->getId()]['general']['misc']['method'] = null;
             }
