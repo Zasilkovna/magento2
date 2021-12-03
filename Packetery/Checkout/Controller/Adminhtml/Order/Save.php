@@ -57,7 +57,7 @@ class Save extends Action implements HttpPostActionInterface
                     'address_validated' => true,
                     'recipient_street' => ($postData['recipient_street'] ?? null),
                     'recipient_house_number' => ($postData['recipient_house_number'] ?? null),
-                    'recipient_country_id' => $postData['recipient_country_id'],
+                    'recipient_country_id' => ($postData['recipient_country_id'] ?? null),
                     'recipient_county' => ($postData['recipient_county'] ?? null),
                     'recipient_city' => ($postData['recipient_city'] ?? null),
                     'recipient_zip' => ($postData['recipient_zip'] ?? null),
