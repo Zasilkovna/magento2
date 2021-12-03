@@ -68,6 +68,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'exported_transformed' => "main_table.exported",
                 'exported_at_transformed' => "main_table.exported_at",
                 'order_status' => "sales_order.status",
+                'shipping_rate_code' => "sales_order.shipping_method",
                 'main_table.*'
             ]
         );
