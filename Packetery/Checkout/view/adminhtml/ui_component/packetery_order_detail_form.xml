@@ -335,6 +335,88 @@
                                     </action>
                                 </actions>
                             </rule>
+                            <rule name="2">
+                                <value>packetery</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_street</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_house_number</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_city</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_zip</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_country_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_county</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>packetery_order_detail_form.areas.general.general.address_picker_field</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_longitude</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_latitude</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="3">
+                                <value>pickupPointDelivery</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_street</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_house_number</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_city</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_zip</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_country_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_county</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>packetery_order_detail_form.areas.general.general.address_picker_field</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_longitude</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>packetery_order_detail_form.areas.general.general.recipient_latitude</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
                         </rules>
                         <enabled>true</enabled>
                     </switcherConfig>
