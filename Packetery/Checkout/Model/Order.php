@@ -27,6 +27,13 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
     }
 
     /**
+     * @return string
+     */
+    public function getOrderNumber(): string {
+        return $this->getData('order_number');
+    }
+
+    /**
      * @return bool
      */
     public function isAddressValidated(): bool {
