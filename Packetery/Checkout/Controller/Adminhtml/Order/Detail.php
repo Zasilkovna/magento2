@@ -3,7 +3,6 @@
 namespace Packetery\Checkout\Controller\Adminhtml\Order;
 
 use Magento\Framework\Controller\AbstractResult;
-use Packetery\Checkout\Model\Carrier\Methods;
 
 class Detail extends \Magento\Backend\App\Action
 {
