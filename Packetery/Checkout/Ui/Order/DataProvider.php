@@ -53,13 +53,6 @@ class DataProvider extends AbstractDataProvider
             $orderNumber = $result[$item->getId()]['general']['order_number'];
             $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
 
-            $shippingAddress = $order->getShippingAddress();
-            if ($shippingAddress) {
-                $result[$item->getId()]['general']['misc']['country_id'] = $shippingAddress->getCountryId();
-            } else {
-                $result[$item->getId()]['general']['misc']['country_id'] = null;
-            }
-
             $shippingMethod = $order->getShippingMethod(true);
             if ($shippingMethod) {
                 $methodCode = MethodCode::fromString($shippingMethod->getData('method'));

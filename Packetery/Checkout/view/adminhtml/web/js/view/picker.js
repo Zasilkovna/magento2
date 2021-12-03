@@ -53,7 +53,7 @@ define([
 
         packetaButtonClick: function() {
             var packetaApiKey = config.apiKey;
-            var countryId = uiRegistry.get('inputName = general[misc][country_id]').value();
+            var countryId = uiRegistry.get('inputName = general[recipient_country_id]').value();
 
             var options = {
                 webUrl: config.packetaOptions.webUrl,
@@ -94,7 +94,7 @@ define([
 
             var packetaApiKey = config.apiKey;
             var destinationAddress = getDestinationAddress();
-            var countryId = uiRegistry.get('inputName = general[misc][country_id]').value();
+            var countryId = uiRegistry.get('inputName = general[recipient_country_id]').value();
             var pointId = uiRegistry.get('inputName = general[point_id]').value();
 
             var options = {

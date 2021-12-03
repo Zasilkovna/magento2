@@ -269,22 +269,6 @@
                     <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
-            <field name="country_id">
-                <argument name="data" xsi:type="array">
-                    <item name="config" xsi:type="array">
-                        <item name="dataType" xsi:type="string">text</item>
-                        <item name="label" xsi:type="string" translate="true">Country</item>
-                        <item name="visible" xsi:type="boolean">true</item>
-                        <item name="formElement" xsi:type="string">input</item>
-                        <item name="dataScope" xsi:type="string">country_id</item>
-                    </item>
-                </argument>
-                <settings>
-                    <validation>
-                        <rule name="required-entry" xsi:type="boolean">true</rule>
-                    </validation>
-                </settings>
-            </field>
             <field name="isPickupPointDelivery">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
