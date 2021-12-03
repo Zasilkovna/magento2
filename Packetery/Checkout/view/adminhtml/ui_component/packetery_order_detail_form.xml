@@ -104,7 +104,7 @@
             </argument>
             <settings>
                 <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
                 </validation>
             </settings>
         </field>
@@ -122,7 +122,7 @@
             </argument>
             <settings>
                 <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
                 </validation>
             </settings>
         </field>
@@ -285,14 +285,14 @@
                     </validation>
                 </settings>
             </field>
-            <field name="method">
+            <field name="isPickupPointDelivery">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="dataType" xsi:type="string">text</item>
-                        <item name="label" xsi:type="string" translate="true">Method</item>
+                        <item name="label" xsi:type="string" translate="true">Is pickup point delivery?</item>
                         <item name="visible" xsi:type="boolean">true</item>
                         <item name="formElement" xsi:type="string">input</item>
-                        <item name="dataScope" xsi:type="string">method</item>
+                        <item name="dataScope" xsi:type="string">isPickupPointDelivery</item>
                     </item>
                 </argument>
                 <settings>
@@ -302,41 +302,7 @@
                     <switcherConfig>
                         <rules>
                             <rule name="0">
-                                <value>addressDelivery</value>
-                                <actions>
-                                    <action name="0">
-                                        <target>packetery_order_detail_form.areas.general.general.point_name</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="1">
-                                        <target>packetery_order_detail_form.areas.general.general.carrier_pickup_point</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="2">
-                                        <target>packetery_order_detail_form.areas.general.general.point_picker_field</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                </actions>
-                            </rule>
-                            <rule name="1">
-                                <value>directAddressDelivery</value>
-                                <actions>
-                                    <action name="0">
-                                        <target>packetery_order_detail_form.areas.general.general.point_name</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="1">
-                                        <target>packetery_order_detail_form.areas.general.general.carrier_pickup_point</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="2">
-                                        <target>packetery_order_detail_form.areas.general.general.point_picker_field</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                </actions>
-                            </rule>
-                            <rule name="2">
-                                <value>packetery</value>
+                                <value>1</value>
                                 <actions>
                                     <action name="0">
                                         <target>packetery_order_detail_form.areas.general.general.recipient_street</target>
@@ -376,43 +342,40 @@
                                     </action>
                                 </actions>
                             </rule>
-                            <rule name="3">
-                                <value>pickupPointDelivery</value>
+                        </rules>
+                        <enabled>true</enabled>
+                    </switcherConfig>
+                </settings>
+            </field>
+            <field name="isAnyAddressDelivery">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" xsi:type="string" translate="true">Is any address delivery?</item>
+                        <item name="visible" xsi:type="boolean">true</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="dataScope" xsi:type="string">isAnyAddressDelivery</item>
+                    </item>
+                </argument>
+                <settings>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <switcherConfig>
+                        <rules>
+                            <rule name="0">
+                                <value>1</value>
                                 <actions>
                                     <action name="0">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_street</target>
+                                        <target>packetery_order_detail_form.areas.general.general.point_name</target>
                                         <callback>hide</callback>
                                     </action>
                                     <action name="1">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_house_number</target>
+                                        <target>packetery_order_detail_form.areas.general.general.carrier_pickup_point</target>
                                         <callback>hide</callback>
                                     </action>
                                     <action name="2">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_city</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="3">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_zip</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="4">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_country_id</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="5">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_county</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="6">
-                                        <target>packetery_order_detail_form.areas.general.general.address_picker_field</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="7">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_longitude</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="8">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_latitude</target>
+                                        <target>packetery_order_detail_form.areas.general.general.point_picker_field</target>
                                         <callback>hide</callback>
                                     </action>
                                 </actions>

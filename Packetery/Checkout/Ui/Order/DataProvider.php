@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Ui\Order;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
+use Packetery\Checkout\Model\Carrier\MethodCode;
+use Packetery\Checkout\Model\Carrier\Methods;
 
 class DataProvider extends AbstractDataProvider
 {
@@ -60,10 +62,12 @@ class DataProvider extends AbstractDataProvider
 
             $shippingMethod = $order->getShippingMethod(true);
             if ($shippingMethod) {
-                $methodCode = \Packetery\Checkout\Model\Carrier\MethodCode::fromString($shippingMethod->getData('method'));
-                $result[$item->getId()]['general']['misc']['method'] = $methodCode->getMethod();
+                $methodCode = MethodCode::fromString($shippingMethod->getData('method'));
+                $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = (Methods::isPickupPointDelivery($methodCode->getMethod()) ? '1' : '0');
+                $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = (Methods::isAnyAddressDelivery($methodCode->getMethod()) ? '1' : '0');
             } else {
-                $result[$item->getId()]['general']['misc']['method'] = null;
+                $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = null;
+                $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = null;
             }
         }
 

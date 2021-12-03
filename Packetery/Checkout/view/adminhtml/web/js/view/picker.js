@@ -43,8 +43,7 @@ define([
         errorValidationMessage: ko.observable(''),
 
         isPickupPointDelivery: function() {
-            var method = uiRegistry.get('inputName = general[misc][method]').value();
-            return method === 'pickupPointDelivery' || method === 'packetery';
+            return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
         },
 
         packetaButtonClick: function() {

@@ -51,7 +51,7 @@ class Save extends Action implements HttpPostActionInterface
         $collection = $this->orderCollectionFactory->create();
         $collection->addFilter('id', $id);
 
-        if (Methods::isAnyAddressDelivery($misc['method'])) {
+        if ($misc['isAnyAddressDelivery'] === '1') {
             $collection->setDataToAll(
                 [
                     'address_validated' => true,
@@ -67,7 +67,7 @@ class Save extends Action implements HttpPostActionInterface
             );
         }
 
-        if (Methods::isPickupPointDelivery($misc['method'])) {
+        if ($misc['isPickupPointDelivery'] === '1') {
             $collection->setDataToAll(
                 [
                     'point_id' => $postData['point_id'],
