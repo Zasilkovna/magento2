@@ -5,7 +5,8 @@ define([
     'ko',
     'mage/translate',
     'mage/storage',
-    'mage/url'
+    'mage/url',
+    'jquery',
 ], function(
     _,
     uiRegistry,
@@ -13,7 +14,8 @@ define([
     ko,
     $t,
     storage,
-    frontUrlBuilder
+    frontUrlBuilder,
+    jQuery
 ) {
     'use strict';
 
@@ -21,6 +23,7 @@ define([
 
     var config = {};
     var loadConfig = function(onSuccess) {
+        jQuery('body').trigger('processStart');
         var configUrl = frontUrlBuilder.build('packetery/config/storeconfig');
         storage.get(configUrl).done(
             function(response) {
@@ -35,7 +38,9 @@ define([
             function() {
                 console.error('Endpoint for packeta config failed');
             }
-        );
+        ).always(function() {
+            jQuery('body').trigger('processStop');
+        });
     };
 
     var mixin = {
