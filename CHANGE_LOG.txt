@@ -1,3 +1,5 @@
+2.2.1 - Fixed: order grid did not display paging controls on top of the grid and did not display row count
+
 2.2.0 - Added: inline order grid editation
       - Fixed: cart and order weight calculation
 
