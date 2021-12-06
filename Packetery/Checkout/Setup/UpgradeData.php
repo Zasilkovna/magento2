@@ -11,20 +11,13 @@ class UpgradeData implements UpgradeDataInterface
     /** @var \Magento\Config\Model\Config\Factory */
     private $configFactory;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
-    private $orderCollectionFactory;
-
-    /** @var \Magento\Sales\Model\OrderFactory */
-    private $orderFactory;
-
     /**
+     * UpgradeData constructor.
+     *
      * @param \Magento\Config\Model\Config\Factory $configFactory
-     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
      */
-    public function __construct(\Magento\Config\Model\Config\Factory $configFactory, \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory, \Magento\Sales\Model\OrderFactory $orderFactory) {
-        $this->orderCollectionFactory = $orderCollectionFactory;
-        $this->orderFactory = $orderFactory;
+    public function __construct(\Magento\Config\Model\Config\Factory $configFactory) {
+        $this->configFactory = $configFactory;
     }
 
     /**
@@ -41,32 +34,16 @@ class UpgradeData implements UpgradeDataInterface
         }
 
         if (version_compare($context->getVersion(), '2.3.0', '<')) {
-            $orderCollection = $this->orderCollectionFactory->create();
-
-            /** @var \Packetery\Checkout\Model\Order $packeteryOrder */
-            foreach ($orderCollection->getItems() as $packeteryOrder) {
-                /** @var \Magento\Sales\Model\Order $order */
-                $order = $this->orderFactory->create()->loadByIncrementId($packeteryOrder->getOrderNumber());
-                if (!$order) {
-                    continue;
-                }
-
-                $shippingAddress = $order->getShippingAddress();
-                if (!$shippingAddress) {
-                    continue;
-                }
-
-                $orderCollectionItem = $this->orderCollectionFactory->create();
-                $orderCollectionItem->addFilter('id', $packeteryOrder->getId());
-                $orderCollectionItem->addFieldToFilter('recipient_country_id', ['null' => true]);
-                $orderCollectionItem->setDataToAll(
-                    [
-                        'recipient_country_id' => $shippingAddress->getCountryId(),
-                    ]
-                );
-                $orderCollectionItem->save();
-            }
-
+            $packeteryOrderTable = $setup->getTable('packetery_order');
+            $salesOrderTable = $setup->getTable('sales_order');
+            $salesOrderAddressTable = $setup->getTable('sales_order_address');
+            $setup->getConnection()->query("
+                UPDATE `$packeteryOrderTable`
+                JOIN `$salesOrderTable` ON `$salesOrderTable`.`increment_id` = $packeteryOrderTable.`order_number`
+                JOIN `$salesOrderAddressTable` ON `$salesOrderTable`.`shipping_address_id` IS NOT NULL AND `$salesOrderAddressTable`.`entity_id` = `$salesOrderTable`.`shipping_address_id`
+                SET `$packeteryOrderTable`.`recipient_country_id` = `$salesOrderAddressTable`.`country_id`
+                WHERE `$packeteryOrderTable`.`recipient_country_id` IS NULL
+            ");
         }
     }
 }
