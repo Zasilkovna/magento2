@@ -114,10 +114,6 @@ define([
             var addressSelected = function(result) {
                 mixin.errorValidationMessage('');
 
-                if(!result) {
-                    return;
-                }
-
                 if (!result) {
                     mixin.errorValidationMessage($t("Address validation is out of order"));
                     return;
