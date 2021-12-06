@@ -59,8 +59,8 @@ class DataProvider extends AbstractDataProvider
                 $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = (Methods::isPickupPointDelivery($methodCode->getMethod()) ? '1' : '0');
                 $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = (Methods::isAnyAddressDelivery($methodCode->getMethod()) ? '1' : '0');
             } else {
-                $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = null;
-                $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = null;
+                $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = '0';
+                $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = '0';
             }
         }
 
