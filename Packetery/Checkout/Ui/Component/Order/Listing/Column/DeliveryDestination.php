@@ -47,13 +47,15 @@ class DeliveryDestination extends Column
      * @return array
      */
     public function prepareDataSource(array $dataSource): array {
+        $cache = [];
+
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 $shippingRateCode = $item['shipping_rate_code'];
                 [$carrierCode, $methodCodeString] = explode('_', $shippingRateCode, 2);
                 $methodCode = MethodCode::fromString($methodCodeString);
                 // make sure you do not use any method requiring country
-                $carrier = $this->carrierFacade->createHybridCarrier($carrierCode, $methodCode->getDynamicCarrierId(), $methodCode->getMethod(), '');
+                $carrier = $this->carrierFacade->createHybridCarrierCached($cache, $carrierCode, $methodCode->getDynamicCarrierId(), $methodCode->getMethod(), '');
 
                 $branchName = (string)$item['point_name'];
                 $branchId = $item['point_id'];
