@@ -154,6 +154,18 @@
                 </item>
             </argument>
         </field>
+        <field name="address_validated">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Is address validated?</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">address_validated</item>
+                </item>
+            </argument>
+        </field>
         <field name="recipient_street">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -322,6 +334,10 @@
                                     </action>
                                     <action name="8">
                                         <target>packetery_order_detail_form.areas.general.general.recipient_latitude</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>packetery_order_detail_form.areas.general.general.address_validated</target>
                                         <callback>hide</callback>
                                     </action>
                                 </actions>

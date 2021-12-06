@@ -130,6 +130,7 @@ define([
                     return;
                 }
 
+                uiRegistry.get('inputName = general[address_validated]').value('1');
                 uiRegistry.get('inputName = general[recipient_street]').value(address.street || null);
                 uiRegistry.get('inputName = general[recipient_house_number]').value(address.houseNumber || null);
                 uiRegistry.get('inputName = general[recipient_city]').value(address.city || null);
