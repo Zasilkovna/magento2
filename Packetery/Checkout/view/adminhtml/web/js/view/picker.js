@@ -46,9 +46,30 @@ define([
     var mixin = {
         isStoreConfigLoaded: ko.observable(false),
         errorValidationMessage: ko.observable(''),
+        pickedValidatedAddress: ko.observable(''),
 
         isPickupPointDelivery: function() {
             return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
+        },
+
+        isAnyAddressDelivery: function() {
+            return uiRegistry.get('inputName = general[misc][isAnyAddressDelivery]').value() === '1';
+        },
+
+        initialize: function() {
+            this._super();
+
+            var fieldset = uiRegistry.get('index = general');
+
+            if (mixin.isPickupPointDelivery()) {
+                fieldset.label = $t('Pickup point selection');
+            }
+
+            if (mixin.isAnyAddressDelivery()) {
+                fieldset.label = $t('Shipping address validation');
+            }
+
+            return this;
         },
 
         packetaButtonClick: function() {
@@ -139,6 +160,12 @@ define([
                 uiRegistry.get('inputName = general[recipient_country_id]').value(countryId);
                 uiRegistry.get('inputName = general[recipient_longitude]').value(address.longitude || null);
                 uiRegistry.get('inputName = general[recipient_latitude]').value(address.latitude || null);
+
+                mixin.pickedValidatedAddress(
+                    [ address.street, address.houseNumber, address.city ].filter(function(value) {
+                        return !!value;
+                    }).join(' ')
+                );
             };
 
             PacketaHD.Widget.pick(packetaApiKey, addressSelected, options);

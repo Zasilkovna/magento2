@@ -163,6 +163,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">address_validated</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -175,6 +176,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_street</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -187,6 +189,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_house_number</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -199,6 +202,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_city</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -211,6 +215,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_zip</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -223,6 +228,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_country_id</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -235,6 +241,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_county</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -247,6 +254,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_longitude</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -259,6 +267,7 @@
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">recipient_latitude</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
                 </item>
             </argument>
         </field>
@@ -301,43 +310,7 @@
                                 <value>1</value>
                                 <actions>
                                     <action name="0">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_street</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="1">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_house_number</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="2">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_city</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="3">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_zip</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="4">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_country_id</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="5">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_county</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="6">
                                         <target>packetery_order_detail_form.areas.general.general.address_picker_field</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="7">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_longitude</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="8">
-                                        <target>packetery_order_detail_form.areas.general.general.recipient_latitude</target>
-                                        <callback>hide</callback>
-                                    </action>
-                                    <action name="9">
-                                        <target>packetery_order_detail_form.areas.general.general.address_validated</target>
                                         <callback>hide</callback>
                                     </action>
                                 </actions>
