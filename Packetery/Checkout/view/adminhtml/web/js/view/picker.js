@@ -47,6 +47,7 @@ define([
         isStoreConfigLoaded: ko.observable(false),
         errorValidationMessage: ko.observable(''),
         pickedValidatedAddress: ko.observable(''),
+        buttonLabel: ko.observable($t('Check delivery address')),
 
         isPickupPointDelivery: function() {
             return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
@@ -56,10 +57,21 @@ define([
             return uiRegistry.get('inputName = general[misc][isAnyAddressDelivery]').value() === '1';
         },
 
+        getPacketaSymbolUrl: function() {
+            return window.packetery.packetaSymbolUrl;
+        },
+
         initialize: function() {
-            this._super();
 
             var fieldset = uiRegistry.get('index = general');
+            uiRegistry.get('inputName = general[address_validated]', function(item) {
+                if (item.value() === '1') {
+                    mixin.buttonLabel($t('Change delivery address'));
+                }
+                if (item.value() === '0') {
+                    mixin.buttonLabel($t('Check delivery address'));
+                }
+            });
 
             if (mixin.isPickupPointDelivery()) {
                 fieldset.label = $t('Pickup point selection');
@@ -69,7 +81,7 @@ define([
                 fieldset.label = $t('Shipping address validation');
             }
 
-            return this;
+            return this._super();
         },
 
         packetaButtonClick: function() {
