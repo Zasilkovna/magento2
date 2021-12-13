@@ -1,3 +1,9 @@
+2.3.0 - Added: checkout address validation via widget
+      - Added: address validation configuration in pricing rules
+      - Updated: Magento order address change results in overriding validated address of Packeta order to address without house number
+      - Added: ability to change shipping address in Packeta order detail in administration
+      - Added: visualization of validated address in Packeta order detail
+
 2.2.0 - Added: inline order grid editation
       - Fixed: cart and order weight calculation
 
