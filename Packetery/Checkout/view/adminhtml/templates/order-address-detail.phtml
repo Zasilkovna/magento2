@@ -13,7 +13,7 @@ $methodCode = \Packetery\Checkout\Model\Carrier\MethodCode::fromString($shipping
 
 <section class="admin__page-section order-addresses">
     <div class="admin__page-section-title">
-        <span class="title"><?= $block->escapeHtml(__('Information')); ?></span>
+        <span class="title"><?= $block->escapeHtml(__('Validated shipping address')); ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item">
@@ -23,17 +23,38 @@ $methodCode = \Packetery\Checkout\Model\Carrier\MethodCode::fromString($shipping
 
             <?php if ($packeteryOrder->isAddressValidated()) { ?>
                 <p><strong><?= $block->escapeHtml(__('Order has following validated address:')); ?></strong></p><br>
-                <address class="admin__page-section-item-content">
-                    <?php if ($packeteryOrder->isAddressValidated()) { ?>
-                        <p><strong><?= $block->escapeHtml(__('Street')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getStreet()); ?></p>
-                        <p><strong><?= $block->escapeHtml(__('House number')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getHouseNumber()); ?></p>
-                        <p><strong><?= $block->escapeHtml(__('City')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getCity()); ?></p>
-                        <p><strong><?= $block->escapeHtml(__('Country Code')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getCountryId()); ?></p>
-                        <p><strong><?= $block->escapeHtml(__('County')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getCounty()); ?></p>
-                        <p><strong><?= $block->escapeHtml(__('Zip')) ?></strong>: <?= $block->escapeHtml($packeteryAddress->getZip()); ?></p>
-                        <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= $block->escapeHtml($packeteryAddress->getLatitude()); ?>,<?= $block->escapeHtml($packeteryAddress->getLongitude()); ?>"><?= $block->escapeHtml(__('GPS coordinates')); ?></a>
-                    <?php } ?>
-                </address>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td><strong><?= $block->escapeHtml(__('Street')) ?></strong></td>
+                        <td><?= $block->escapeHtml($packeteryAddress->getStreet()); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong><?= $block->escapeHtml(__('House number')) ?></strong></td>
+                        <td><?= $block->escapeHtml($packeteryAddress->getHouseNumber()); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong><?= $block->escapeHtml(__('City')) ?></strong></td>
+                        <td><?= $block->escapeHtml($packeteryAddress->getCity()); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong><?= $block->escapeHtml(__('Zip')) ?></strong></td>
+                        <td><?= $block->escapeHtml($packeteryAddress->getZip()); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong><?= $block->escapeHtml(__('County')) ?></strong></td>
+                        <td><?= $block->escapeHtml($packeteryAddress->getCounty()); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong><?= $block->escapeHtml(__('Country Code')) ?></strong></td>
+                        <td><?= $block->escapeHtml($packeteryAddress->getCountryId()); ?></td>
+                    </tr>
+                    <tr>
+                        <td><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= $block->escapeHtml($packeteryAddress->getLatitude()); ?>,<?= $block->escapeHtml($packeteryAddress->getLongitude()); ?>"><?= $block->escapeHtml(__('GPS coordinates')); ?></a></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
             <?php } ?>
         </div>
     </div>
