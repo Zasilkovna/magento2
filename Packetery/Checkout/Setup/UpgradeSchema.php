@@ -155,6 +155,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
 
             $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_pricing_rule'),
+                'max_cod',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'nullable' => true,
+                    'after' => 'address_validation',
+                    'length' => '20,4',
+                    'comment' => 'From what cart value will be COD payment methods hidden?'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
                 $setup->getTable('packetery_order'),
                 'address_validated',
                 [
