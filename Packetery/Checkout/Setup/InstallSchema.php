@@ -295,7 +295,7 @@ class InstallSchema implements InstallSchemaInterface
                     'nullable' => true,
                     'after' => 'address_validation',
                     'length' => '20,4',
-                    'comment' => 'From what cart value will be COD payment methods hidden?'
+                    'comment' => 'minimal value to hide COD payment methods'
                 ],
             ],
         ]);
