@@ -8,7 +8,8 @@ define(
         'mage/translate',
         'mage/storage',
         'mage/url',
-        'ko'
+        'ko',
+        'uiRegistry'
     ], function(
         quote,
         shippingService,
@@ -18,11 +19,20 @@ define(
         $t,
         storage,
         url,
-        ko
+        ko,
+        registry
     ) {
         'use strict';
 
         var config = null;
+
+        var selectCurrentShipping = function() {
+            registry.get('checkout.steps.shipping-step.shippingAddress', function (component) {
+                if (component.isSelected()) {
+                    component.selectShippingMethod(quote.shippingMethod());
+                }
+            });
+        }
 
         var getSelectedRateConfig = function() {
             var selectedShippingRateCode = mixin.getShippingRateCode(quote.shippingMethod());
@@ -78,18 +88,7 @@ define(
                         return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
                     }, quote.shippingMethod()));
 
-                    var address = packeteryService.getPacketaValidatedAddress(null);
-                    if (address) {
-                        quote.shippingAddress(Object.assign(quote.shippingAddress(), {
-                            city: address.city || null,
-                            street: [ address.street || '', address.houseNumber || '' ],
-                            postcode: address.postcode || null,
-                            countryId: address.countryId,
-                            region: address.county || null,
-                            regionCode: null,
-                            regionId: null
-                        }));
-                    }
+                    // Shipping address replacing removed due to Amasty Checkout v3.1.3
                 });
 
                 var stepNavigatorReadinessChecker = function() {
@@ -191,6 +190,10 @@ define(
             },
 
             validateShippingInformation: function() {
+                if (mixin.shippingRatesConfig() === null) {
+                    return false;
+                }
+
                 var packetaPoint = packeteryService.getPacketaPoint({});
                 if(packeteryPickupPointSelected() && !packetaPoint.pointId) {
                     var message = $t("Please select pickup point");
@@ -249,6 +252,7 @@ define(
             mixin.shippingRatesConfig(null);
             loadShippingRatesConfig(rates,function (responseValue) {
                 mixin.shippingRatesConfig(responseValue.rates);
+                selectCurrentShipping();
             });
         };
 
@@ -300,6 +304,8 @@ define(
                     carrierId: point.carrierId ? point.carrierId : null,
                     carrierPickupPointId: point.carrierPickupPointId ? point.carrierPickupPointId : null
                 });
+
+                selectCurrentShipping();
             } else {
                 resetPickedPacketaPoint();
             }
@@ -338,15 +344,9 @@ define(
             });
 
             mixin.pickedValidatedAddress(formatPacketaAddress(packeteryService.getPacketaValidatedAddress('')));
-            quote.shippingAddress(Object.assign(quote.shippingAddress(), {
-                city: address.city || null,
-                street: [ address.street || '', address.houseNumber || '' ],
-                postcode: address.postcode || null,
-                countryId: destinationAddress.countryId,
-                region: address.county || null,
-                regionCode: null,
-                regionId: null
-            }));
+            // Shipping address replacing removed due to Amasty Checkout v3.1.3
+
+            selectCurrentShipping();
         }
 
         var loadStoreConfig = function(onSuccess) {

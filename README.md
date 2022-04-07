@@ -76,6 +76,7 @@ Price rules are created as unavailable, without set maximum weight.
 - export shipments to a CSV file that can be imported in [client section](https://client.packeta.com/)
 - possibility to change the pickup point for an existing order in the administration
 - email template variables
+- support for Amasty Checkout version 4.1.0 and 3.1.3
 
 #### Email template variables
 
@@ -168,6 +169,7 @@ Cenová pravidla jsou vytvořena jako nedostupná, bez nastavené maximální hm
 - export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/)
 - možnost změny výdejního místa u existující objednávky v administraci
 - proměnné pro emailové šablony
+- podpora Amasty Checkout verze 4.1.0 a 3.1.3
 
 #### Proměnné pro emailové šablony
 

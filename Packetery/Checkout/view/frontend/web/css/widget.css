@@ -1,7 +1,14 @@
-.packetery-zas-box .icon
-{
+.packetery-zas-box {
+    box-shadow: none;
+}
+
+.packetery-zas-box .icon {
     vertical-align: middle;
     display: inline-block;
     height: 34px;
     width: 32px;
+}
+
+.table-checkout-shipping-method tbody .packetery-zas-box td {
+    width: auto;
 }

@@ -1,0 +1,209 @@
+<li id="opc-shipping_method"
+    class="checkout-shipping-method"
+    data-bind="fadeVisible: visible(), blockLoader: isLoading"
+    role="presentation">
+    <div class="checkout-shipping-method">
+        <p class="step-title amcheckout-title"
+           data-amcheckout-js="step-title"
+           data-bind="i18n: getNameShippingMethod()"
+           data-role="title"></p>
+        <div class="step-content amcheckout-content"
+             data-amcheckout-js="step-content"
+             data-bind="mageInit: {'checkoutCollapsibleSteps': {}}">
+            <div class="amcheckout-wrapper">
+                <!-- ko fastForEach: getRegion('before-shipping-method-form') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!-- /ko -->
+                <div id="checkout-step-shipping_method">
+                    <!-- ko if: rates().length  -->
+                    <form class="form methods-shipping" id="co-shipping-method-form" data-bind="submit: setShippingInformation" novalidate="novalidate">
+                        <div id="checkout-shipping-method-load">
+                            <table class="table-checkout-shipping-method amcheckout-shipping-methods">
+                                <thead class="amcheckout-header">
+                                <tr class="row">
+                                    <th class="col col-method" data-bind="i18n: 'Select Method'"></th>
+                                    <th class="col col-price" data-bind="i18n: 'Price'"></th>
+                                    <th class="col col-method" data-bind="i18n: 'Method Title'"></th>
+                                    <th class="col col-carrier" data-bind="i18n: 'Carrier Title'" colspan="2"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="amcheckout-items">
+
+                                <!-- ko foreach: { data: rates(), as: 'method'} -->
+                                <tr class="row amcheckout-method"
+                                    data-bind="
+                                        click: $parent.selectShippingMethod,
+                                        css : { '-selected' : $parent.isSelected() == (method.carrier_code + '_' + method.method_code) }">
+                                    <td class="col col-method">
+                                        <!-- ko ifnot: method.error_message -->
+                                        <!-- ko if: $parent.rates().length == 1 -->
+                                        <input class="radio"
+                                               type="radio"
+                                               data-bind="attr: {
+                                                            disabled: false,
+                                                            checked: $parent.rates().length == 1,
+                                                            'value' : method.carrier_code + '_' + method.method_code,
+                                                            'id': 's_method_' + method.method_code,
+                                                            'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code
+                                                         }" />
+                                        <label class="amcheckout-label -radio"
+                                               data-bind="attr: {
+                                                            'for': 's_method_' + method.method_code
+                                                         }"></label>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: ($parent.rates().length == 1) -->
+                                        <input type="radio"
+                                               data-bind="
+                                                        value: method.carrier_code + '_' + method.method_code,
+                                                        checked: $parent.isSelected,
+                                                        attr: {
+                                                            disabled: false,
+                                                            'id': 's_method_' + method.carrier_code + '_' + method.method_code,
+                                                            'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code
+                                                        }"
+                                               class="radio"/>
+                                        <label class="amcheckout-label -radio"
+                                               data-bind="attr: {
+                                                            'for': 's_method_' + method.carrier_code + '_' + method.method_code
+                                                         }"></label>
+                                        <!--/ko-->
+                                        <!-- /ko -->
+                                        <!-- ko if: $parent.isModernDesign() && method.error_message -->
+                                        <div class="no-display">
+                                            <input type="radio" data-bind="attr: {'value' : method.method_code, 'id': 's_method_' + method.method_code}"/>
+                                            <label class="amcheckout-label -radio"
+                                                   data-bind="attr: {
+                                                            'for': 's_method_' + method.method_code
+                                                         }"></label>
+                                        </div>
+                                        <!-- /ko -->
+                                    </td>
+                                    <td class="col col-price">
+                                        <!-- ko fastForEach: $parent.getRegion('price') -->
+                                        <!-- ko template: getTemplate() --><!-- /ko -->
+                                        <!-- /ko -->
+                                    </td>
+                                    <td class="col col-method"
+                                        data-bind="text: method.method_title, attr: {'id': 'label_method_' + method.method_code + '_' + method.carrier_code}"></td>
+
+                                    <td class="col col-carrier"
+                                        data-bind="text: method.carrier_title, attr: {'id': 'label_carrier_' + method.method_code + '_' + method.carrier_code, 'colspan': $parent.getColspanCarrier(method)}"></td>
+
+                                    <!-- ko if: $parent.isShippingMethodTooltip(method) -->
+                                    <td class="col col-comment">
+                                        <div class="control">
+                                            <div data-bind="attr: {'class': 'field-tooltip toggle ' + $parent.getAdditionalClassForIcons(method)}">
+                                                <span class="field-tooltip-action"
+                                                    tabindex="0"
+                                                    data-toggle="dropdown"
+                                                    data-bind="mageInit: {'dropdown':{'activeClass': '_active'}}">
+                                                </span>
+                                                <div class="field-tooltip-content"
+                                                     data-target="dropdown"
+                                                    data-bind="html: $parent.getMethodTooltipText(method)">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <!-- /ko -->
+
+                                    <!-- TIG PostNL modification start -->
+                                        <!-- ko if: $parent.isPostNlEnable() && $parent.isModernDesign() -->
+                                            <td class="col col-price">
+                                                <!-- ko ifnot: $parent.canUsePostnlDeliveryOptions(method)-->
+
+                                                    <!-- ko fastForEach: $parent.getRegion('price') -->
+                                                    <!-- ko template: getTemplate() --><!-- /ko -->
+                                                <!-- /ko -->
+                                            <!-- /ko -->
+                                        </td>
+                                    <!-- /ko -->
+                                </tr>
+
+                                <tr if="method.carrier_code == 'packetery' && method.method_code == 'pickupPointDelivery'"
+                                    visible="$parent.isStoreConfigLoaded() && $parent.shippingRatesConfig() != null && $parent.isSelected() == $parent.getShippingRateCode(method)"
+                                    class="packetery-zas-box">
+                                    <td colspan="4">
+                                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAiCAIAAACx0EyoAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJCElEQVRIiZWWaYzdZRXGn3Pe97/emTvTWbtMO5WlpYVSBFFEhAAiNmErQsBUQYhGMSHy0SUkoBjCEpTEDZQlBCESKUYWFYxaIGVT1paytmOnU9rpMp07997/8r7vOX6ofnM+eL6f35PzPMk5hzafsryYa0VKgCpBoIYMeVHKAlU+qlWVvY0pYZD42pvKkBUPwwnYVKE2VhWSBA4MgTAIokTsGVlv03Zbs2Wr7QBAlKBKDCJR5VkDoyKqXiwKgYqxlBs4D6esTloaxFoWFqcIGglBoMzQIAAHIhGxkZJTNVBSCIsqGWKATO3VSuAUajkEVedNKLmbQopaI2vJRIGDQtkhNQgKghCUFRCAlUBWYIkACAQKgQCkAJOEEPdUWigVBpDAESfWaOXrinosOw7itAKDrQWMr8EchAESUlYIqSFWZrJKABMgepgMZRIleC2NBiswbMHsxKMKuQEfbGtOPtLEcBwQCi9RJJlVV4NFiRRQAkiUDA4LqJKAQCpQAKqkkFh8iKkEWLwRhApI88bgWPPSTxQf7px57c1ytiUpQk7KIdQuIQZYNQQCAAKpUlCxDGaQIVYlJj0cssI4jm0tWVW6ABnpWbDujOUXb1h42lnaP0jd2e7Wf048vnHqySfDxK6MVS1ECVDDhglKAAAQg+m5Ywa6rRYrWEWZBErKCFKKgDC86qSF539x6PwLGitXtCd2vfmnZzqvb7Zjy1euu2jxiSdUBw/s+fPje3/3YPulzXVZwIAMLBsSFWJlynp7adPqPtfu+o7jHjiPvmC7weuylYtP/vjohRsWfOZUU9Xvvbj5/ScetdP7Ri5av+aEs7e/u2nP83/rRsnYmk8tP/e83uHm9JZX5jY+t+vZv8vWTWQpsAbKYlfY4UXmq4NZXVVpnBXO2ST2VejkZsX6y5becWdV1K/94pfvPPZQ59VNeOpxmdhe93O6au2yc9ePr1u/aHxNsW1q20P3fPD0HweP+uzIlSeZgcGJF55POlVJKmziRLvG0vPHDc/NHIjIKtelI4PkqHVn+nMueff++wZGx8YuP3/xKWelzYXVljfevfu23X947NBcNzn93OXXfmv1p0+3Pf2ualdvvblt4yNTW7cuOW/92MHtb/z4zijxkIxQRs0FHAQCqUJNAZmNO51ytsbR6y5c3ps1zzhdxo4v1HqDZM3aY3/24GlPvHzClZc3X3152yUXPr3+C1sf+KXbs3e6OcDHrE61Pn79JfGicdMOcYXgKo3jVMiCDTHiOKKuMxZDjWzfzqnZMswsW8qR1TTs3bixd6j3iFPPSkdGs7Urj7jz/mO+vX/7r26dePS37157zbbjVlVf+XqmQ31ZlPQNvf/BpMS2m4sg6pRlkvWwCyGKTFk5A3hfh7LA7ME0aN5Msz17h6P+8TM+V2rnuTuuf/vR32B3K4J0j1iSXHqZ+fSpA4qGNbR4zNeTaZq2od0D0wiu2ZWejhuMMiFYA1OVwVoLogAXE9A60JnenQ+MH9x38ABX0Vxj+OTzhj62as9fnnvm2e+PLFs29d6bUz3JyJoTss1PB0bD99X7D8X9C7rdjt87yRkcUZFApWr4nAkwDAaVzjkLGEhdzE7viob7w9R06jpZE+1Ds0Xf2OhlG8bWXzT58F3oWzxwzuXIRqN27fsVCYWOM73NrON5cncBILZxkNzBGMMVBw5QuIiSJMQSEOq0M/Vh0lxY+dkiDPnqkGZzcZcrd5BHVsUrTuSl4211UWuyDraZLg+YQVHQ6Gi3PDDbmuqLEJz1omUaqxq2xABCgJAQ/2ebz01NzeV5Ob2nx03D9mVVUtq29VnK3bB0oGLJ68jFKZ91UefsLzlSzB00+eK9W94PnZoUTBRZhKIieDYKJWKGElwIqkiI/OSuCmkILZltRSHYGFZSgbLrpM600ywKNRau6Fx+YRgaonbcmH5nbtGY37c3UfYOzns1nJuY4RgSiIiIwVBVBSIWt2N7umhw4JNnvnXzDbOtCUeDife19z7NyPaaUr1KK3bB9oZiqvXQT9Ilq/tXLi0n3taysMYgokJFCYCYq0cariygwiAYZYbU2i2KIrbHbvian5n+8N578+NW24VLE2Nn3Gy5e39oJj5Ok6Qnntkl9z/QXDK09js3Tf/1yamHH2wcmjF9UVlXxGBP2rDmquGsqmoDIhUQhJnA5KuZl16do3L8ius0oYm7b8uXLk3HjowD7d+5tWz0N/pGD+zfKffcNX782qO+e+uOJ5/46PZbmrsm8150ENQjZ2MocnlsrhzOXF0lbCBBCI7IGs6AfrEfvfLCXLe9+opv2+F46q6fpj2DC45cse9f2yrqbe+b1gd/dfS6dSNfv2bnI/d+dPsdw3PTQ41mV70X7bFWaqghSmJz9Wij6pYGql7IIjADYmtpG9cXI7z4+kc73h/91neWjK/e8usfBabkqJM6EzvsA784fsPFfV/+xp6779vz4x8Om27VQMdBKU4pkJCAxWhsE9p07ED3UMtC//u2qCGrQSxjNpLcw82h/vx5x9x8u+6fee8HN/pe5yenj/vGdQPrLvjHzTe4+34+aNVniXpHhoN6IiIFwB6U9zcZ85QPZqDLzJT0GXnqiS3XfrMvrj5xy03Nko+8/saeM099+XvXlPf/bDiLJE9LX83HMVeNZK6sGAAUBABMDFXmtBPV5BA57s3ZfbBj4vXX+085jXMaGV3yxm23hMd+PxLDiTK7IkYciJgUQkSHz76AonR+i2pixD5yMJo41lzquZq7YyukN+stZ2THRCMyhc2ZqiTUgWIN/n9aZOcbLTOhKmHTqC58SlHJpJH0T7/D22FyVAkKMXnkW51aIhsFmY8zbwbslNI01CZFqEzpVXuMCUCxICuAWMiS71RFFiHj2Bv/fwvUFtZpLcFl7CpEEauJ8xCzxJxEbVJkltlAyVfdSOfDzC8AsRQcYqkCmjZ1Bdrig0Gus9ymxPa50uWVWoFLuaBkPowVHwBAlAgCJaKgYohAKobiAIAquMhSJOIJUIM0UGjH4DoCQJFHBH+4kYhUlZVUFUzig40HBjXOWAKRkgqYIGRA8042fxEUrBC1xKpk2MQ9+b8BP8kmldgCqfQAAAAASUVORK5CYII=" class="icon"/>
+                                        <a href="javascript:void(0)" click="$parent.packetaButtonClick" class="button action continue primary">
+                                            <translate args="'Select pick-up point'"/>
+                                        </a>
+                                        <br>
+                                        <span data-bind="text: $parent.pickedDeliveryPlace"></span>
+                                    </td>
+                                </tr>
+
+                                <tr if="method.carrier_code.indexOf('packetery') === 0"
+                                    visible="$parent.isStoreConfigLoaded() && $parent.shippingRatesConfig() != null && $parent.isSelected() == $parent.getShippingRateCode(method) && $parent.getRateConfig(method).isPacketaRate && $parent.getRateConfig(method).isAnyAddressDelivery && $parent.getRateConfig(method).addressValidation !== 'none'"
+                                    class="packetery-zas-box">
+                                    <td colspan="4">
+                                        <img src="data:image/png;base64,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" class="icon"/>
+                                        <a href="javascript:void(0)" click="$parent.packetaHDButtonClick" class="button action continue primary">
+                                            <translate args="'Check delivery address'"/>
+                                        </a>
+                                        <br>
+                                        <span data-bind="text: $parent.pickedValidatedAddress"></span>
+                                    </td>
+                                </tr>
+
+                                <!-- ko ifnot: $parent.isModernDesign() -->
+                                <!-- ko if: $parent.getCommentShippingMethod(method) -->
+                                <tr class="row">
+                                    <td class="col" colspan="4"
+                                        data-bind="html: $parent.getCommentShippingMethod(method)">
+                                    </td>
+                                </tr>
+                                <!-- /ko -->
+
+                                <!-- ko if:  method.error_message -->
+                                <tr class="row row-error">
+                                    <td class="col col-error" colspan="4">
+                                        <div class="message error">
+                                            <div data-bind="text: method.error_message"></div>
+                                        </div>
+                                        <div class="no-display">
+                                            <input type="radio" data-bind="attr: {'value' : method.method_code, 'id': 's_method_' + method.method_code}"/>
+                                            <label class="amcheckout-label -radio"
+                                                   data-bind="attr: {
+                                                            'for': 's_method_' + method.method_code
+                                                         }"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- /ko -->
+
+                                <!-- TIG PostNL modification start -->
+                                <!-- ko if: ($parent.isPostNlEnable() && $parent.canUsePostnlDeliveryOptions(method)) -->
+                                <tr>
+                                    <td colspan="10" class="postnl-deliveryoptions">
+                                        <!-- ko fastForEach: $parent.getRegion('postnl-deliveryoptions') -->
+                                        <!-- ko template: getTemplate() --><!-- /ko -->
+                                        <!-- /ko -->
+                                    </td>
+                                </tr>
+                                <!-- /ko -->
+                                <!-- TIG PostNL modification end -->
+                                <!-- /ko -->
+                                <!-- /ko -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="onepage-checkout-shipping-method-additional-load">
+                            <!-- ko fastForEach: getRegion('shippingAdditional') -->
+                            <!-- ko template: getTemplate() --><!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                        <!-- ko if: errorValidationMessage().length > 0 -->
+                        <div class="message notice">
+                            <span><!-- ko text: errorValidationMessage()--><!-- /ko --></span>
+                        </div>
+                        <!-- /ko -->
+                    </form>
+                    <!-- /ko -->
+                    <!-- ko ifnot: rates().length > 0 --><div class="no-quotes-block"><!-- ko i18n: 'Sorry, no quotes are available for this order at this time'--><!-- /ko --></div><!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+</li>
