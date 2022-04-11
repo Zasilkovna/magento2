@@ -88,7 +88,18 @@ define(
                         return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
                     }, quote.shippingMethod()));
 
-                    // Shipping address replacing removed due to Amasty Checkout v3.1.3
+                    var address = packeteryService.getPacketaValidatedAddress(null);
+                    if (address) {
+                        quote.shippingAddress(Object.assign(quote.shippingAddress(), {
+                            city: address.city || null,
+                            street: [ address.street || '', address.houseNumber || '' ],
+                            postcode: address.postcode || null,
+                            countryId: address.countryId,
+                            region: address.county || null,
+                            regionCode: null,
+                            regionId: null
+                        }));
+                    }
                 });
 
                 var stepNavigatorReadinessChecker = function() {
@@ -344,7 +355,15 @@ define(
             });
 
             mixin.pickedValidatedAddress(formatPacketaAddress(packeteryService.getPacketaValidatedAddress('')));
-            // Shipping address replacing removed due to Amasty Checkout v3.1.3
+            quote.shippingAddress(Object.assign(quote.shippingAddress(), {
+                city: address.city || null,
+                street: [ address.street || '', address.houseNumber || '' ],
+                postcode: address.postcode || null,
+                countryId: destinationAddress.countryId,
+                region: address.county || null,
+                regionCode: null,
+                regionId: null
+            }));
 
             selectCurrentShipping();
         }
