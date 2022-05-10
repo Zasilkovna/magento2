@@ -126,7 +126,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         }
 
         if ($isCOD && MethodList::exceedsValueMaxLimit($order->getGrandTotal(), $relatedPricingRule->getMaxCOD())) {
-            throw new InputException(__('Selected payment method is not allowed because grand total exceeds limit %1.', $this->priceCurrency->format($relatedPricingRule->getMaxCOD(), false)));
+            throw new InputException(__('Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.', $this->priceCurrency->format($relatedPricingRule->getMaxCOD(), false)));
         }
 
         if ($postData)
