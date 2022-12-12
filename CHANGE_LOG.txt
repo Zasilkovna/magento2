@@ -8,6 +8,7 @@
       - Added: SK translations
       - Updated: Widget HD library URL
       - Added: ability to create order with partial Packeta shipping in administration
+      - Fixed: checkout shipping methods update for preselected non-US country and new customer
 
 2.2.2 - Added: email template variables
       - Added: order grid filtering and sorting by order creation
