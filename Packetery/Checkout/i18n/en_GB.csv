@@ -128,3 +128,6 @@
 "Order detail","Order detail"
 "Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.","Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier."
 "Max COD","Max COD"
+"Internal pickup points","Internal pickup points"
+"Allowed pickup point types","Allowed pickup point types"
+"Check at least two types of pickup points or set corresponding separate carriers","Check at least two types of pickup points or set corresponding separate carriers"

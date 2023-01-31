@@ -79,6 +79,10 @@ define(
                         return lastValue.countryId !== value.countryId;
                     }, quote.shippingAddress()));
 
+                    quote.shippingMethod.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedPacketaPoint), function(lastValue, value) {
+                        return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
+                    }, quote.shippingMethod()));
+
                     // TODO: implement selected address history
                     quote.shippingMethod.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedValidatedAddress), function(lastValue, value) {
                         return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
@@ -169,7 +173,22 @@ define(
                     appIdentity: config.packetaOptions.appIdentity,
                     country: countryCode,
                     language: config.packetaOptions.language,
+                    defaultPrice: quote.shippingMethod().amount,
+                    defaultCurrency: config.currentStoreCurrencyCode
                 };
+
+                var rateConfig = getSelectedRateConfig();
+                var vendorCodes = rateConfig.widgetVendorCodes ? rateConfig.widgetVendorCodes : [];
+                var vendors = vendorCodes.map(function(vendorCode) {
+                    return {
+                        code: vendorCode,
+                        selected: true
+                    };
+                });
+
+                if (vendors.length > 0) {
+                    options.vendors = vendors;
+                }
 
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
             },
@@ -275,9 +294,8 @@ define(
         shippingService.getShippingRates().subscribe(shippingRatesSubscriber);
 
         var packeteryPickupPointSelected = function() {
-            var shippingMethod = quote.shippingMethod();
             var selectedRateConfig = getSelectedRateConfig();
-            if(shippingMethod && selectedRateConfig && selectedRateConfig.isPacketaRate && shippingMethod['method_code'] === 'pickupPointDelivery') {
+            if(selectedRateConfig && selectedRateConfig.isPacketaRate && selectedRateConfig.isPickupPointDelivery) {
                 return true;
             }
 

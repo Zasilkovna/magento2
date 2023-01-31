@@ -30,6 +30,9 @@ abstract class AbstractBrain
     /** @var \Packetery\Checkout\Model\Weight\Calculator */
     private $weightCalculator;
 
+    /** @var \Magento\Shipping\Model\Rate\ResultFactory */
+    protected $rateResultFactory;
+
     /**
      * AbstractBrain constructor.
      *
@@ -42,12 +45,14 @@ abstract class AbstractBrain
         \Magento\Framework\App\Request\Http $httpRequest,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
+        \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
+        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
     ) {
         $this->httpRequest = $httpRequest;
         $this->pricingService = $pricingService;
         $this->scopeConfig = $scopeConfig;
         $this->weightCalculator = $weightCalculator;
+        $this->rateResultFactory = $rateResultFactory;
     }
 
     /**
@@ -83,7 +88,14 @@ abstract class AbstractBrain
         return true;
     }
 
-    /**
+	/**
+	 * @return \Magento\Shipping\Model\Rate\Result
+	 */
+	public function createRateResult(): \Magento\Shipping\Model\Rate\Result {
+		return $this->rateResultFactory->create();
+	}
+
+	/**
      * @param string $carrierCode
      * @param mixed $scope
      * @return mixed
@@ -151,7 +163,7 @@ abstract class AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null
      */
     public function getDynamicCarrierById(?int $id): ?AbstractDynamicCarrier {
-        return null; // majority of Magento carriers do not have dynamic carriers
+        return null;
     }
 
     /**
@@ -237,7 +249,6 @@ abstract class AbstractBrain
     }
 
     /** dynamic carriers visible in configuration
-     * @param bool $configurable
      * @param string $country
      * @param array $methods
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
@@ -245,6 +256,13 @@ abstract class AbstractBrain
     public function findConfigurableDynamicCarriers(string $country, array $methods): array {
         return [];
     }
+
+	/** dynamic carriers visible in checkout
+	 * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
+	 */
+	public function findResolvableDynamicCarriers(): array {
+		return [];
+	}
 
     /** Static + dynamic countries
      * @param array $methods

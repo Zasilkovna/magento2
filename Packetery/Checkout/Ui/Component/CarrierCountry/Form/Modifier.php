@@ -63,12 +63,12 @@ class Modifier implements ModifierInterface
         $staticCarriers = $this->carrierFacade->getPacketeryAbstractCarriers();
         usort(
             $staticCarriers,
-            function (Carrier\AbstractCarrier $staticCarrier) {
+            static function (Carrier\AbstractCarrier $staticCarrier): int {
                 if ($staticCarrier instanceof Carrier\Imp\Packetery\Carrier) {
-                    return 1; // Packetery is always first
+                    return 0; // Packetery is always first
                 }
 
-                return 0;
+                return 1;
             }
         );
 
@@ -77,32 +77,31 @@ class Modifier implements ModifierInterface
             $methods = $packeteryAbstractCarrierBrain->getMethodSelect()->getMethods();
             usort(
                 $methods,
-                function (string $method) {
+                static function (string $method): int {
                     if ($method === Methods::PICKUP_POINT_DELIVERY) {
-                        return 1; // PP methods are first in list
+                        return 0; // PP methods are first in list
                     }
 
-                    return 0;
+                    return 1;
                 }
             );
 
             foreach ($methods as $method) {
                 // each hybrid carrier represent form fieldset as row
                 $carriers = $packeteryAbstractCarrierBrain->findConfigurableDynamicCarriers($country, [$method]);
+                $vendorCodeOptions = $this->carrierFacade->getVendorCodesOptions($carriers);
 
                 if ($packeteryAbstractCarrierBrain->isAssignableToPricingRule()) {
                     // static carrier has no dynamic carriers
                     // static wrapping carriers are omitted
                     $availableCountries = $packeteryAbstractCarrierBrain->getAvailableCountries([$method]);
                     if (in_array($country, $availableCountries)) {
-                        $hybridCarrier = HybridCarrier::fromAbstract($packeteryAbstractCarrier, $method, $country);
-                        array_unshift($hybridCarriers, $hybridCarrier);
+                        $hybridCarriers[] = HybridCarrier::fromAbstract($packeteryAbstractCarrier, $method, $country, $vendorCodeOptions);
                     }
                 }
 
                 foreach ($carriers as $carrier) {
-                    $hybridCarrier = HybridCarrier::fromAbstractDynamic($packeteryAbstractCarrier, $carrier, $method, $country);
-                    $hybridCarriers[] = $hybridCarrier;
+                    $hybridCarriers[] = HybridCarrier::fromAbstractDynamic($packeteryAbstractCarrier, $carrier, $method, $country);
                 }
             }
         }
@@ -129,7 +128,9 @@ class Modifier implements ModifierInterface
         $newMeta = [];
         foreach ($carriers as $carrier) {
             $carrierFieldName = $this->getCarrierFieldName($carrier);
-            $isDynamic = $this->carrierFacade->isDynamicCarrier($carrier->getData('carrier_code'), $carrier->getData('carrier_id'));
+            $magentoCarrier = $this->carrierFacade->getMagentoCarrier($carrier->getData('carrier_code'));
+            $carrierId = $carrier->getData('carrier_id');
+            $dynamicCarrier = $magentoCarrier->getPacketeryBrain()->getDynamicCarrierById((is_numeric($carrierId) ? (int)$carrierId : null));
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($carrier->getMethod(), $carrier->getCountry(), $carrier->getCarrierCode(), $carrier->getCarrierId());
             $carrierFieldLabel = $carrier->getFieldsetTitle($resolvedPricingRule);
             $newMeta[$carrierFieldName] = [
@@ -202,9 +203,9 @@ class Modifier implements ModifierInterface
                                     'dataType' => 'text',
                                     'componentType' => 'field',
                                     'label' => __('Carrier name'),
-                                    'visible' => $isDynamic,
+                                    'visible' => $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater,
                                     'validation' => [
-                                        'required-entry' => $isDynamic,
+                                        'required-entry' => $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater,
                                     ],
                                 ],
                             ],
@@ -318,6 +319,23 @@ class Modifier implements ModifierInterface
                             'visible' => false,
                             'required' => true,
                             'value' => $carrier->getData('method'),
+                        ],
+                    ],
+                ],
+            ],
+            'vendor_codes' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Allowed pickup point types'),
+                            'formElement' => 'checkboxset',
+                            'dataType' => 'text',
+                            'componentType' => 'field',
+                            'visible' => $carrier->hasVendorCodesOptions(),
+                            'disabled' => $carrier->hasNonInteractableVendorCodesOptions(),
+                            'required' => false,
+                            'multiple' => true,
+                            'options' => $carrier->getVendorCodesOptions()
                         ],
                     ],
                 ],
@@ -551,11 +569,18 @@ class Modifier implements ModifierInterface
                 $pricingRule['free_shipment'] = $resolvedPricingRule->getFreeShipment();
                 $pricingRule['address_validation'] = $resolvedPricingRule->getAddressValidation();
                 $pricingRule['max_cod'] = $resolvedPricingRule->getMaxCOD();
+                $pricingRule['vendor_codes'] = $resolvedPricingRule->getVendorCodes() ?? [];
 
                 $weightRules = $this->pricingService->getWeightRulesByPricingRule($resolvedPricingRule);
                 $pricingRule['weight_rules']['weight_rules'] = [];
                 foreach ($weightRules as $weightRule) {
                     $pricingRule['weight_rules']['weight_rules'][] = $weightRule->getData();
+                }
+            }
+
+            if ($resolvedPricingRule === null) {
+                if ($carrier->hasNonInteractableVendorCodesOptions()) {
+                    $pricingRule['vendor_codes'] = $carrier->getVendorCodesOptionsValues();
                 }
             }
 

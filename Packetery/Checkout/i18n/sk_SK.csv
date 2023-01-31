@@ -128,3 +128,6 @@
 "Order detail","Detail objednávky"
 "Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.","Zvolená platobná metóda nie je povolená, pretože prekračuje maximálnu povolenú hodnotu dobierky (%1) nastavenú pre tohto dopravcu."
 "Max COD","Maximálna výška dobierky"
+"Internal pickup points","Interní výdejní místa"
+"Allowed pickup point types","Povolené typy výdejních míst"
+"Check at least two types of pickup points or set corresponding separate carriers","Zaškrtněte alespoň dva typy výdejních míst nebo nastavte odpovídajícího samostatné přepravce."

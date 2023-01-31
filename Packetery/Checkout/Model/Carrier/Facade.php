@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier;
 
+use Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier;
 use Packetery\Checkout\Model\HybridCarrier;
 
 class Facade
@@ -83,7 +84,46 @@ class Facade
             return HybridCarrier::fromAbstractDynamic($carrier, $dynamicCarrier, $method, $country);
         }
 
-        return HybridCarrier::fromAbstract($carrier, $method, $country);
+        $vendorCodesOptions = [];
+        if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier) {
+            $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($country, [$method]);
+            $vendorCodesOptions = $this->getVendorCodesOptions($dynamicCarriers);
+        }
+
+        return HybridCarrier::fromAbstract($carrier, $method, $country, $vendorCodesOptions);
+    }
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[] $carriers
+     * @return string[]
+     */
+    public function getVendorCodesOptions(array $carriers): array {
+        $vendorCodesOptions = [];
+        foreach ($carriers as $carrier) {
+            if ($carrier instanceof VendorCarrier) {
+                $vendorCodesOptions[] = [
+                    'value' => $carrier->getVendorCode(),
+                    'label' => VendorCodes::getLabel($carrier->getVendorCode()),
+                ];
+            }
+        }
+
+        return $vendorCodesOptions;
+    }
+
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[] $carriers
+     * @return string[]
+     */
+    public function getVendorCodes(array $carriers): array {
+        $vendorCodes = [];
+        foreach ($carriers as $carrier) {
+            if ($carrier instanceof VendorCarrier) {
+                $vendorCodes[] = $carrier->getVendorCode();
+            }
+        }
+
+        return $vendorCodes;
     }
 
     /**
@@ -143,7 +183,7 @@ class Facade
      * @param string $carrierCode
      * @return \Packetery\Checkout\Model\Carrier\AbstractCarrier
      */
-    private function getMagentoCarrier(string $carrierCode): AbstractCarrier {
+    public function getMagentoCarrier(string $carrierCode): AbstractCarrier {
         return $this->carrierFactory->get($carrierCode);
     }
 

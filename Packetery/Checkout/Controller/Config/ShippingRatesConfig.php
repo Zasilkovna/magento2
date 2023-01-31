@@ -74,6 +74,17 @@ class ShippingRatesConfig implements HttpPostActionInterface
         $config['directionId'] = $directionId; // for Packeta PP it returns null because it is provided by widget
         $config['addressValidation'] = $relatedPricingRule ? $relatedPricingRule->getAddressValidation() : AddressValidationSelect::NONE;
         $config['isAnyAddressDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($methodCodeObject->getMethod());
+        $config['isPickupPointDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isPickupPointDelivery($methodCodeObject->getMethod());
+        $config['widgetVendorCodes'] = [];
+
+        if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier) {
+            $config['widgetVendorCodes'] = $relatedPricingRule ? $relatedPricingRule->getVendorCodes() : [];
+        }
+
+        $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());
+        if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
+            $config['widgetVendorCodes'][] = $dynamicCarrier->getVendorCode();
+        }
 
         return $config;
     }
