@@ -75,15 +75,25 @@ class ShippingRatesConfig implements HttpPostActionInterface
         $config['addressValidation'] = $relatedPricingRule ? $relatedPricingRule->getAddressValidation() : AddressValidationSelect::NONE;
         $config['isAnyAddressDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($methodCodeObject->getMethod());
         $config['isPickupPointDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isPickupPointDelivery($methodCodeObject->getMethod());
-        $config['widgetVendorCodes'] = [];
+        $config['widgetVendors'] = [];
 
-        if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier) {
-            $config['widgetVendorCodes'] = $relatedPricingRule ? $relatedPricingRule->getVendorCodes() : [];
+        if ($relatedPricingRule !== null && $carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier) {
+            $vendorCodes = $relatedPricingRule->getVendorCodes() ?? [];
+
+            foreach ($vendorCodes as $vendorCode) {
+                $config['widgetVendors'][] = [
+                    'code' => $vendorCode,
+                    'selected' => true,
+                ];
+            }
         }
 
         $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());
         if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
-            $config['widgetVendorCodes'][] = $dynamicCarrier->getVendorCode();
+            $config['widgetVendors'][] = [
+                'code' => $dynamicCarrier->getVendorCode(),
+                'selected' => true,
+            ];
         }
 
         return $config;

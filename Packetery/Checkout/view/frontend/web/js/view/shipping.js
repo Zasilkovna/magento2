@@ -178,16 +178,8 @@ define(
                 };
 
                 var rateConfig = getSelectedRateConfig();
-                var vendorCodes = rateConfig.widgetVendorCodes ? rateConfig.widgetVendorCodes : [];
-                var vendors = vendorCodes.map(function(vendorCode) {
-                    return {
-                        code: vendorCode,
-                        selected: true
-                    };
-                });
-
-                if (vendors.length > 0) {
-                    options.vendors = vendors;
+                if (rateConfig.widgetVendors.length > 0) {
+                    options.vendors = rateConfig.widgetVendors;
                 }
 
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
