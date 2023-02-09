@@ -331,6 +331,7 @@ class Modifier implements ModifierInterface
                             'formElement' => 'checkboxset',
                             'dataType' => 'text',
                             'componentType' => 'field',
+                            'additionalClasses' => 'packetery-checkboxset',
                             'visible' => $carrier->hasVendorCodesOptions(),
                             'disabled' => $carrier->hasNonInteractableVendorCodesOptions(),
                             'required' => false,
