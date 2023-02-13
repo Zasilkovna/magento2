@@ -579,10 +579,8 @@ class Modifier implements ModifierInterface
                 }
             }
 
-            if ($resolvedPricingRule === null) {
-                if ($carrier->hasNonInteractableVendorCodesOptions()) {
-                    $pricingRule['vendor_codes'] = $carrier->getVendorCodesOptionsValues();
-                }
+            if ($resolvedPricingRule === null && $carrier->hasNonInteractableVendorCodesOptions()) {
+                $pricingRule['vendor_codes'] = $carrier->getVendorCodesOptionsValues();
             }
 
             $shippingMethod['pricing_rule'] = $pricingRule;

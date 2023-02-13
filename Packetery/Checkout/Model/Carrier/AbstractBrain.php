@@ -95,12 +95,12 @@ abstract class AbstractBrain
         return true;
     }
 
-	/**
-	 * @return \Magento\Shipping\Model\Rate\Result
-	 */
-	public function createRateResult(): \Magento\Shipping\Model\Rate\Result {
-		return $this->rateResultFactory->create();
-	}
+    /**
+     * @return \Magento\Shipping\Model\Rate\Result
+     */
+    public function createRateResult(): \Magento\Shipping\Model\Rate\Result {
+        return $this->rateResultFactory->create();
+    }
 
 	/**
      * @param string $carrierCode
@@ -278,12 +278,13 @@ abstract class AbstractBrain
         return [];
     }
 
-	/** dynamic carriers visible in checkout
-	 * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
-	 */
-	public function findResolvableDynamicCarriers(): array {
-		return [];
-	}
+    /** dynamic carriers visible in checkout
+     *
+     * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
+     */
+    public function findResolvableDynamicCarriers(): array {
+        return [];
+    }
 
     /** Static + dynamic countries
      * @param array $methods
