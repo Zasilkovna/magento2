@@ -358,6 +358,19 @@
                     </switcherConfig>
                 </settings>
             </field>
+            <field name="widgetVendors">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Widget vendors</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="visible" xsi:type="boolean">true</item>
+                        <item name="disabled" xsi:type="boolean">true</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="dataScope" xsi:type="string">widgetVendors</item>
+                        <item name="additionalClasses" xsi:type="string">hidden</item>
+                    </item>
+                </argument>
+            </field>
         </fieldset>
     </fieldset>
 </form>

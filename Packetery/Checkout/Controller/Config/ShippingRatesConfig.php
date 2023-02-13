@@ -7,7 +7,10 @@ namespace Packetery\Checkout\Controller\Config;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Packetery\Checkout\Model\AddressValidationSelect;
+use Packetery\Checkout\Model\Carrier\AbstractCarrier;
+use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 use Packetery\Checkout\Model\Carrier\MethodCode;
+use Packetery\Checkout\Model\Pricingrule;
 
 class ShippingRatesConfig implements HttpPostActionInterface
 {
@@ -52,7 +55,7 @@ class ShippingRatesConfig implements HttpPostActionInterface
         /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier */
         $carrier = $this->carrierFactory->create($carrierCode);
 
-        if (!$carrier instanceof \Packetery\Checkout\Model\Carrier\AbstractCarrier) {
+        if (!$carrier instanceof AbstractCarrier) {
             return $config; // rate is not from Packeta
         }
 
@@ -75,28 +78,41 @@ class ShippingRatesConfig implements HttpPostActionInterface
         $config['addressValidation'] = $relatedPricingRule ? $relatedPricingRule->getAddressValidation() : AddressValidationSelect::NONE;
         $config['isAnyAddressDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($methodCodeObject->getMethod());
         $config['isPickupPointDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isPickupPointDelivery($methodCodeObject->getMethod());
-        $config['widgetVendors'] = [];
 
-        if ($relatedPricingRule !== null && $carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier) {
+        $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());
+        $config['widgetVendors'] = self::buildWidgetVendors([$dynamicCarrier], $relatedPricingRule);
+
+        return $config;
+    }
+
+    /**
+     * @param AbstractDynamicCarrier[] $dynamicCarriers
+     * @return array<int, array>
+     */
+    public static function buildWidgetVendors(array $dynamicCarriers, ?Pricingrule $relatedPricingRule): array {
+        $widgetVendors = [];
+
+        if ($relatedPricingRule !== null) {
             $vendorCodes = $relatedPricingRule->getVendorCodes() ?? [];
 
             foreach ($vendorCodes as $vendorCode) {
-                $config['widgetVendors'][] = [
+                $widgetVendors[] = [
                     'code' => $vendorCode,
                     'selected' => true,
                 ];
             }
         }
 
-        $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());
-        if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
-            $config['widgetVendors'][] = [
-                'code' => $dynamicCarrier->getVendorCode(),
-                'selected' => true,
-            ];
+        foreach ($dynamicCarriers as $dynamicCarrier) {
+            if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
+                $widgetVendors[] = [
+                    'code' => $dynamicCarrier->getVendorCode(),
+                    'selected' => true,
+                ];
+            }
         }
 
-        return $config;
+        return $widgetVendors;
     }
 
     public function execute() {

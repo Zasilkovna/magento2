@@ -9,6 +9,7 @@ use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
 use Packetery\Checkout\Model\Carrier\Config\AbstractDynamicConfig;
 use Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect;
+use Packetery\Checkout\Model\Misc\ComboPhrase;
 
 /**
  * Use this service to extend custom carriers with new logic that is using dependencies. Good for avoiding constructor hell.
@@ -33,6 +34,9 @@ abstract class AbstractBrain
     /** @var \Magento\Shipping\Model\Rate\ResultFactory */
     protected $rateResultFactory;
 
+    /** @var \Magento\Framework\App\State */
+    protected $appState;
+
     /**
      * AbstractBrain constructor.
      *
@@ -40,19 +44,22 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
+     * @param \Magento\Framework\App\State $appState
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
-        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
+        \Magento\Framework\App\State $appState
     ) {
         $this->httpRequest = $httpRequest;
         $this->pricingService = $pricingService;
         $this->scopeConfig = $scopeConfig;
         $this->weightCalculator = $weightCalculator;
         $this->rateResultFactory = $rateResultFactory;
+        $this->appState = $appState;
     }
 
     /**
@@ -229,7 +236,21 @@ abstract class AbstractBrain
         $request = clone $request;
         $request->setPackageWeight($packeteryWeight);
 
-        return $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods, ($dynamicCarrier ? $dynamicCarrier->getCarrierId() : null));
+        $rates = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods, ($dynamicCarrier ? $dynamicCarrier->getCarrierId() : null));
+
+        if ($rates !== null && $this->appState->getAreaCode() === 'adminhtml' && $dynamicCarrier instanceof AbstractDynamicCarrier) {
+            foreach ($rates->getAllRates() as $rate) {
+                if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
+                    $rate->setMethodTitle(new ComboPhrase([VendorCodes::getLabel($dynamicCarrier->getVendorCode()), ' - ', $rate->getMethodTitle()]));
+                } else {
+                    $rate->setMethodTitle(new ComboPhrase([$rate->getCarrierTitle(), ' - ', $rate->getMethodTitle()]));
+                }
+
+                $rate->setCarrierTitle($carrier->getPacketeryConfig()->getTitle());
+            }
+        }
+
+        return $rates;
     }
 
     /**

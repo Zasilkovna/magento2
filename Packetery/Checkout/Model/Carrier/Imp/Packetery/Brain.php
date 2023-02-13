@@ -26,6 +26,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+     * @param \Magento\Framework\App\State $appState
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
@@ -34,9 +35,10 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect,
         \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
-        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
+        \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
+        \Magento\Framework\App\State $appState
     ) {
-        parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory);
+        parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory, $appState);
         $this->methodSelect = $methodSelect;
         $this->carrierCollectionFactory = $carrierCollectionFactory;
     }
