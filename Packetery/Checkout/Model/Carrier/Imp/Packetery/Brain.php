@@ -155,7 +155,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      */
     public function findResolvableDynamicCarriers(): array {
         $zpointTitle = 'Packeta internal pickup points';
-        $zboxTitle = 'Packeta - Z-BOXes';
+        $zboxTitle = 'Packeta - Z-BOX';
 
         return [
             new VendorCarrier(
@@ -173,7 +173,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
             new VendorCarrier(
                 3,
                 VendorCodes::CZALZABOX,
-                'Packeta - AlzaBoxes',
+                'Packeta - AlzaBox',
                 'CZ',
             ),
             new VendorCarrier(

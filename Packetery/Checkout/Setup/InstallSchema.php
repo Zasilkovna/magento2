@@ -271,8 +271,8 @@ class InstallSchema implements InstallSchemaInterface
                     'after' => 'carrier_code'
                 ]
             ],
-            "vendor_codes" => [
-                "type" => Table::TYPE_TEXT,
+            'vendor_codes' => [
+                'type' => Table::TYPE_TEXT,
                 'attr' => [
                     'nullable' => true,
                     'length' => '255',

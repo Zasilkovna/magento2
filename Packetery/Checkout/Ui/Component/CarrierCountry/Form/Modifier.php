@@ -133,6 +133,7 @@ class Modifier implements ModifierInterface
             $dynamicCarrier = $magentoCarrier->getPacketeryBrain()->getDynamicCarrierById((is_numeric($carrierId) ? (int)$carrierId : null));
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($carrier->getMethod(), $carrier->getCountry(), $carrier->getCarrierCode(), $carrier->getCarrierId());
             $carrierFieldLabel = $carrier->getFieldsetTitle($resolvedPricingRule);
+            $isCarrierNameUpdatable = $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater;
             $newMeta[$carrierFieldName] = [
                 'arguments' => [
                     'data' => [
@@ -203,9 +204,9 @@ class Modifier implements ModifierInterface
                                     'dataType' => 'text',
                                     'componentType' => 'field',
                                     'label' => __('Carrier name'),
-                                    'visible' => $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater,
+                                    'visible' => $isCarrierNameUpdatable,
                                     'validation' => [
-                                        'required-entry' => $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater,
+                                        'required-entry' => $isCarrierNameUpdatable,
                                     ],
                                 ],
                             ],
