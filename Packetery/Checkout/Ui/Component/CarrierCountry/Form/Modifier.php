@@ -324,7 +324,7 @@ class Modifier implements ModifierInterface
                     ],
                 ],
             ],
-            'vendor_codes' => [
+            'vendor_groups' => [
                 'arguments' => [
                     'data' => [
                         'config' => [
@@ -333,11 +333,11 @@ class Modifier implements ModifierInterface
                             'dataType' => 'text',
                             'componentType' => 'field',
                             'additionalClasses' => 'packetery-checkboxset',
-                            'visible' => $carrier->hasVendorCodesOptions(),
-                            'disabled' => $carrier->hasNonInteractableVendorCodesOptions(),
+                            'visible' => $carrier->hasVendorGroupsOptions(),
+                            'disabled' => $carrier->hasNonInteractableVendorGroupsOptions(),
                             'required' => false,
                             'multiple' => true,
-                            'options' => $carrier->getVendorCodesOptions()
+                            'options' => $carrier->getVendorGroupsOptions()
                         ],
                     ],
                 ],
@@ -571,7 +571,7 @@ class Modifier implements ModifierInterface
                 $pricingRule['free_shipment'] = $resolvedPricingRule->getFreeShipment();
                 $pricingRule['address_validation'] = $resolvedPricingRule->getAddressValidation();
                 $pricingRule['max_cod'] = $resolvedPricingRule->getMaxCOD();
-                $pricingRule['vendor_codes'] = $resolvedPricingRule->getVendorCodes() ?? [];
+                $pricingRule['vendor_groups'] = $resolvedPricingRule->getVendorGroups() ?? [];
 
                 $weightRules = $this->pricingService->getWeightRulesByPricingRule($resolvedPricingRule);
                 $pricingRule['weight_rules']['weight_rules'] = [];
@@ -580,8 +580,8 @@ class Modifier implements ModifierInterface
                 }
             }
 
-            if ($resolvedPricingRule === null && $carrier->hasNonInteractableVendorCodesOptions()) {
-                $pricingRule['vendor_codes'] = $carrier->getVendorCodesOptionsValues();
+            if ($resolvedPricingRule === null && $carrier->hasNonInteractableVendorGroupsOptions()) {
+                $pricingRule['vendor_groups'] = $carrier->getVendorCodesOptionsValues();
             }
 
             $shippingMethod['pricing_rule'] = $pricingRule;

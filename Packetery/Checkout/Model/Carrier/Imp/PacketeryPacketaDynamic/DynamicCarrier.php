@@ -24,7 +24,7 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
     /**
      * @return int
      */
-    public function getCarrierId(): int {
+    public function getDynamicCarrierId(): int {
         return $this->model->getCarrierId();
     }
 

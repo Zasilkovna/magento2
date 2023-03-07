@@ -102,8 +102,8 @@ class Facade
         foreach ($carriers as $carrier) {
             if ($carrier instanceof VendorCarrier) {
                 $vendorCodesOptions[] = [
-                    'value' => $carrier->getVendorCode(),
-                    'label' => VendorCodes::getLabel($carrier->getVendorCode()),
+                    'value' => $carrier->getGroup(),
+                    'label' => VendorGroups::getLabel($carrier->getGroup()),
                 ];
             }
         }
@@ -115,15 +115,15 @@ class Facade
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[] $carriers
      * @return string[]
      */
-    public function getVendorCodes(array $carriers): array {
-        $vendorCodes = [];
+    public function getVendorGroups(array $carriers): array {
+        $vendorGroups = [];
         foreach ($carriers as $carrier) {
             if ($carrier instanceof VendorCarrier) {
-                $vendorCodes[] = $carrier->getVendorCode();
+                $vendorGroups[] = $carrier->getGroup();
             }
         }
 
-        return $vendorCodes;
+        return $vendorGroups;
     }
 
     /**

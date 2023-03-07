@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model;
 
-use Packetery\Checkout\Model\Carrier\VendorCodes;
+use Packetery\Checkout\Model\Carrier\VendorGroups;
 
 class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
@@ -106,14 +106,14 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     /**
      * @return array|null
      */
-    public function getVendorCodes(): ?array
+    public function getVendorGroups(): ?array
     {
-        $value = $this->getData('vendor_codes');
+        $value = $this->getData('vendor_groups');
         if (empty($value)) {
             return null;
         }
 
-        return VendorCodes::decode($value);
+        return VendorGroups::decode($value);
     }
 
     /**

@@ -173,7 +173,7 @@ define(
                     appIdentity: config.packetaOptions.appIdentity,
                     country: countryCode,
                     language: config.packetaOptions.language,
-                    defaultPrice: quote.shippingMethod().amount,
+                    defaultPrice: parseFloat(quote.shippingMethod().amount),
                     defaultCurrency: config.currentStoreCurrencyCode
                 };
 

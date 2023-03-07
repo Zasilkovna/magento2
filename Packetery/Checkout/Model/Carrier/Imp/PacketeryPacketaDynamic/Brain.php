@@ -144,7 +144,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
             return null;
         }
 
-        return $dynamicCarrier->getCarrierId();
+        return $dynamicCarrier->getDynamicCarrierId();
     }
 
     /**
@@ -165,7 +165,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      */
     public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {
         $collection = $this->carrierCollectionFactory->create();
-        $collection->addFilter('carrier_id', $dynamicCarrier->getCarrierId());
+        $collection->addFilter('carrier_id', $dynamicCarrier->getDynamicCarrierId());
         $collection->setDataToAll(
             [
                 'carrier_name' => $carrierName,

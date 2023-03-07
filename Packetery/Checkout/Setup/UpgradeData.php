@@ -53,12 +53,12 @@ class UpgradeData implements UpgradeDataInterface
                 WHERE `$packeteryOrderTable`.`recipient_country_id` IS NULL
             ");
 
-            // Static vendor codes snapshot for given module version 2.3.0
-            $vendorCodesMapping = [
-                'CZ' => '["czzpoint","czalzabox","czzbox"]',
-                'SK' => '["skzpoint","skzbox"]',
-                'HU' => '["huzpoint","huzbox"]',
-                'RO' => '["rozpoint","rozbox"]',
+            // Static Vendor groups snapshot for given module version 2.3.0
+            $vendorGroupsMapping = [
+                'CZ' => '["zpoint","alzabox","zbox"]',
+                'SK' => '["zpoint","zbox"]',
+                'HU' => '["zpoint","zbox"]',
+                'RO' => '["zpoint","zbox"]',
             ];
 
             $countries = $this->pricingRuleCollectionFactory->create();
@@ -70,22 +70,22 @@ class UpgradeData implements UpgradeDataInterface
             $pricingCountries = $countries->getColumnValues('country_id');
 
             foreach ($pricingCountries as $countryId) {
-                $vendorCodesValue = $vendorCodesMapping[$countryId] ?? null;
-                if ($vendorCodesValue === null) {
+                $vendorGroupsValue = $vendorGroupsMapping[$countryId] ?? null;
+                if ($vendorGroupsValue === null) {
                     continue;
                 }
 
                 $setup->getConnection()->update(
                     'packetery_pricing_rule',
                     [
-                        'vendor_codes' => $vendorCodesValue,
+                        'vendor_groups' => $vendorGroupsValue,
                     ],
                     [
                         '`method` = ?' => 'pickupPointDelivery',
                         '`carrier_code` = ?' => 'packetery',
                         '`country_id` = ?' => $countryId,
                         new \Zend_Db_Expr('`carrier_id` IS NULL'),
-                        new \Zend_Db_Expr('`vendor_codes` IS NULL'),
+                        new \Zend_Db_Expr('`vendor_groups` IS NULL'),
                     ],
                 );
             }

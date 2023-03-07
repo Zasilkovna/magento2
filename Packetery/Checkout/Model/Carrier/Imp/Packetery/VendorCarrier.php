@@ -12,12 +12,12 @@ class VendorCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCar
     /**
      * @var int
      */
-    private $carrierId;
+    private $dynamicCarrierId;
 
     /**
      * @var string
      */
-    private $vendorCode;
+    private $group;
 
     /**
      * @var string
@@ -29,19 +29,19 @@ class VendorCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCar
      */
     private $countryId;
 
-    public function __construct(int $carrierId, string $vendorCode, string $title, string $countryId) {
-        $this->carrierId = $carrierId;
-        $this->vendorCode = $vendorCode;
+    public function __construct(int $dynamicCarrierId, string $group, string $title, string $countryId) {
+        $this->dynamicCarrierId = $dynamicCarrierId;
+        $this->group = $group;
         $this->title = $title;
         $this->countryId = $countryId;
     }
 
-    public function getCarrierId(): int {
-        return $this->carrierId;
+    public function getDynamicCarrierId(): int {
+        return $this->dynamicCarrierId;
     }
 
-    public function getVendorCode(): string {
-        return $this->vendorCode;
+    public function getGroup(): string {
+        return $this->group;
     }
 
     public function getName(): string {

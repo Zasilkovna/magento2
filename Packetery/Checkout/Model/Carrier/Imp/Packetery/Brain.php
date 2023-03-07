@@ -6,7 +6,7 @@ namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 use Packetery\Checkout\Model\Carrier\Methods;
-use Packetery\Checkout\Model\Carrier\VendorCodes;
+use Packetery\Checkout\Model\Carrier\VendorGroups;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
@@ -130,7 +130,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         }
 
         foreach ( $this->findResolvableDynamicCarriers() as $carrier ) {
-            if ($id === $carrier->getCarrierId()) {
+            if ($id === $carrier->getDynamicCarrierId()) {
                 return $carrier;
             }
         }
@@ -160,55 +160,55 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         return [
             new VendorCarrier(
                 1,
-                VendorCodes::CZZPOINT,
+                VendorGroups::ZPOINT,
                 $zpointTitle,
                 'CZ',
             ),
             new VendorCarrier(
                 2,
-                VendorCodes::CZZBOX,
+                VendorGroups::ZBOX,
                 $zboxTitle,
                 'CZ',
             ),
             new VendorCarrier(
                 3,
-                VendorCodes::CZALZABOX,
+                VendorGroups::ALZABOX,
                 'Packeta - AlzaBox',
                 'CZ',
             ),
             new VendorCarrier(
                 4,
-                VendorCodes::SKZPOINT,
+                VendorGroups::ZPOINT,
                 $zpointTitle,
                 'SK',
             ),
             new VendorCarrier(
                 5,
-                VendorCodes::SKZBOX,
+                VendorGroups::ZBOX,
                 $zboxTitle,
                 'SK',
             ),
             new VendorCarrier(
                 6,
-                VendorCodes::HUZPOINT,
+                VendorGroups::ZPOINT,
                 $zpointTitle,
                 'HU',
             ),
             new VendorCarrier(
                 7,
-                VendorCodes::HUZBOX,
+                VendorGroups::ZBOX,
                 $zboxTitle,
                 'HU',
             ),
             new VendorCarrier(
                 8,
-                VendorCodes::ROZPOINT,
+                VendorGroups::ZPOINT,
                 $zpointTitle,
                 'RO',
             ),
             new VendorCarrier(
                 9,
-                VendorCodes::ROZBOX,
+                VendorGroups::ZBOX,
                 $zboxTitle,
                 'RO',
             ),

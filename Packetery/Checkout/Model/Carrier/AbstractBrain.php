@@ -236,12 +236,12 @@ abstract class AbstractBrain
         $request = clone $request;
         $request->setPackageWeight($packeteryWeight);
 
-        $rates = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods, ($dynamicCarrier ? $dynamicCarrier->getCarrierId() : null));
+        $rates = $this->pricingService->collectRates($request, $carrier->getCarrierCode(), $config, $methods, ($dynamicCarrier ? $dynamicCarrier->getDynamicCarrierId() : null));
 
         if ($rates !== null && $this->appState->getAreaCode() === 'adminhtml' && $dynamicCarrier instanceof AbstractDynamicCarrier) {
             foreach ($rates->getAllRates() as $rate) {
                 if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
-                    $rate->setMethodTitle(new ComboPhrase([VendorCodes::getLabel($dynamicCarrier->getVendorCode()), ' - ', $rate->getMethodTitle()]));
+                    $rate->setMethodTitle(new ComboPhrase([VendorGroups::getLabel($dynamicCarrier->getGroup()), ' - ', $rate->getMethodTitle()]));
                 } else {
                     $rate->setMethodTitle(new ComboPhrase([$rate->getCarrierTitle(), ' - ', $rate->getMethodTitle()]));
                 }

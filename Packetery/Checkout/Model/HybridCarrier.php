@@ -22,13 +22,13 @@ class HybridCarrier extends \Magento\Framework\DataObject
     public static function fromAbstractDynamic(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier, string $method, string $country) {
         $hybridCarrier = new self();
         $hybridCarrier->setData('carrier_code', $carrier->getCarrierCode());
-        $hybridCarrier->setData('carrier_id', $dynamicCarrier->getCarrierId());
+        $hybridCarrier->setData('carrier_id', $dynamicCarrier->getDynamicCarrierId());
         $hybridCarrier->setData('name', $dynamicCarrier->getName());
         $hybridCarrier->setData('carrier_name', $dynamicCarrier->getFinalCarrierName());
         $hybridCarrier->setData('country', $country);
         $hybridCarrier->setData('method', $method);
-        $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getCarrierId()))->toString());
-        $hybridCarrier->setData('vendor_codes_options', []);
+        $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getDynamicCarrierId()))->toString());
+        $hybridCarrier->setData('vendor_groups_options', []);
         return $hybridCarrier;
     }
 
@@ -57,7 +57,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier->setData('country', $country);
         $hybridCarrier->setData('method', $method);
         $hybridCarrier->setData('method_code', (new MethodCode($method, null))->toString());
-        $hybridCarrier->setData('vendor_codes_options', $vendorCodeOptions);
+        $hybridCarrier->setData('vendor_groups_options', $vendorCodeOptions);
         return $hybridCarrier;
     }
 
@@ -146,8 +146,8 @@ class HybridCarrier extends \Magento\Framework\DataObject
     /**
      * @return array
      */
-    public function getVendorCodesOptions(): array {
-        return $this->getData('vendor_codes_options');
+    public function getVendorGroupsOptions(): array {
+        return $this->getData('vendor_groups_options');
     }
 
     /**
@@ -158,15 +158,15 @@ class HybridCarrier extends \Magento\Framework\DataObject
             static function (array $options): string {
                 return $options['value'];
             },
-            $this->getVendorCodesOptions()
+            $this->getVendorGroupsOptions()
         );
     }
 
-    public function hasVendorCodesOptions(): bool {
-        return !empty($this->getVendorCodesOptions());
+    public function hasVendorGroupsOptions(): bool {
+        return !empty($this->getVendorGroupsOptions());
     }
 
-    public function hasNonInteractableVendorCodesOptions(): bool {
-        return count($this->getVendorCodesOptions()) <= 2;
+    public function hasNonInteractableVendorGroupsOptions(): bool {
+        return count($this->getVendorGroupsOptions()) <= 2;
     }
 }

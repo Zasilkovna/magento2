@@ -73,14 +73,14 @@ class DataProvider extends AbstractDataProvider
 
                 if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier && $dynamicCarrier === null) {
                     $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($order->getShippingAddress()->getCountryId(), [$methodCode->getMethod()]);
-                    $widgetVendors = ShippingRatesConfig::buildWidgetVendors(
+                    $widgetVendors = ShippingRatesConfig::createWidgetVendors(
                         $dynamicCarriers,
                         null
                     );
                 }
 
                 if ($dynamicCarrier !== null) {
-                    $widgetVendors = ShippingRatesConfig::buildWidgetVendors(
+                    $widgetVendors = ShippingRatesConfig::createWidgetVendors(
                         [$dynamicCarrier],
                         null
                     );

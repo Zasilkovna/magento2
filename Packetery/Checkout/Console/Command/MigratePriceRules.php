@@ -135,7 +135,7 @@ class MigratePriceRules extends Command
             $pricingRule = [
                 'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                 'carrier_id' => null,
-                'vendor_codes' => $this->carrierFacade->getVendorCodes($dynamicCarriers) ?: null,
+                'vendor_groups' => $this->carrierFacade->getVendorGroups($dynamicCarriers) ?: null,
                 'enabled' => false,
                 'free_shipment' => (is_numeric($countryFreeShipping) ? (float)$countryFreeShipping : null),
                 'country_id' => $countryId,
