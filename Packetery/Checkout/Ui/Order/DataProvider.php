@@ -20,6 +20,9 @@ class DataProvider extends AbstractDataProvider
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
 
+    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
+    private $featureFlagManager;
+
     /**
      * DataProvider constructor.
      *
@@ -39,6 +42,7 @@ class DataProvider extends AbstractDataProvider
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
+        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager,
         array $meta = [],
         array $data = []
     ) {
@@ -46,6 +50,7 @@ class DataProvider extends AbstractDataProvider
         $this->collection = $collectionFactory->create();
         $this->orderFactory = $orderFactory;
         $this->carrierFacade = $carrierFacade;
+        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -68,22 +73,24 @@ class DataProvider extends AbstractDataProvider
                 $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = (Methods::isAnyAddressDelivery($methodCode->getMethod()) ? '1' : '0');
                 $widgetVendors = [];
 
-                $carrier = $this->carrierFacade->getMagentoCarrier($shippingRateCode->getCarrierCode());
-                $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCode->getDynamicCarrierId());
+                if ($this->featureFlagManager->isSplitActive()) {
+                    $carrier = $this->carrierFacade->getMagentoCarrier($shippingRateCode->getCarrierCode());
+                    $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCode->getDynamicCarrierId());
 
-                if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier && $dynamicCarrier === null) {
-                    $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($order->getShippingAddress()->getCountryId(), [$methodCode->getMethod()]);
-                    $widgetVendors = ShippingRatesConfig::createWidgetVendors(
-                        $dynamicCarriers,
-                        null
-                    );
-                }
+                    if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier && $dynamicCarrier === null) {
+                        $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($order->getShippingAddress()->getCountryId(), [$methodCode->getMethod()]);
+                        $widgetVendors = ShippingRatesConfig::createWidgetVendors(
+                            $dynamicCarriers,
+                            null
+                        );
+                    }
 
-                if ($dynamicCarrier !== null) {
-                    $widgetVendors = ShippingRatesConfig::createWidgetVendors(
-                        [$dynamicCarrier],
-                        null
-                    );
+                    if ($dynamicCarrier !== null) {
+                        $widgetVendors = ShippingRatesConfig::createWidgetVendors(
+                            [$dynamicCarrier],
+                            null
+                        );
+                    }
                 }
 
                 $result[$item->getId()]['general']['misc']['widgetVendors'] = json_encode($widgetVendors, JSON_THROW_ON_ERROR);

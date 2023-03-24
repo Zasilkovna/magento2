@@ -131,3 +131,5 @@
 "Internal pickup points","Interní výdejní místa"
 "Allowed pickup point types","Povolené typy výdejních míst"
 "Check at least two types of pickup points or set corresponding separate carriers","Zaškrtněte alespoň dva typy výdejních míst nebo nastavte odpovídajícího samostatné přepravce."
+"We've just turned on new options for setting up your Packeta pickup points. You can now choose a different price for a Z-Box or a pickup point in the pricing rules settings. More information can be found in the plugin documentation.","Právě jsme vám zapnuli nové možnosti nastavení výdejních míst Zásikovny. Nyní si v nastavení cenových pravidel můžete zvolit jinou cenu pro Z-Box nebo výdejní místo. Více informací najdete v dokumentaci pluginu"
+"New feature was enabled","Nová funkce byla povolena"

@@ -27,6 +27,9 @@ class ShippingRatesConfig implements HttpPostActionInterface
     /** @var \Packetery\Checkout\Model\Pricing\Service */
     private $pricingService;
 
+    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
+    private $featureFlagManager;
+
     /**
      * ShippingRateConfig constructor.
      *
@@ -34,12 +37,20 @@ class ShippingRatesConfig implements HttpPostActionInterface
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
      */
-    public function __construct(\Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory, \Magento\Framework\App\RequestInterface $request, \Magento\Shipping\Model\CarrierFactory $carrierFactory, \Packetery\Checkout\Model\Pricing\Service $pricingService) {
+    public function __construct(
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Framework\App\RequestInterface $request,
+        \Magento\Shipping\Model\CarrierFactory $carrierFactory,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
+    ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->request = $request;
         $this->carrierFactory = $carrierFactory;
         $this->pricingService = $pricingService;
+        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -79,9 +90,12 @@ class ShippingRatesConfig implements HttpPostActionInterface
         $config['addressValidation'] = $relatedPricingRule ? $relatedPricingRule->getAddressValidation() : AddressValidationSelect::NONE;
         $config['isAnyAddressDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($methodCodeObject->getMethod());
         $config['isPickupPointDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isPickupPointDelivery($methodCodeObject->getMethod());
+        $config['widgetVendors'] = [];
 
-        $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());
-        $config['widgetVendors'] = self::createWidgetVendors([$dynamicCarrier], $relatedPricingRule);
+        if ($this->featureFlagManager->isSplitActive()) {
+            $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());
+            $config['widgetVendors'] = self::createWidgetVendors([$dynamicCarrier], $relatedPricingRule);
+        }
 
         return $config;
     }

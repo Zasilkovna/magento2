@@ -16,6 +16,9 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
     private $carrierCollectionFactory;
 
+    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
+    private $featureFlagManager;
+
     /**
      * Brain constructor.
      *
@@ -36,11 +39,13 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
-        \Magento\Framework\App\State $appState
+        \Magento\Framework\App\State $appState,
+        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
     ) {
         parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory, $appState);
         $this->methodSelect = $methodSelect;
         $this->carrierCollectionFactory = $carrierCollectionFactory;
+        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -156,6 +161,10 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     public function findResolvableDynamicCarriers(): array {
         $zpointTitle = 'Packeta internal pickup points';
         $zboxTitle = 'Packeta - Z-BOX';
+
+        if (!$this->featureFlagManager->isSplitActive()) {
+            return [];
+        }
 
         return [
             new VendorCarrier(

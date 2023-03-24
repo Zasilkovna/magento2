@@ -28,6 +28,9 @@ class Modifier implements ModifierInterface
     /** @var \Packetery\Checkout\Model\AddressValidationSelect */
     private $addressValidationSelect;
 
+    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager  */
+    private $featureFlagManager;
+
     /**
      * Modifier constructor.
      *
@@ -44,7 +47,8 @@ class Modifier implements ModifierInterface
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
-        \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect
+        \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect,
+        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
     ) {
         $this->carrierCollectionFactory = $carrierCollectionFactory;
         $this->request = $request;
@@ -52,6 +56,7 @@ class Modifier implements ModifierInterface
         $this->pricingService = $pricingService;
         $this->carrierFacade = $carrierFacade;
         $this->addressValidationSelect = $addressValidationSelect;
+        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -333,7 +338,7 @@ class Modifier implements ModifierInterface
                             'dataType' => 'text',
                             'componentType' => 'field',
                             'additionalClasses' => 'packetery-checkboxset',
-                            'visible' => $carrier->hasVendorGroupsOptions(),
+                            'visible' => $carrier->hasVendorGroupsOptions() && $this->featureFlagManager->isSplitActive(),
                             'disabled' => $carrier->hasNonInteractableVendorGroupsOptions(),
                             'required' => false,
                             'multiple' => true,
