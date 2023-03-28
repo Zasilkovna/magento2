@@ -102,7 +102,7 @@ abstract class AbstractBrain
         return $this->rateResultFactory->create();
     }
 
-	/**
+     /**
      * @param string $carrierCode
      * @param mixed $scope
      * @return mixed
