@@ -38,7 +38,7 @@ class SplitFlag extends \Magento\Framework\Flag
     }
 
     public function isActive(): bool {
-        $data = $this->getFlagData();
+        $data = $this->getFlagDataAsArray();
         if (!isset($data['active'])) {
             return false;
         }
@@ -47,7 +47,7 @@ class SplitFlag extends \Magento\Framework\Flag
     }
 
     public function getLastFetchTime(): ?\DateTimeImmutable {
-        $data = $this->getFlagData();
+        $data = $this->getFlagDataAsArray();
         if (!isset($data['lastFetchTime'])) {
             return null;
         }
@@ -55,7 +55,7 @@ class SplitFlag extends \Magento\Framework\Flag
         return \DateTimeImmutable::createFromFormat(\DateTimeImmutable::ATOM, $data['lastFetchTime'], new \DateTimeZone('UTC'));
     }
 
-    public function getFlagDataAsArray(): array {
+    private function getFlagDataAsArray(): array {
         $flagData = $this->getFlagData();
         if (!is_array($flagData)) {
             return [];
