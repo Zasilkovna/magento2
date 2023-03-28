@@ -83,7 +83,7 @@ class Manager
 
         try {
             $response = $this->client->get(
-                sprintf('https://pes-features-test.packeta-com.codenow.com/v1/magento?api-key=%s', $apiKey),
+                sprintf('https://pes-features-test.packeta-com.codenow.com/v1/magento?api_key=%s', $apiKey),
                 [
                     'timeout' => 5, // seconds
                 ]
