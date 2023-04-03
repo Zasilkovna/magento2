@@ -25,6 +25,9 @@ class MigrateDefaultPrice extends Command
     /** @var \Magento\Framework\App\Config\ValueFactory */
     private $configValueFactory;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     /**
      * MigratePriceRules constructor.
      *
@@ -33,13 +36,15 @@ class MigrateDefaultPrice extends Command
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ValueFactory $configValueFactory
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
     public function __construct(
         \Magento\Config\Model\Config\Factory $configFactory,
         \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
-        \Magento\Framework\App\Config\ValueFactory $configValueFactory
+        \Magento\Framework\App\Config\ValueFactory $configValueFactory,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
     ) {
         parent::__construct();
         $this->configFactory = $configFactory;
@@ -47,6 +52,7 @@ class MigrateDefaultPrice extends Command
         $this->packeteryCarrier = $packeteryCarrier;
         $this->pricingService = $pricingService;
         $this->configValueFactory = $configValueFactory;
+        $this->carrierFacade = $carrierFacade;
     }
 
     protected function configure(): void {
@@ -99,9 +105,12 @@ class MigrateDefaultPrice extends Command
                 $resolvedPricingRule = $this->pricingService->resolvePricingRule($allowedMethod, $country, \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::getCarrierCodeStatic());
 
                 if ($resolvedPricingRule === null) {
+                    $dynamicCarriers = $brain->findConfigurableDynamicCarriers($country, [$allowedMethod]);
+
                     $pricingRule = [
                         'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                         'carrier_id' => null,
+                        'vendor_groups' => $this->carrierFacade->getVendorGroups($dynamicCarriers) ?: null,
                         'enabled' => false,
                         'free_shipment' => null,
                         'country_id' => $country,

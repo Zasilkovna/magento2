@@ -89,6 +89,11 @@ class MultiSave extends Action implements HttpPostActionInterface
             $hybridCarrier = $this->carrierFacade->createHybridCarrier($carrierCode, $carrierId, $method, $country);
             $carrierPublicName = $hybridCarrier->getFieldsetTitle();
 
+            if ($hybridCarrier->hasVendorGroupsOptions() && (empty($pricingRule['vendor_groups']) || count($pricingRule['vendor_groups']) < 2)) {
+                $this->messageManager->addErrorMessage(new ComboPhrase([$carrierPublicName, '-', __('Check at least two types of pickup points or set corresponding separate carriers')], ' '));
+                continue;
+            }
+
             try {
                 $this->pricingruleRepository->savePricingRule($pricingRule, $weightRules);
             } catch (\Packetery\Checkout\Model\Exception\DuplicateCountry $e) {

@@ -225,6 +225,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'after' => 'recipient_longitude'
                 ]
             );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_pricing_rule'),
+                'vendor_groups',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'length' => '255',
+                    'comment' => 'Vendor groups',
+                    'after' => 'carrier_id'
+                ]
+            );
         }
 
         $setup->endSetup();

@@ -11,13 +11,21 @@ class UpgradeData implements UpgradeDataInterface
     /** @var \Magento\Config\Model\Config\Factory */
     private $configFactory;
 
+    /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory  */
+    private $pricingRuleCollectionFactory;
+
     /**
      * UpgradeData constructor.
      *
      * @param \Magento\Config\Model\Config\Factory $configFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
      */
-    public function __construct(\Magento\Config\Model\Config\Factory $configFactory) {
+    public function __construct(
+        \Magento\Config\Model\Config\Factory $configFactory,
+        \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
+    ) {
         $this->configFactory = $configFactory;
+        $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
     }
 
     /**
@@ -44,6 +52,43 @@ class UpgradeData implements UpgradeDataInterface
                 SET `$packeteryOrderTable`.`recipient_country_id` = `$salesOrderAddressTable`.`country_id`
                 WHERE `$packeteryOrderTable`.`recipient_country_id` IS NULL
             ");
+
+            // Static Vendor groups snapshot for given module version 2.3.0
+            $vendorGroupsMapping = [
+                'CZ' => '["zpoint","alzabox","zbox"]',
+                'SK' => '["zpoint","zbox"]',
+                'HU' => '["zpoint","zbox"]',
+                'RO' => '["zpoint","zbox"]',
+            ];
+
+            $countries = $this->pricingRuleCollectionFactory->create();
+            $countries
+                ->getSelect()
+                ->reset(\Magento\Framework\DB\Select::COLUMNS)
+                ->columns('country_id')
+                ->group('country_id');
+            $pricingCountries = $countries->getColumnValues('country_id');
+
+            foreach ($pricingCountries as $countryId) {
+                $vendorGroupsValue = $vendorGroupsMapping[$countryId] ?? null;
+                if ($vendorGroupsValue === null) {
+                    continue;
+                }
+
+                $setup->getConnection()->update(
+                    'packetery_pricing_rule',
+                    [
+                        'vendor_groups' => $vendorGroupsValue,
+                    ],
+                    [
+                        '`method` = ?' => 'pickupPointDelivery',
+                        '`carrier_code` = ?' => 'packetery',
+                        '`country_id` = ?' => $countryId,
+                        new \Zend_Db_Expr('`carrier_id` IS NULL'),
+                        new \Zend_Db_Expr('`vendor_groups` IS NULL'),
+                    ],
+                );
+            }
         }
     }
 }

@@ -43,9 +43,23 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
      */
     public function collectRates(RateRequest $request)
     {
-        $result = $this->packeteryBrain->collectRates($this, $request);
-        if ($result === null) {
-            return false;
+        $result = $this->packeteryBrain->createRateResult();
+        $dynamicCarriers = $this->packeteryBrain->findResolvableDynamicCarriers();
+
+        foreach ($dynamicCarriers as $dynamicCarrier) {
+            $dynamicCarrierResult = $this->packeteryBrain->collectRates($this, $request, $dynamicCarrier);
+            if ($dynamicCarrierResult !== null) {
+                $result->append($dynamicCarrierResult);
+            }
+        }
+
+        if ($this->packeteryBrain->isAssignableToPricingRule() === false) {
+            return $result;
+        }
+
+        $carrierResult = $this->packeteryBrain->collectRates($this, $request);
+        if ($carrierResult !== null) {
+            $result->append($carrierResult);
         }
 
         return $result;

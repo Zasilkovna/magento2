@@ -9,7 +9,7 @@ abstract class AbstractDynamicCarrier
     /**
      * @return int
      */
-    abstract public function getCarrierId(): int;
+    abstract public function getDynamicCarrierId(): int;
 
     /**
      * @return string

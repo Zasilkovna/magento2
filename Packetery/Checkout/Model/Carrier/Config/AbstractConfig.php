@@ -15,11 +15,15 @@ abstract class AbstractConfig
     /**
      * AbstractConfig constructor.
      *
-     * @param array $data
+     * @param array|null $data
      */
-    public function __construct(array $data)
+    public function __construct(?array $data)
     {
-        $this->data = $data;
+        $this->data = $data ?? [];
+    }
+
+    public function toArray(): array {
+        return $this->data;
     }
 
     /**

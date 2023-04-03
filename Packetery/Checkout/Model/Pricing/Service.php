@@ -105,6 +105,8 @@ class Service
 
         if ($carrierId !== null) {
             $pricingRuleCollection->addFilter('carrier_id', $carrierId);
+        } else {
+            $pricingRuleCollection->addFieldToFilter('carrier_id', ['null' => true]);
         }
 
         return ($pricingRuleCollection->getFirstRecord() ?: null);

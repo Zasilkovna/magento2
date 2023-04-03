@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
+use Packetery\Checkout\Model\Carrier\IDynamicCarrierNameUpdater;
 
-class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
+class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements IDynamicCarrierNameUpdater
 {
     /** @var \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect */
     private $methodSelect;
 
     /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
     private $carrierCollectionFactory;
-
-    /** @var \Magento\Shipping\Model\Rate\ResultFactory */
-    private $rateResultFactory;
 
     /**
      * Brain constructor.
@@ -27,6 +25,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
+     * @param \Magento\Framework\App\State $appState
      */
     public function __construct(
         \Magento\Framework\App\Request\Http $httpRequest,
@@ -35,12 +34,12 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect $methodSelect,
         \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
-        \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
+        \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
+        \Magento\Framework\App\State $appState
     ) {
-        parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator);
+        parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory, $appState);
         $this->methodSelect = $methodSelect;
         $this->carrierCollectionFactory = $carrierCollectionFactory;
-        $this->rateResultFactory = $rateResultFactory;
     }
 
     /**
@@ -49,13 +48,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      */
     public function createConfig(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
         return new Config($this->getConfigData($carrier->getCarrierCode(), $carrier->getStore()));
-    }
-
-    /**
-     * @return \Magento\Shipping\Model\Rate\Result
-     */
-    public function createRateResult(): \Magento\Shipping\Model\Rate\Result {
-        return $this->rateResultFactory->create();
     }
 
     /** Represents all possible methods for all dynamic carriers
@@ -85,6 +77,10 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier|null
      */
     public function getDynamicCarrierById(?int $dynamicCarrierId): ?AbstractDynamicCarrier {
+        if ($dynamicCarrierId === null) {
+            return null;
+        }
+
         $model = $this->carrierCollectionFactory->create()->getItemByColumnValue('carrier_id', $dynamicCarrierId);
         if ($model === null) {
             return null;
@@ -94,14 +90,21 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
-     * @return array
+     * @return DynamicCarrier[]
      */
     public function findResolvableDynamicCarriers(): array {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->resolvableOnly();
         $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
-        return $collection->getItems();
+        $items = $collection->getItems();
+
+        return array_map(
+            function (\Packetery\Checkout\Model\Carrier $carrier) {
+                return new DynamicCarrier($carrier);
+            },
+            $items
+        );
     }
 
     /**
@@ -141,7 +144,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
             return null;
         }
 
-        return $dynamicCarrier->getCarrierId();
+        return $dynamicCarrier->getDynamicCarrierId();
     }
 
     /**
@@ -162,7 +165,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      */
     public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {
         $collection = $this->carrierCollectionFactory->create();
-        $collection->addFilter('carrier_id', $dynamicCarrier->getCarrierId());
+        $collection->addFilter('carrier_id', $dynamicCarrier->getDynamicCarrierId());
         $collection->setDataToAll(
             [
                 'carrier_name' => $carrierName,

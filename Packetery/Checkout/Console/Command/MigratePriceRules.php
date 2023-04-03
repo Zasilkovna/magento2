@@ -20,19 +20,29 @@ class MigratePriceRules extends Command
     /** @var \Magento\Framework\App\Config\ValueFactory */
     private $configValueFactory;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     /**
      * MigratePriceRules constructor.
      *
      * @param \Magento\Config\Model\Config\Factory $configFactory
      * @param \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository
      * @param \Magento\Framework\App\Config\ValueFactory $configValueFactory
+     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
-    public function __construct(\Magento\Config\Model\Config\Factory $configFactory, \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository, \Magento\Framework\App\Config\ValueFactory $configValueFactory)
+    public function __construct(
+        \Magento\Config\Model\Config\Factory $configFactory,
+        \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
+        \Magento\Framework\App\Config\ValueFactory $configValueFactory,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+    )
     {
         parent::__construct();
         $this->configFactory = $configFactory;
         $this->pricingruleRepository = $pricingruleRepository;
         $this->configValueFactory = $configValueFactory;
+        $this->carrierFacade = $carrierFacade;
     }
 
     /**
@@ -66,6 +76,9 @@ class MigratePriceRules extends Command
         $output->writeln("Migration started");
 
         $configModel = $this->configFactory->create();
+        $brain = $this->carrierFacade
+            ->getMagentoCarrier(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic())
+            ->getPacketeryBrain();
 
         $apiKey = $configModel->getConfigDataValue('widget/options/api_key');
         $codMethods = $configModel->getConfigDataValue('packetery_cod/general/payment_methods');
@@ -116,12 +129,16 @@ class MigratePriceRules extends Command
                 'price' => (float)$countryDefaultPrice
             ];
 
+            $countryId = strtoupper($country);
+            $dynamicCarriers = $brain->findConfigurableDynamicCarriers($countryId, [Methods::PICKUP_POINT_DELIVERY]);
+
             $pricingRule = [
                 'carrier_code' => \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(),
                 'carrier_id' => null,
+                'vendor_groups' => $this->carrierFacade->getVendorGroups($dynamicCarriers) ?: null,
                 'enabled' => false,
                 'free_shipment' => (is_numeric($countryFreeShipping) ? (float)$countryFreeShipping : null),
-                'country_id' => strtoupper($country),
+                'country_id' => $countryId,
                 'method' => Methods::PICKUP_POINT_DELIVERY,
             ];
 

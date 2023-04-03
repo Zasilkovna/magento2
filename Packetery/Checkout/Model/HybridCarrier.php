@@ -22,12 +22,13 @@ class HybridCarrier extends \Magento\Framework\DataObject
     public static function fromAbstractDynamic(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier, string $method, string $country) {
         $hybridCarrier = new self();
         $hybridCarrier->setData('carrier_code', $carrier->getCarrierCode());
-        $hybridCarrier->setData('carrier_id', $dynamicCarrier->getCarrierId());
+        $hybridCarrier->setData('carrier_id', $dynamicCarrier->getDynamicCarrierId());
         $hybridCarrier->setData('name', $dynamicCarrier->getName());
         $hybridCarrier->setData('carrier_name', $dynamicCarrier->getFinalCarrierName());
         $hybridCarrier->setData('country', $country);
         $hybridCarrier->setData('method', $method);
-        $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getCarrierId()))->toString());
+        $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getDynamicCarrierId()))->toString());
+        $hybridCarrier->setData('vendor_groups_options', []);
         return $hybridCarrier;
     }
 
@@ -35,9 +36,10 @@ class HybridCarrier extends \Magento\Framework\DataObject
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @param string $method
      * @param string $country
+     * @param array $vendorCodeOptions
      * @return static
      */
-    public static function fromAbstract(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, string $method, string $country): self {
+    public static function fromAbstract(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, string $method, string $country, array $vendorCodeOptions): self {
         $hybridCarrier = new self();
         $hybridCarrier->setData('carrier_code', $carrier->getCarrierCode());
         $hybridCarrier->setData('carrier_id');
@@ -47,7 +49,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
             $postfix = 'HD';
         }
         if (\Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY === $method) {
-            $postfix = 'PP';
+            $postfix = 'pickup points';
         }
 
         $hybridCarrier->setData('name', "$country {$carrier->getPacketeryConfig()->getTitle()} $postfix");
@@ -55,6 +57,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier->setData('country', $country);
         $hybridCarrier->setData('method', $method);
         $hybridCarrier->setData('method_code', (new MethodCode($method, null))->toString());
+        $hybridCarrier->setData('vendor_groups_options', $vendorCodeOptions);
         return $hybridCarrier;
     }
 
@@ -138,5 +141,32 @@ class HybridCarrier extends \Magento\Framework\DataObject
      */
     public function getDeleted(): bool {
         return (bool)$this->getData('deleted');
+    }
+
+    /**
+     * @return array
+     */
+    public function getVendorGroupsOptions(): array {
+        return $this->getData('vendor_groups_options');
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getVendorCodesOptionsValues(): array {
+        return array_map(
+            static function (array $options): string {
+                return $options['value'];
+            },
+            $this->getVendorGroupsOptions()
+        );
+    }
+
+    public function hasVendorGroupsOptions(): bool {
+        return !empty($this->getVendorGroupsOptions());
+    }
+
+    public function hasNonInteractableVendorGroupsOptions(): bool {
+        return count($this->getVendorGroupsOptions()) <= 2;
     }
 }

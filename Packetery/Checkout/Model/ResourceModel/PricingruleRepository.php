@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\ResourceModel;
 
+use Packetery\Checkout\Model\Carrier\VendorGroups;
+
 class PricingruleRepository
 {
     /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory  */
@@ -119,6 +121,14 @@ class PricingruleRepository
 
         /** @var \Packetery\Checkout\Model\Pricingrule|null $item */
         $item = null;
+
+        if (empty($postData['vendor_groups'])) {
+            $postData['vendor_groups'] = null;
+        }
+
+        if (is_array($postData['vendor_groups'])) {
+            $postData['vendor_groups'] = VendorGroups::encode($postData['vendor_groups']);
+        }
 
         /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection $collection */
         $collection = $this->pricingRuleCollectionFactory->create();

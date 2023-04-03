@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model;
 
+use Packetery\Checkout\Model\Carrier\VendorGroups;
+
 class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
     const CACHE_TAG = 'packetery_checkout_pricingrule';
@@ -99,6 +101,19 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
         }
 
         return null;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getVendorGroups(): ?array
+    {
+        $value = $this->getData('vendor_groups');
+        if (empty($value)) {
+            return null;
+        }
+
+        return VendorGroups::decode($value);
     }
 
     /**

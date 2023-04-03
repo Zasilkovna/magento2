@@ -32,24 +32,6 @@ class Carrier extends \Packetery\Checkout\Model\Carrier\AbstractCarrier
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function collectRates(RateRequest $request)
-    {
-        $result = $this->packeteryBrain->createRateResult();
-        $dynamicCarriers = $this->packeteryBrain->findResolvableDynamicCarriers();
-
-        foreach ($dynamicCarriers as $dynamicCarrier) {
-            $dynamicCarrierResult = $this->packeteryBrain->collectRates($this, $request, new DynamicCarrier($dynamicCarrier));
-            if ($dynamicCarrierResult !== null) {
-                $result->append($dynamicCarrierResult);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain
      */
     public function getPacketeryBrain(): \Packetery\Checkout\Model\Carrier\AbstractBrain {

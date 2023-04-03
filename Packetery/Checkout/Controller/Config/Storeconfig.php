@@ -62,6 +62,7 @@ class Storeconfig implements HttpGetActionInterface
                 'appIdentity' => $this->helperData->getPacketeryAppIdentity(),
                 'language' => $this->helperData->getShortLocale(),
             ];
+            $config['currentStoreCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
 
             $response = [
                 'success' => true,

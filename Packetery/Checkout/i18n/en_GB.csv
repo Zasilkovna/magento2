@@ -128,3 +128,8 @@
 "Order detail","Order detail"
 "Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.","Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier."
 "Max COD","Max COD"
+"Internal pickup points","Internal pickup points"
+"Allowed pickup point types","Allowed pickup point types"
+"Check at least two types of pickup points or set corresponding separate carriers","Check at least two types of pickup points or set corresponding separate carriers"
+"We've just turned on new options for setting up your Packeta pickup points. You can now choose a different price for a Z-Box or a pickup point in the pricing rules settings. More information can be found in the plugin documentation.","We've just turned on new options for setting up your Packeta pickup points. You can now choose a different price for a Z-Box or a pickup point in the pricing rules settings. More information can be found in the plugin documentation."
+"New feature was enabled","New feature was enabled"
