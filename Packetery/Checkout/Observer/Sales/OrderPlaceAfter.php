@@ -313,6 +313,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 	{
         /** @var \Packetery\Checkout\Model\ResourceModel\Order\Collection $collection */
         $collection = $this->orderCollectionFactory->create();
+        $collection->getSelect()->where('0');
         $order = $collection->getNewEmptyItem();
         $order->setData($data);
         $collection->addItem($order);
