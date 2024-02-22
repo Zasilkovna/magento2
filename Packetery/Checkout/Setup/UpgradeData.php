@@ -76,7 +76,7 @@ class UpgradeData implements UpgradeDataInterface
                 }
 
                 $setup->getConnection()->update(
-                    'packetery_pricing_rule',
+                    $setup->getTable('packetery_pricing_rule'),
                     [
                         'vendor_groups' => $vendorGroupsValue,
                     ],
