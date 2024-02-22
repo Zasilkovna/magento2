@@ -34,25 +34,19 @@ class Modifier implements ModifierInterface
     /**
      * Modifier constructor.
      *
-     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Magento\Framework\App\RequestInterface $request
-     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      * @param \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect
      */
     public function __construct(
-        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Magento\Framework\App\RequestInterface $request,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packeteryCarrier,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
         \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect,
         \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
     ) {
-        $this->carrierCollectionFactory = $carrierCollectionFactory;
         $this->request = $request;
-        $this->packeteryCarrier = $packeteryCarrier;
         $this->pricingService = $pricingService;
         $this->carrierFacade = $carrierFacade;
         $this->addressValidationSelect = $addressValidationSelect;
