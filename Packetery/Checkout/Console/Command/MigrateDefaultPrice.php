@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Console\Command;
 
+use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -65,7 +66,7 @@ class MigrateDefaultPrice extends Command
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @return int|void
+     * @return int
      * @throws \Packetery\Checkout\Model\Exception\PricingRuleNotFound
      * @throws \Packetery\Checkout\Model\Exception\WeightRuleMissing
      */
@@ -76,7 +77,7 @@ class MigrateDefaultPrice extends Command
 
         if ($configDataCollection->getSize() > 0) {
             $output->writeln("Multi scope not supported");
-            return;
+            return Cli::RETURN_SUCCESS;
         }
 
         $configModel = $this->configFactory->create();
@@ -88,7 +89,7 @@ class MigrateDefaultPrice extends Command
 
         if (!is_numeric($defaultPrice)) {
             $output->writeln("Unable to migrate. Default price is missing.");
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         $output->writeln("Migration started");
@@ -140,5 +141,7 @@ class MigrateDefaultPrice extends Command
         }
 
         $output->writeln("Migration finished");
+
+        return Cli::RETURN_SUCCESS;
     }
 }

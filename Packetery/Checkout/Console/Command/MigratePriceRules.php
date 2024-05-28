@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Console\Command;
 
+use Magento\Framework\Console\Cli;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,7 +60,7 @@ class MigratePriceRules extends Command
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @return int|void
+     * @return int
      * @throws \Packetery\Checkout\Model\Exception\PricingRuleNotFound
      * @throws \Packetery\Checkout\Model\Exception\WeightRuleMissing
      */
@@ -70,7 +71,7 @@ class MigratePriceRules extends Command
 
         if ($configDataCollection->getSize() > 0) {
             $output->writeln("Multi scope not supported");
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         $output->writeln("Migration started");
@@ -207,5 +208,7 @@ class MigratePriceRules extends Command
         }
 
         $output->writeln("Migration finished");
+
+        return Cli::RETURN_SUCCESS;
     }
 }

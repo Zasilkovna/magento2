@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Console\Command;
 
+use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -70,7 +71,7 @@ class ImportFeedCarriers extends Command
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @return int|void
+     * @return int
      * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
@@ -83,7 +84,7 @@ class ImportFeedCarriers extends Command
 
         if (empty($data) || !isset($data->carriers)) {
             $output->writeln('An error has occurred');
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
@@ -140,6 +141,8 @@ class ImportFeedCarriers extends Command
         $this->pricingRuleRepository->disablePricingRulesExcept($rules);
 
         $output->writeln('Carrier feed import ended successfully');
+
+        return Cli::RETURN_SUCCESS;
     }
 
     /**
