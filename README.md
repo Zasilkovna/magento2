@@ -4,7 +4,7 @@
 
 ### Download module
 
-[Current version 2.2.2](https://github.com/Zasilkovna/magento2/archive/v2.2.2.zip)
+[Download the latest version](https://github.com/Zasilkovna/magento2/releases/latest)
 
 ### Installation
 
@@ -62,8 +62,9 @@ Price rules are created as unavailable, without set maximum weight.
 
 #### Supported versions:
 
-- Magento 2.3, 2.4
-- If you have a problem using the module, please contact us by email: [support@packeta.com](mailto:support@packeta.com)
+- Magento 2.4
+- php 7.4 - 8.2
+- If you have a problem using the module, please contact us by email: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com)
 
 #### Supported features:
 
@@ -94,7 +95,7 @@ Price rules are created as unavailable, without set maximum weight.
 
 ### Stažení modulu
 
-[Aktuální verze 2.2.2](https://github.com/Zasilkovna/magento2/archive/v2.2.2.zip)
+[Stáhnout nejnovější verzi](https://github.com/Zasilkovna/magento2/releases/latest)
 
 ### Instalace
 
@@ -154,8 +155,9 @@ Cenová pravidla jsou vytvořena jako nedostupná, bez nastavené maximální hm
 
 #### Podporované verze:
 
-- Magento 2.3, 2.4
-- Při problému s použitím modulu nás kontaktujte na emailu: [technicka.podpora@zasilkovna.cz](mailto:technicka.podpora@zasilkovna.cz)
+- Magento 2.4
+- php 7.4 - 8.2
+- Při problému s použitím modulu nás kontaktujte na emailu: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com)
 
 #### Poskytované funkce:
 
