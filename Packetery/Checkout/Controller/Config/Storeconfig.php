@@ -57,6 +57,7 @@ class Storeconfig implements HttpGetActionInterface
         try {
             $config = [];
             $config['apiKey'] = $this->packeteryConfig->getApiKey();
+            $config['apiPassword'] = $this->packeteryConfig->getApiPassword();
             $config['packetaOptions'] = [
                 'webUrl' => $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK),
                 'appIdentity' => $this->helperData->getPacketeryAppIdentity(),
