@@ -10,7 +10,6 @@
             "email": "support@packeta.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {},
     "autoload": {
         "files": [
@@ -19,13 +18,5 @@
         "psr-4": {
             "Packetery\\Checkout\\": "Packetery/Checkout"
         }
-    },
-    "extra": {
-      "map": [
-        [
-          "*",
-          "Packetery/Checkout"
-        ]
-      ]
     }
 }
