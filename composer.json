@@ -2,11 +2,12 @@
     "name": "packetery/module-checkout",
     "description": "module Packetery for Magento 2",
     "type": "magento2-module",
+    "version": "2.3.1",
     "license": "AFL-3.0",
     "authors": [
         {
             "name": "Packeta Innovations",
-            "email": "support@packeta.com"
+            "email": "e-commerce.support@packeta.com"
         }
     ],
     "minimum-stability": "dev",
