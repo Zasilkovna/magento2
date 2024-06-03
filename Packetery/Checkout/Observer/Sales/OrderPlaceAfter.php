@@ -174,7 +174,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
                 $carrierPickupPoint = null;
             }
 
-            if (empty($packeteryOrderData) && $deliveryMethod->getMethod() !== Methods::PICKUP_POINT_DELIVERY) {
+            if(empty($packeteryOrderData) && $deliveryMethod->getMethod() !== Methods::PICKUP_POINT_DELIVERY) {
                 $pointId = $this->resolvePointId($shippingRate, $destinationAddress);
                 $pointName = '';
             }
@@ -282,40 +282,40 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         return $orderId;
     }
 
-    /**
-     * Check, if it is COD type in Packetery configuration
-     */
-    private function isCod($methodCode)
-    {
+	/**
+	 * Check, if it is COD type in Packetery configuration
+	 */
+	private function isCod($methodCode)
+	{
         $codPayments = $this->packeteryConfig->getCodMethods();
-        return in_array($methodCode, $codPayments);
-    }
+		return in_array($methodCode, $codPayments);
+	}
 
-    /**
-     * Create unique label/id of the store
-     */
-    private function getLabel()
-    {
+	/**
+	 * Create unique label/id of the store
+	 */
+	private function getLabel()
+	{
         $store = $this->storeManager->getGroup();
 
-        if ($store)
+        if($store)
         {
             return $store->getCode();
         }
         return null;
     }
 
-    /**
-     * Save order data to packetery module
-     * @package array $data
-     */
-    private function saveData(array $data): void
-    {
+	/**
+	 * Save order data to packetery module
+	 * @package array $data
+	 */
+	private function saveData(array $data): void
+	{
         $collection = $this->orderCollectionFactory->createForDbInsert();
         $order = $collection->getNewEmptyItem();
         $order->setData($data);
         $collection->addItem($order);
 
         $collection->save();
-    }
+	}
 }
