@@ -46,7 +46,7 @@ class CollectionFactory
         return $collection;
     }
 
-    public function createForDbInsert(array $data = [])
+    public function createForDbInsert(array $data = []): Collection
     {
         /** @var \Packetery\Checkout\Model\ResourceModel\Order\Collection $collection */
         $collection = $this->create($data);
