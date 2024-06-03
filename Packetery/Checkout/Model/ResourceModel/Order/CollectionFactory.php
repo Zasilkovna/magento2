@@ -45,4 +45,13 @@ class CollectionFactory
         $collection->joinSalesOrder();
         return $collection;
     }
+
+    public function createForDbInsert(array $data = [])
+    {
+        /** @var \Packetery\Checkout\Model\ResourceModel\Order\Collection $collection */
+        $collection = $this->create($data);
+        $collection->getSelect()->where('0');
+
+        return $collection;
+    }
 }
