@@ -65,7 +65,7 @@ class Actions extends Column
                 if ($shippingMethod) {
                     $item[$name]['view'] = [
                         'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['id' => $item['id']]),
-                        'label' => __('Edit')
+                        'label' => __('Edit order')
                     ];
                 }
 
