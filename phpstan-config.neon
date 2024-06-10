@@ -1,0 +1,9 @@
+parameters:
+    bootstrapFiles:
+        - phpstan-autoload.php
+    level: 1
+    fileExtensions:
+        - php
+        - phtml
+    paths:
+        - ./Packetery/Checkout

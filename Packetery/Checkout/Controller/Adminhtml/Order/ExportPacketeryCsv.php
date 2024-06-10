@@ -5,7 +5,6 @@ namespace Packetery\Checkout\Controller\Adminhtml\Order;
 class ExportPacketeryCsv extends \Magento\Backend\App\Action
 {
     protected $_fileFactory;
-    protected $_response;
     protected $_view;
     protected $directory;
     protected $converter;
@@ -39,7 +38,7 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
             $this->messageManager->addError(__('Error! No export data found.'));
             $this->_redirect($this->_redirect->getRefererUrl());
 
-            return;
+            return $this->_response;
         }
 
 
@@ -57,6 +56,8 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
         $collection->save();
 
         $this->_sendUploadResponse($this->data->getExportFileName(), $content);
+
+        return $this->_response;
     }
 
     protected function _sendUploadResponse($fileName, $content, $contentType = 'application/octet-stream')

@@ -48,6 +48,7 @@ class Detail extends \Magento\Backend\App\Action
 
         $id = $this->getRequest()->getParam('id');
         $orderCollection = $this->orderCollectionFactory->create();
+        /** @var \Magento\Framework\DataObject|null $order */
         $order = $orderCollection->getItemById($id);
 
         if (empty($order)) {

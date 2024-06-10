@@ -25,5 +25,7 @@ class Version extends \Magento\Framework\App\Config\Value
     {
         $version = $this->helperData->getModuleVersion();
         $this->setValue($version);
+
+        return $this;
     }
 }
