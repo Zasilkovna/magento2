@@ -9,4 +9,7 @@
 	<event name="email_order_set_template_vars_before">
 		<observer instance="Packetery\Checkout\Observer\Sales\EmailOrderTemplateVarsBefore" name="packetery_checkout_email_order_set_template_vars_before"/>
 	</event>
+	<event name="admin_system_config_changed_section_carriers">
+		<observer instance="Packetery\Checkout\Observer\Carriers\SoapCheckAfter" name="packetery_checkout_soap_check_after"/>
+	</event>
 </config>
