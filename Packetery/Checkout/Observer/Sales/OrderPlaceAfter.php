@@ -311,12 +311,11 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 	 */
 	private function saveData(array $data): void
 	{
-        /** @var \Packetery\Checkout\Model\ResourceModel\Order\Collection $collection */
-        $collection = $this->orderCollectionFactory->create();
-        $collection->getSelect()->where('0');
+        $collection = $this->orderCollectionFactory->createForDbInsert();
         $order = $collection->getNewEmptyItem();
         $order->setData($data);
         $collection->addItem($order);
+
         $collection->save();
 	}
 }

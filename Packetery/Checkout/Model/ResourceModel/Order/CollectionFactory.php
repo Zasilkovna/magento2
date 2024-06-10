@@ -45,4 +45,18 @@ class CollectionFactory
         $collection->joinSalesOrder();
         return $collection;
     }
+
+    /**
+     * Creates a Collection specifically for inserting new entries into the DB
+     *
+     * @param array $data Class constructor arguments to override auto-wiring or specify non-service arguments.
+     * @return \Packetery\Checkout\Model\ResourceModel\Order\Collection
+     */
+    public function createForDbInsert(array $data = []): Collection
+    {
+        $collection = $this->create($data);
+        $collection->getSelect()->where('0');
+
+        return $collection;
+    }
 }
