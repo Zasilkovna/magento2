@@ -8,7 +8,7 @@ use Magento\Framework\Phrase;
 
 class ApiKeyValidate extends \Magento\Framework\App\Config\Value
 {
-    const API_KEY_LENGTH = 16;
+    private const API_KEY_LENGTH = 16;
 
     /**
      * @return void
@@ -19,10 +19,9 @@ class ApiKeyValidate extends \Magento\Framework\App\Config\Value
 
         $apiKey = $this->getValue();
 
-        if(strlen($apiKey) !== self::API_KEY_LENGTH) {
-
-            $message = _(sprintf("The API key length must have %d characters!", self::API_KEY_LENGTH));
-            throw new \Magento\Framework\Exception\ValidatorException(new Phrase($message));
+        if (strlen($apiKey) !== self::API_KEY_LENGTH) {
+            $message = __("The API key length must have %1 characters!", self::API_KEY_LENGTH);
+            throw new \Magento\Framework\Exception\ValidatorException($message);
         }
 
         parent::beforeSave();

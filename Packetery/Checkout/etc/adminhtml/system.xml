@@ -30,6 +30,11 @@
                     <validate>required-entry</validate>
                     <backend_model>Packetery\Checkout\Block\System\Config\Form\ApiKeyValidate</backend_model>
                 </field>
+                <field id="api_password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>API password</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Packetery\Checkout\Block\System\Config\Form\ApiPasswordValidate</backend_model>
+                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>
