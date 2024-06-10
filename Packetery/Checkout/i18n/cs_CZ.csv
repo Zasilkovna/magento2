@@ -54,7 +54,7 @@
 "The payment methods selected above will be considered as cash on delivery (for Packeta).","Platební metody vybrané výše budou považovány za platební metody na dobírku (pro Zásilkovnu)."
 "Some prices are not filled","Některé ceny nejsou vyplněné"
 "The weight is invalid","Zadejte validní váhu. Váha se nesmí opakovat a nesmí být větší než maximální možná (%1)."
-"The API key length must have %d characters!","Délka API klíče musí být %d znaků!"
+"The API key length must have %1 characters!","Délka API klíče musí být %1 znaků!"
 "The API password length must have %1 characters!","Délka API hesla musí být %1 znaků!"
 "Select pick-up point","Vybrat výdejní místo"
 "You must select pick-up point","Musíte zvolit výdejní místo"
