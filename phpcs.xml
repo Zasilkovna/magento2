@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<ruleset name="Packetery Coding Standards">
+    <description>Magento Coding Standards</description>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="PSR12">
+        <exclude name="Squiz.WhiteSpace.ControlStructureSpacing.SpacingAfterOpen"/>
+        <exclude name="PSR2.Classes.PropertyDeclaration.Underscore"/>
+        <exclude name="PSR2.Methods.MethodDeclaration.Underscore"/>
+    </rule>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="340"/>
+            <property name="absoluteLineLimit" value="340"/>
+        </properties>
+    </rule>
+
+    <!-- Custom rules -->
+    <rule ref="./Sniffs/Whitespace/NewLineBeforeReturnStatementSniff.php"/>
+
+    <file>./Packetery/Checkout</file>
+</ruleset>
