@@ -10,7 +10,8 @@ class Item extends \Magento\Framework\DataObject
      * @param array $items
      * @return array
      */
-    public static function transformItems(array $items): array {
+    public static function transformItems(array $items): array
+    {
         $instances = [];
 
         foreach ($items as $key => $item) {
@@ -30,7 +31,8 @@ class Item extends \Magento\Framework\DataObject
      * @param \Magento\Quote\Model\Quote\Item $item
      * @return static
      */
-    public static function fromQuoteItem(\Magento\Quote\Model\Quote\Item $item): self {
+    public static function fromQuoteItem(\Magento\Quote\Model\Quote\Item $item): self
+    {
         $instance = new self($item->getData());
         $instance->setData('qty', $item->getTotalQty()); // only configurable items have correct quantity
         $instance->setData('product', $item->getProduct());
@@ -49,7 +51,8 @@ class Item extends \Magento\Framework\DataObject
      * @param \Magento\Sales\Model\Order\Item $item
      * @return static
      */
-    public static function fromOrderItem(\Magento\Sales\Model\Order\Item $item): self {
+    public static function fromOrderItem(\Magento\Sales\Model\Order\Item $item): self
+    {
         $instance = new self($item->getData());
         $instance->setData('qty', $item->getQtyOrdered());
         $instance->setData('product', $item->getProduct());
@@ -60,6 +63,7 @@ class Item extends \Magento\Framework\DataObject
         }
 
         $instance->setData('children', $children);
+
         return $instance;
     }
 }

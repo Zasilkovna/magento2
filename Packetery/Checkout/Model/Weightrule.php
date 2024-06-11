@@ -44,6 +44,7 @@ class Weightrule extends \Magento\Framework\Model\AbstractModel implements \Mage
     public function getPrice(): float
     {
         $price = $this->getData('price');
+
         return (float) $price;
     }
 
@@ -53,6 +54,7 @@ class Weightrule extends \Magento\Framework\Model\AbstractModel implements \Mage
     public function getMaxWeight(): ?float
     {
         $weight = $this->getData('max_weight');
+
         return (is_numeric($weight) ? (float) $weight : null);
     }
 }

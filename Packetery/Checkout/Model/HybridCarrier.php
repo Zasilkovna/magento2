@@ -19,7 +19,8 @@ class HybridCarrier extends \Magento\Framework\DataObject
      * @param string $country
      * @return \Packetery\Checkout\Model\HybridCarrier
      */
-    public static function fromAbstractDynamic(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier, string $method, string $country) {
+    public static function fromAbstractDynamic(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier, string $method, string $country)
+    {
         $hybridCarrier = new self();
         $hybridCarrier->setData('carrier_code', $carrier->getCarrierCode());
         $hybridCarrier->setData('carrier_id', $dynamicCarrier->getDynamicCarrierId());
@@ -29,6 +30,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier->setData('method', $method);
         $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getDynamicCarrierId()))->toString());
         $hybridCarrier->setData('vendor_groups_options', []);
+
         return $hybridCarrier;
     }
 
@@ -39,7 +41,8 @@ class HybridCarrier extends \Magento\Framework\DataObject
      * @param array $vendorCodeOptions
      * @return static
      */
-    public static function fromAbstract(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, string $method, string $country, array $vendorCodeOptions): self {
+    public static function fromAbstract(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, string $method, string $country, array $vendorCodeOptions): self
+    {
         $hybridCarrier = new self();
         $hybridCarrier->setData('carrier_code', $carrier->getCarrierCode());
         $hybridCarrier->setData('carrier_id');
@@ -58,6 +61,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier->setData('method', $method);
         $hybridCarrier->setData('method_code', (new MethodCode($method, null))->toString());
         $hybridCarrier->setData('vendor_groups_options', $vendorCodeOptions);
+
         return $hybridCarrier;
     }
 
@@ -65,7 +69,8 @@ class HybridCarrier extends \Magento\Framework\DataObject
      * @param \Packetery\Checkout\Model\Pricingrule|null $pricingrule
      * @return string|\Packetery\Checkout\Model\Misc\ComboPhrase|null
      */
-    public function getFieldsetTitle(?Pricingrule $pricingrule = null) {
+    public function getFieldsetTitle(?Pricingrule $pricingrule = null)
+    {
         if ($pricingrule !== null) {
             $tags = [];
 
@@ -82,78 +87,90 @@ class HybridCarrier extends \Magento\Framework\DataObject
     /**
      * @return string
      */
-    public function getCarrierCode(): string {
+    public function getCarrierCode(): string
+    {
         return $this->getData('carrier_code');
     }
 
     /**
      * @return string
      */
-    public function getMethod(): string {
+    public function getMethod(): string
+    {
         return $this->getData('method');
     }
 
     /**
      * @return string
      */
-    public function getMethodCode(): string {
+    public function getMethodCode(): string
+    {
         return $this->getData('method_code');
     }
 
     /**
      * @return int|null
      */
-    public function getCarrierId(): ?int {
+    public function getCarrierId(): ?int
+    {
         $value = $this->getData('carrier_id');
+
         return (is_numeric($value) ? (int)$value : null);
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return (string)$this->getData('name');
     }
 
     /**
      * @return string
      */
-    public function getCarrierName(): string {
+    public function getCarrierName(): string
+    {
         return (string)$this->getData('carrier_name');
     }
 
     /**
      * @return string
      */
-    public function getFinalCarrierName(): string {
+    public function getFinalCarrierName(): string
+    {
         return ($this->getCarrierName() ?: $this->getName());
     }
 
     /**
      * @return string
      */
-    public function getCountry(): string {
+    public function getCountry(): string
+    {
         return (string)$this->getData('country');
     }
 
     /**
      * @return bool
      */
-    public function getDeleted(): bool {
+    public function getDeleted(): bool
+    {
         return (bool)$this->getData('deleted');
     }
 
     /**
      * @return array
      */
-    public function getVendorGroupsOptions(): array {
+    public function getVendorGroupsOptions(): array
+    {
         return $this->getData('vendor_groups_options');
     }
 
     /**
      * @return string[]
      */
-    public function getVendorCodesOptionsValues(): array {
+    public function getVendorCodesOptionsValues(): array
+    {
         return array_map(
             static function (array $options): string {
                 return $options['value'];
@@ -162,11 +179,13 @@ class HybridCarrier extends \Magento\Framework\DataObject
         );
     }
 
-    public function hasVendorGroupsOptions(): bool {
+    public function hasVendorGroupsOptions(): bool
+    {
         return !empty($this->getVendorGroupsOptions());
     }
 
-    public function hasNonInteractableVendorGroupsOptions(): bool {
+    public function hasNonInteractableVendorGroupsOptions(): bool
+    {
         return count($this->getVendorGroupsOptions()) <= 2;
     }
 }

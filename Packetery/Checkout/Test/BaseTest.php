@@ -8,7 +8,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 abstract class BaseTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @param $object
      * @param string $method
@@ -21,6 +20,7 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
         $rc = new \ReflectionClass($object);
         $method = $rc->getMethod($method);
         $method->setAccessible(true);
+
         return $method->invokeArgs($object, $args);
     }
 
@@ -34,6 +34,7 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
     {
         $object = array_shift($callback);
         $method = array_shift($callback);
+
         return $this->invokeMethod($object, $method, $args);
     }
 
@@ -59,7 +60,7 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
      * @return array
      * @throws \ReflectionException
      */
-    protected function createConstructorMocks(string $className, array $except = []):array
+    protected function createConstructorMocks(string $className, array $except = []): array
     {
         $rc = new \ReflectionClass($className);
         $constructor = $rc->getConstructor();
@@ -145,7 +146,10 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
 
         foreach ($properties as $argName => $customArg) {
             $this->mockPrivateProperty(
-                $originalClassName, $service, $argName, $customArg
+                $originalClassName,
+                $service,
+                $argName,
+                $customArg
             );
         }
 

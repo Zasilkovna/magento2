@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model\ResourceModel;
 
 class Order extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb

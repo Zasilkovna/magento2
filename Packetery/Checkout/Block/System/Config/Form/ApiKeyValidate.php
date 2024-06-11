@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Packetery\Checkout\Block\System\Config\Form;
-
 
 use Magento\Framework\Phrase;
 
@@ -15,7 +13,8 @@ class ApiKeyValidate extends \Magento\Framework\App\Config\Value
      * @throws \Magento\Framework\Exception\ValidatorException
      * @throws \Magento\Framework\Exception\FileSystemException
      */
-    public function beforeSave() {
+    public function beforeSave()
+    {
 
         $apiKey = $this->getValue();
 

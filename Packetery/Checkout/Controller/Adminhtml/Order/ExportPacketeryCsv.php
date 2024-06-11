@@ -1,9 +1,9 @@
 <?php
+
 namespace Packetery\Checkout\Controller\Adminhtml\Order;
 
 class ExportPacketeryCsv extends \Magento\Backend\App\Action
 {
-
     protected $_fileFactory;
     protected $_response;
     protected $_view;
@@ -19,7 +19,7 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
     private $orderCollectionFactory;
 
     public function __construct(
-        \Magento\Backend\App\Action\Context  $context,
+        \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Packetery\Checkout\Helper\Data $data,
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
@@ -34,9 +34,8 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
     {
         $resultPage = $this->resultPageFactory->create();
 
-        $content = $resultPage->getLayout()->createBlock('Packetery\Checkout\Block\Adminhtml\Order\GridExport')->getCsvAllFileContents(TRUE);
-        if (!$content)
-        {
+        $content = $resultPage->getLayout()->createBlock('Packetery\Checkout\Block\Adminhtml\Order\GridExport')->getCsvAllFileContents(true);
+        if (!$content) {
             $this->messageManager->addError(__('Error! No export data found.'));
             $this->_redirect($this->_redirect->getRefererUrl());
 
@@ -58,10 +57,9 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
         $collection->save();
 
         $this->_sendUploadResponse($this->data->getExportFileName(), $content);
-
     }
 
-    protected function _sendUploadResponse($fileName, $content, $contentType='application/octet-stream')
+    protected function _sendUploadResponse($fileName, $content, $contentType = 'application/octet-stream')
     {
         $this->_response->setHttpResponseCode(200)
             ->setHeader('Pragma', 'public', true)

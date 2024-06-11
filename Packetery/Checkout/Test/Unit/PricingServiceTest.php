@@ -150,6 +150,7 @@ class PricingServiceTest extends BaseTest
     protected function createService()
     {
         $service = $this->createMock(Pricing\Service::class);
+
         return $service;
     }
 
@@ -197,6 +198,7 @@ class PricingServiceTest extends BaseTest
             ->getMock();
 
         $factory->method('create')->willReturn($willCreate);
+
         return $factory;
     }
 
@@ -211,6 +213,7 @@ class PricingServiceTest extends BaseTest
         $weightRule->method('getFreeShipment')->willReturn($freeShipment);
         $weightRule->method('getCountryId')->willReturn($countryId);
         $weightRule->method('getEnabled')->willReturn(true);
+
         return $weightRule;
     }
 
@@ -224,10 +227,12 @@ class PricingServiceTest extends BaseTest
         $weightRule = $this->createMock(Weightrule::class);
         $weightRule->method('getPrice')->willReturn($price);
         $weightRule->method('getMaxWeight')->willReturn($maxWeightKg);
+
         return $weightRule;
     }
 
-    private function collectRates(?Pricingrule $pricingRule, array $weightRules, int $cartWeight, int $cartValue, string $country, float $maxGlobalWeight, $globalfreeShipment, array $methods): ?\Magento\Shipping\Model\Rate\Result {
+    private function collectRates(?Pricingrule $pricingRule, array $weightRules, int $cartWeight, int $cartValue, string $country, float $maxGlobalWeight, $globalfreeShipment, array $methods): ?\Magento\Shipping\Model\Rate\Result
+    {
         /** @var \Packetery\Checkout\Model\Pricing\Service|MockObject $service */
         $service = $this->createProxy(
             Pricing\Service::class,
@@ -255,7 +260,8 @@ class PricingServiceTest extends BaseTest
         return $result;
     }
 
-    private function createMethodsWithLabels(array $methods): array {
+    private function createMethodsWithLabels(array $methods): array
+    {
         $finalMethods = [];
 
         $methodSelect = new \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect();
@@ -266,7 +272,8 @@ class PricingServiceTest extends BaseTest
         return $finalMethods;
     }
 
-    private function assertRateMethod($result, array $rateMethod) {
+    private function assertRateMethod($result, array $rateMethod)
+    {
         $this->assertNotNull($result, 'collected result is null or empty');
 
         $rates = $result->getAllRates();

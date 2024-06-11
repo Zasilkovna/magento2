@@ -56,7 +56,8 @@ class MigrateDefaultPrice extends Command
         $this->carrierFacade = $carrierFacade;
     }
 
-    protected function configure(): void {
+    protected function configure(): void
+    {
         $this->setName('packetery:migrate-default-price');
         $this->setDescription('Migrates default price to weight rule');
 
@@ -70,13 +71,15 @@ class MigrateDefaultPrice extends Command
      * @throws \Packetery\Checkout\Model\Exception\PricingRuleNotFound
      * @throws \Packetery\Checkout\Model\Exception\WeightRuleMissing
      */
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $configDataCollection = $this->configValueFactory->create()->getCollection();
         $configDataCollection->addFieldToFilter('path', ['like' => 'carriers/packetery/%']);
         $configDataCollection->addFieldToFilter('scope_id', ['gt' => 0]);
 
         if ($configDataCollection->getSize() > 0) {
             $output->writeln("Multi scope not supported");
+
             return Cli::RETURN_SUCCESS;
         }
 
@@ -89,6 +92,7 @@ class MigrateDefaultPrice extends Command
 
         if (!is_numeric($defaultPrice)) {
             $output->writeln("Unable to migrate. Default price is missing.");
+
             return Cli::RETURN_FAILURE;
         }
 

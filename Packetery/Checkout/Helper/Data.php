@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Packetery\Checkout\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -47,15 +46,18 @@ class Data extends AbstractHelper
      *
      * @return string
      */
-    public function getExportFileName($extension = 'csv'): string {
+    public function getExportFileName($extension = 'csv'): string
+    {
         $dateTime = $this->timezone->date()->format('Y-m-d-His');
+
         return  sprintf('%s-%s.%s', self::EXPORT_FILE_NAME, $dateTime, $extension);
     }
 
     /**
      * @return string
      */
-    public function getModuleVersion(): string {
+    public function getModuleVersion(): string
+    {
 
         return $this->moduleList->getOne($this->_getModuleName())['setup_version'];
     }

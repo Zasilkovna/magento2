@@ -101,9 +101,9 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $weight = $this->weightCalculator->getOrderWeight($order);
 
         $postData = json_decode(file_get_contents("php://input"));
-        $pointId = NULL;
-        $pointName = NULL;
-        $point = NULL;
+        $pointId = null;
+        $pointName = null;
+        $point = null;
         $isCarrier = false;
         $addressValidated = false;
         $carrierPickupPoint = null;
@@ -129,8 +129,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             throw new InputException(__('Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.', $this->priceCurrency->format($relatedPricingRule->getMaxCOD(), false)));
         }
 
-        if ($postData)
-        {
+        if ($postData) {
             // new order from frontend
 
             if ($deliveryMethod->getMethod() === Methods::PICKUP_POINT_DELIVERY) {
@@ -154,9 +153,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
                 $pointId = $this->resolvePointId($shippingRate, $destinationAddress);
                 $pointName = '';
             }
-        }
-        else
-        {
+        } else {
             // creating order from admin
 
             $packeteryOrderData = $this->getOriginalPacketeryOrderData($order);
@@ -174,7 +171,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
                 $carrierPickupPoint = null;
             }
 
-            if(empty($packeteryOrderData) && $deliveryMethod->getMethod() !== Methods::PICKUP_POINT_DELIVERY) {
+            if (empty($packeteryOrderData) && $deliveryMethod->getMethod() !== Methods::PICKUP_POINT_DELIVERY) {
                 $pointId = $this->resolvePointId($shippingRate, $destinationAddress);
                 $pointName = '';
             }
@@ -226,11 +223,13 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         }
     }
 
-    private function resolvePointId(ShippingRateCode $shippingRate, Address $destinationAddress) {
+    private function resolvePointId(ShippingRateCode $shippingRate, Address $destinationAddress)
+    {
         $deliveryMethod = $shippingRate->getMethodCode();
 
         /** @var \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier */
         $carrier = $this->carrierFactory->create($shippingRate->getCarrierCode());
+
         return $carrier->getPacketeryBrain()->resolvePointId(
             $deliveryMethod->getMethod(),
             $destinationAddress->getCountryId(),
@@ -238,10 +237,10 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         );
     }
 
-    private function getOriginalPacketeryOrderData(\Magento\Sales\Model\Order $order) {
+    private function getOriginalPacketeryOrderData(\Magento\Sales\Model\Order $order)
+    {
         $orderIdOriginal = self::getRealOrderId($order->getIncrementId());
-        if (!is_numeric($orderIdOriginal))
-        {
+        if (!is_numeric($orderIdOriginal)) {
             return null;
         }
 
@@ -266,8 +265,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 
         $data = $item->toArray(['point_id', 'point_name', 'is_carrier', 'carrier_pickup_point']);
 
-        if (empty($data))
-        {
+        if (empty($data)) {
             return null;
         }
 
@@ -277,45 +275,46 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     private static function getRealOrderId($orderId)
     {
         // $orderId = ltrim($orderId, 0);
-        $orderId = strstr($orderId, "-", TRUE);
+        $orderId = strstr($orderId, "-", true);
 
         return $orderId;
     }
 
-	/**
-	 * Check, if it is COD type in Packetery configuration
-	 */
-	private function isCod($methodCode)
-	{
+    /**
+     * Check, if it is COD type in Packetery configuration
+     */
+    private function isCod($methodCode)
+    {
         $codPayments = $this->packeteryConfig->getCodMethods();
-		return in_array($methodCode, $codPayments);
-	}
 
-	/**
-	 * Create unique label/id of the store
-	 */
-	private function getLabel()
-	{
+        return in_array($methodCode, $codPayments);
+    }
+
+    /**
+     * Create unique label/id of the store
+     */
+    private function getLabel()
+    {
         $store = $this->storeManager->getGroup();
 
-        if($store)
-        {
+        if ($store) {
             return $store->getCode();
         }
+
         return null;
     }
 
-	/**
-	 * Save order data to packetery module
-	 * @package array $data
-	 */
-	private function saveData(array $data): void
-	{
+    /**
+     * Save order data to packetery module
+     * @package array $data
+     */
+    private function saveData(array $data): void
+    {
         $collection = $this->orderCollectionFactory->createForDbInsert();
         $order = $collection->getNewEmptyItem();
         $order->setData($data);
         $collection->addItem($order);
 
         $collection->save();
-	}
+    }
 }

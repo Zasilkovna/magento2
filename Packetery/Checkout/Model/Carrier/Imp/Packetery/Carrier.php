@@ -34,14 +34,16 @@ class Carrier extends \Packetery\Checkout\Model\Carrier\AbstractCarrier
     /**
      * @return \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain
      */
-    public function getPacketeryBrain(): \Packetery\Checkout\Model\Carrier\AbstractBrain {
+    public function getPacketeryBrain(): \Packetery\Checkout\Model\Carrier\AbstractBrain
+    {
         return $this->packeteryBrain;
     }
 
     /**
      * @return \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config
      */
-    public function getPacketeryConfig(): AbstractConfig {
+    public function getPacketeryConfig(): AbstractConfig
+    {
         return $this->packeteryConfig;
     }
 }

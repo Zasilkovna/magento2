@@ -30,28 +30,32 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
     /**
      * @return bool
      */
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         return parent::isActive() && !$this->carrier->getDeleted();
     }
 
     /**
      * @return \Magento\Framework\Phrase|string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->carrier->getFinalCarrierName();
     }
 
     /**
      * @return array
      */
-    public function getAllowedMethods(): array {
+    public function getAllowedMethods(): array
+    {
         return $this->carrier->getMethods();
     }
 
     /**
      * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Config
      */
-    public function getConfig(): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
+    public function getConfig(): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+    {
         return $this->config;
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Packetery\Checkout\Setup;
 
 use Magento\Framework\Setup\InstallDataInterface;
@@ -9,7 +8,6 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 
 class InstallData implements InstallDataInterface
 {
-
     /**
      * {@inheritdoc}
      */

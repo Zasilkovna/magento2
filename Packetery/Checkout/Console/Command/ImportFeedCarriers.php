@@ -61,7 +61,8 @@ class ImportFeedCarriers extends Command
     /**
      *  Command general configuration
      */
-    protected function configure(): void {
+    protected function configure(): void
+    {
         $this->setName('packetery:import-feed-carriers');
         $this->setDescription('Import Packeta branch feed to carrier database table');
 
@@ -74,7 +75,8 @@ class ImportFeedCarriers extends Command
      * @return int
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $output->writeln('Carrier feed import started');
 
         $apiKey = $this->scopeConfig->getValue('carriers/packetery/api_key'); // default scope
@@ -84,6 +86,7 @@ class ImportFeedCarriers extends Command
 
         if (empty($data) || !isset($data->carriers)) {
             $output->writeln('An error has occurred');
+
             return Cli::RETURN_FAILURE;
         }
 
@@ -149,7 +152,8 @@ class ImportFeedCarriers extends Command
      * @param mixed $value
      * @return bool
      */
-    private function parseBool($value): bool {
+    private function parseBool($value): bool
+    {
         if ($value === 'false') {
             return false;
         }
@@ -161,8 +165,8 @@ class ImportFeedCarriers extends Command
      * @return int
      * @throws \Exception
      */
-    public function runForCron(): int {
+    public function runForCron(): int
+    {
         return $this->run(new ArrayInput([]), new NullOutput());
     }
 }
-

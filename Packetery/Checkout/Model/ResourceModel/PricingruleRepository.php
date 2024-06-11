@@ -87,6 +87,7 @@ class PricingruleRepository
             if ($maxWeight !== null) {
                 if ($weight > $maxWeight) {
                     // weight is assumed to be always set
+
                     return false;
                 }
             }
@@ -194,7 +195,8 @@ class PricingruleRepository
      * @param int $id
      * @param bool $enabled
      */
-    public function setPricingRuleEnabled(int $id, bool $enabled): void {
+    public function setPricingRuleEnabled(int $id, bool $enabled): void
+    {
         $rule = $this->pricingRuleCollectionFactory->create()->getItemById($id);
         $rule->setData('enabled', $enabled);
         $rule->save();
@@ -203,7 +205,8 @@ class PricingruleRepository
     /**
      * @param array $exclude
      */
-    public function disablePricingRulesExcept(array $exclude): void {
+    public function disablePricingRulesExcept(array $exclude): void
+    {
         $collection = $this->pricingRuleCollectionFactory->create();
 
         if (!empty($exclude)) {
@@ -218,10 +221,12 @@ class PricingruleRepository
      * @param string $country
      * @return \Packetery\Checkout\Model\Pricingrule[]
      */
-    public function findBy(string $country, bool $enabled): array {
+    public function findBy(string $country, bool $enabled): array
+    {
         $collection = $this->pricingRuleCollectionFactory->create();
         $collection->addFilter('main_table.country_id', $country);
         $collection->addFilter('main_table.enabled', $enabled);
+
         return $collection->getItems();
     }
 }

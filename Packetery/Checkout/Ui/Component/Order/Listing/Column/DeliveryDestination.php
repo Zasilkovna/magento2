@@ -46,7 +46,8 @@ class DeliveryDestination extends Column
      * @param array $dataSource
      * @return array
      */
-    public function prepareDataSource(array $dataSource): array {
+    public function prepareDataSource(array $dataSource): array
+    {
         $cache = [];
 
         if (isset($dataSource['data']['items'])) {
@@ -77,7 +78,8 @@ class DeliveryDestination extends Column
         return $dataSource;
     }
 
-    protected function applySorting() {
+    protected function applySorting()
+    {
         // no DB select sorting
     }
 }

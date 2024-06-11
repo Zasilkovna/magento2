@@ -39,7 +39,8 @@ class ConvertToCsvCustom
      * @return array
      * @throws LocalizedException
      */
-    public function getItemIds(): array {
+    public function getItemIds(): array
+    {
         $component = $this->filter->getComponent();
 
         $this->filter->prepareComponent($component);

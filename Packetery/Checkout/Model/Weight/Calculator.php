@@ -12,10 +12,12 @@ class Calculator
      * @param \Magento\Sales\Model\Order $order
      * @return float
      */
-    public function getOrderWeight(\Magento\Sales\Model\Order $order): float {
+    public function getOrderWeight(\Magento\Sales\Model\Order $order): float
+    {
         /** @var \Magento\Sales\Model\Order\Item[] $allVisibleItems */
         $allVisibleItems = $order->getAllVisibleItems();
         $allVisibleItems = \Packetery\Checkout\Model\Weight\Item::transformItems($allVisibleItems);
+
         return $this->getItemsWeight($allVisibleItems);
     }
 
@@ -23,7 +25,8 @@ class Calculator
      * @param Item[] $allVisibleItems
      * @return float
      */
-    public function getItemsWeight(array $allVisibleItems): float {
+    public function getItemsWeight(array $allVisibleItems): float
+    {
         $productWeights = [];
         $totalWeight = 0.0;
 

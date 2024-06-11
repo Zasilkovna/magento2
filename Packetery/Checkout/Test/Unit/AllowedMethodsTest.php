@@ -8,7 +8,8 @@ use Packetery\Checkout\Model\Carrier\Methods;
 
 class AllowedMethodsTest extends \Packetery\Checkout\Test\BaseTest
 {
-    public function testGetFinalAllowedMethods() {
+    public function testGetFinalAllowedMethods()
+    {
         $this->assertFinals(
             [Methods::ADDRESS_DELIVERY],
             [Methods::ADDRESS_DELIVERY],
@@ -57,7 +58,8 @@ class AllowedMethodsTest extends \Packetery\Checkout\Test\BaseTest
      * @param array $dynamicMethods
      * @param array $resultMethods
      */
-    private function assertFinals(array $userMethods, array $dynamicMethods, array $resultMethods): void {
+    private function assertFinals(array $userMethods, array $dynamicMethods, array $resultMethods): void
+    {
         /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain $proxy */
         $proxy = $this->createProxy(\Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain::class, [], []);
 

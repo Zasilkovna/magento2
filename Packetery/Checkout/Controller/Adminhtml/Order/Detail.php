@@ -52,6 +52,7 @@ class Detail extends \Magento\Backend\App\Action
 
         if (empty($order)) {
             $this->messageManager->addErrorMessage(__('Page not found'));
+
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
 
@@ -60,6 +61,7 @@ class Detail extends \Magento\Backend\App\Action
 
         if (!$shippingMethod) {
             $this->messageManager->addErrorMessage(__('Page not found'));
+
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
 

@@ -43,6 +43,7 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     public function getFreeShipment(): ?float
     {
         $value = ($this->getData('free_shipment') ?: null);
+
         return ($value === null ? null : (float)$value);
     }
 
@@ -52,6 +53,7 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     public function getCountryId(): ?string
     {
         $value = ($this->getData('country_id') ?: null);
+
         return ($value === null ? null : (string)$value);
     }
 
@@ -61,6 +63,7 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     public function getMethod(): ?string
     {
         $value = ($this->getData('method') ?: null);
+
         return ($value === null ? null : (string)$value);
     }
 
@@ -70,6 +73,7 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     public function getCarrierCode(): ?string
     {
         $value = ($this->getData('carrier_code') ?: null);
+
         return ($value === null ? null : (string)$value);
     }
 
@@ -79,6 +83,7 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     public function getCarrierId(): ?int
     {
         $value = ($this->getData('carrier_id') ?: null);
+
         return ($value === null ? null : (int)$value);
     }
 

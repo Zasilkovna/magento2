@@ -34,8 +34,7 @@ class Service
      * @param \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      */
-    public function __construct
-    (
+    public function __construct(
         \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory,
         \Packetery\Checkout\Model\ResourceModel\Weightrule\CollectionFactory $weightRuleCollectionFactory,
         \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
@@ -130,6 +129,7 @@ class Service
         }
 
         $weightRules = $this->getWeightRulesByPricingRule($pricingRule);
+
         return $this->resolveWeightedPrice($weightRules, $weightTotal, $config->getMaxWeight());
     }
 
@@ -146,6 +146,7 @@ class Service
             function (Weightrule $a, Weightrule $b) use ($fallbackWeight) {
                 $weightA = ($a->getMaxWeight() ?? $fallbackWeight);
                 $weightB = ($b->getMaxWeight() ?? $fallbackWeight);
+
                 return $weightA <=> $weightB; // has to be sorted in ASC order
             }
         );
@@ -204,6 +205,7 @@ class Service
         $collection = $this->weightRuleCollectionFactory->create();
         $collection->addFilter('packetery_pricing_rule_id', $pricingRule->getId());
         $collection->setOrder('max_weight', 'ASC');
+
         return $collection->getItems();
     }
 

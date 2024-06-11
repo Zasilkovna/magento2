@@ -30,7 +30,8 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
     /**
      * @return string
      */
-    public function getMethod(): string {
+    public function getMethod(): string
+    {
         $isPickupPoints = (bool)$this->getData('is_pickup_points');
         if ($isPickupPoints) {
             return \Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY;
@@ -42,49 +43,56 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
     /**
      * @return int
      */
-    public function getCarrierId(): int {
+    public function getCarrierId(): int
+    {
         return (int)$this->getData('carrier_id');
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return (string)$this->getData('name');
     }
 
     /**
      * @return string
      */
-    public function getCarrierName(): string {
+    public function getCarrierName(): string
+    {
         return (string)$this->getData('carrier_name');
     }
 
     /**
      * @return string
      */
-    public function getFinalCarrierName(): string {
+    public function getFinalCarrierName(): string
+    {
         return ($this->getCarrierName() ?: $this->getName());
     }
 
     /**
      * @return string
      */
-    public function getCountry(): string {
+    public function getCountry(): string
+    {
         return (string)$this->getData('country');
     }
 
     /**
      * @return float
      */
-    public function getMaxWeight(): float {
+    public function getMaxWeight(): float
+    {
         return (float)$this->getData('max_weight');
     }
 
     /**
      * @return bool
      */
-    public function getDeleted(): bool {
+    public function getDeleted(): bool
+    {
         return (bool)$this->getData('deleted');
     }
 }

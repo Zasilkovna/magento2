@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model\ResourceModel;
 
 class Pricingrule extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb

@@ -48,7 +48,8 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel, $identifierName, $connectionName);
     }
 
-    protected function _initSelect() {
+    protected function _initSelect()
+    {
         $neededCountries = $this->carrierFacade->getAllAvailableCountries();
         $assembledQueries = [];
 

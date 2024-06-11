@@ -17,7 +17,8 @@ class Methods
     /**
      * @return string[]
      */
-    public static function getAll(): array {
+    public static function getAll(): array
+    {
         return [
             self::PICKUP_POINT_DELIVERY,
             self::LEGACY_PICKUP_POINT_DELIVERY,
@@ -30,7 +31,8 @@ class Methods
      * @param string $method
      * @return bool
      */
-    public static function isAnyAddressDelivery(string $method): bool {
+    public static function isAnyAddressDelivery(string $method): bool
+    {
         return in_array($method, [self::ADDRESS_DELIVERY, self::DIRECT_ADDRESS_DELIVERY]);
     }
 
@@ -38,7 +40,8 @@ class Methods
      * @param string $method
      * @return bool
      */
-    public static function isPickupPointDelivery(string $method): bool {
+    public static function isPickupPointDelivery(string $method): bool
+    {
         return in_array($method, [self::PICKUP_POINT_DELIVERY, self::LEGACY_PICKUP_POINT_DELIVERY]);
     }
 }

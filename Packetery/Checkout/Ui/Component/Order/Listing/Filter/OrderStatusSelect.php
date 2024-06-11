@@ -16,11 +16,13 @@ class OrderStatusSelect implements \Magento\Framework\Data\OptionSourceInterface
      *
      * @param \Magento\Sales\Model\ResourceModel\Order\Status\Collection $statusCollectionFactory
      */
-    public function __construct(\Magento\Sales\Model\ResourceModel\Order\Status\Collection $statusCollectionFactory) {
+    public function __construct(\Magento\Sales\Model\ResourceModel\Order\Status\Collection $statusCollectionFactory)
+    {
         $this->statusCollectionFactory = $statusCollectionFactory;
     }
 
-    public function toOptionArray() {
+    public function toOptionArray()
+    {
         return $this->statusCollectionFactory->toOptionArray();
     }
 }
