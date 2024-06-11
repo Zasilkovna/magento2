@@ -17,8 +17,8 @@
         </properties>
     </rule>
 
-<!--    Custom rules-->
+    <!-- Custom rules -->
     <rule ref="./Sniffs/Whitespace/NewLineBeforeReturnStatementSniff.php"/>
 
-    <file>./Packetery/Checkout</file>
+    <file>./Packetery/Checkout/Model/Carrier/Imp/Packetery/VendorCarrier.php</file>
 </ruleset>
