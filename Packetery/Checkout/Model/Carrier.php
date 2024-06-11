@@ -6,7 +6,7 @@ namespace Packetery\Checkout\Model;
 
 class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
-    const CACHE_TAG = 'packetery_checkout_carrier';
+    public const CACHE_TAG = 'packetery_checkout_carrier';
 
     protected $_cacheTag = 'packetery_checkout_carrier';
 

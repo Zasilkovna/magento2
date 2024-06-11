@@ -4,7 +4,7 @@ namespace Packetery\Checkout\Model;
 
 class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
-    const CACHE_TAG = 'packetery_checkout_order';
+    public const CACHE_TAG = 'packetery_checkout_order';
 
     protected $_cacheTag = 'packetery_checkout_order';
 

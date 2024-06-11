@@ -14,7 +14,7 @@ use Packetery\Checkout\Model\Misc\ComboPhrase;
 
 class MultiSave extends Action implements HttpPostActionInterface
 {
-    const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
+    public const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
 
     /** @var \Packetery\Checkout\Model\ResourceModel\PricingruleRepository */
     private $pricingruleRepository;
