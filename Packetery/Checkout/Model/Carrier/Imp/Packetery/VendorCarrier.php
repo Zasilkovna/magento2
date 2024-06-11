@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
-use Magento\Tests\NamingConvention\true\string;
 use Packetery\Checkout\Model\Carrier\Methods;
 
 class VendorCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier

@@ -3,7 +3,6 @@
 namespace Packetery\Checkout\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Tests\NamingConvention\true\string;
 
 class Data extends AbstractHelper
 {
