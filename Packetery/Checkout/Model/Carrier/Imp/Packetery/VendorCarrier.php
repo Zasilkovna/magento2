@@ -65,6 +65,7 @@ class VendorCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCar
     {
         return false;
     }
+    
     public function getFinalCarrierName(): string
     {
         return $this->title;
