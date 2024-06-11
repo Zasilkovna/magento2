@@ -11,7 +11,7 @@ use Magento\Framework\Controller\ResultFactory;
 
 class InlineEdit extends Action implements HttpPostActionInterface
 {
-    const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
+    public const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
 
     /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
     private $orderCollectionFactory;

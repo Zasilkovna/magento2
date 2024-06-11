@@ -13,7 +13,7 @@ use Magento\Framework\Exception\NotFoundException;
 
 class Save extends Action implements HttpPostActionInterface
 {
-    const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
+    public const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
 
     /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
     private $orderCollectionFactory;

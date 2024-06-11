@@ -6,7 +6,7 @@ namespace Packetery\Checkout\Model;
 
 class Weightrule extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
-    const CACHE_TAG = 'packetery_checkout_weightrule';
+    public const CACHE_TAG = 'packetery_checkout_weightrule';
 
     protected $_cacheTag = 'packetery_checkout_weightrule';
 

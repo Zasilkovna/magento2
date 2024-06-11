@@ -36,8 +36,14 @@ class PricingruleRepository
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
-    public function __construct(Pricingrule\CollectionFactory $pricingRuleCollectionFactory, \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory, Weightrule\CollectionFactory $weightRuleCollectionFactory, \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory, \Packetery\Checkout\Model\Pricing\Service $pricingService, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade)
-    {
+    public function __construct(
+        Pricingrule\CollectionFactory $pricingRuleCollectionFactory,
+        \Packetery\Checkout\Model\PricingruleFactory $pricingruleFactory,
+        Weightrule\CollectionFactory $weightRuleCollectionFactory,
+        \Packetery\Checkout\Model\WeightruleFactory $weightruleFactory,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+    ) {
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
         $this->pricingruleFactory = $pricingruleFactory;
         $this->weightRuleCollectionFactory = $weightRuleCollectionFactory;

@@ -6,7 +6,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 
 class Data extends AbstractHelper
 {
-    const EXPORT_FILE_NAME = 'packetExport';
+    public const EXPORT_FILE_NAME = 'packetExport';
 
     /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface */
     private $timezone;
@@ -58,7 +58,6 @@ class Data extends AbstractHelper
      */
     public function getModuleVersion(): string
     {
-
         return $this->moduleList->getOne($this->_getModuleName())['setup_version'];
     }
 
