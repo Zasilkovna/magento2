@@ -20,5 +20,5 @@
     <!-- Custom rules -->
     <rule ref="./Sniffs/Whitespace/NewLineBeforeReturnStatementSniff.php"/>
 
-    <file>./Packetery/Checkout/Model/Carrier/Imp/Packetery/VendorCarrier.php</file>
+    <file>./Packetery/Checkout</file>
 </ruleset>
