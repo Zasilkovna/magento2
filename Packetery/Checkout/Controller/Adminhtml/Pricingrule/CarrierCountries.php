@@ -26,7 +26,8 @@ class CarrierCountries extends \Magento\Backend\App\Action
     /**
      * @return Page
      */
-    public function execute(): Page {
+    public function execute(): Page
+    {
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Packetery_Checkout::carrierCountries');

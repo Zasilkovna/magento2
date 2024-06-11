@@ -6,5 +6,4 @@ namespace Packetery\Checkout\Model\Exception;
 
 class PricingRuleNotFound extends \Exception
 {
-
 }

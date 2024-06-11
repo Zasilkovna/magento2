@@ -27,8 +27,7 @@ class AddressPlaceAfter implements \Magento\Framework\Event\ObserverInterface
      */
     public function execute(
         \Magento\Framework\Event\Observer $observer
-    )
-    {
+    ) {
         $orderId = $observer->getData('order_id');
         $order = $this->orderRepository->get($orderId);
         $orderNumber = $order->getIncrementId();

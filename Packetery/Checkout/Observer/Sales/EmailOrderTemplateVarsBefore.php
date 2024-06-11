@@ -19,7 +19,8 @@ class EmailOrderTemplateVarsBefore implements \Magento\Framework\Event\ObserverI
      * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      */
-    public function __construct(\Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade) {
+    public function __construct(\Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade)
+    {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->carrierFacade = $carrierFacade;
     }
@@ -31,11 +32,11 @@ class EmailOrderTemplateVarsBefore implements \Magento\Framework\Event\ObserverI
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         /** @var array $transport */
-        $transport = ( $observer->hasData( 'transport' ) ? $observer->getData( 'transport' ) : $observer->getData( 'transportObject' ) );
+        $transport = ( $observer->hasData('transport') ? $observer->getData('transport') : $observer->getData('transportObject') );
         /** @var \Magento\Sales\Model\Order $order */
         $order = $transport['order'];
         $collection = $this->orderCollectionFactory->create();
-        $collection->addFilter('order_number', $order->getData( 'increment_id' ));
+        $collection->addFilter('order_number', $order->getData('increment_id'));
         /** @var \Packetery\Checkout\Model\Order|null $packeteryOrder */
         $items = ( $collection->getItems() ?: [] );
         $packeteryOrder = array_shift($items);

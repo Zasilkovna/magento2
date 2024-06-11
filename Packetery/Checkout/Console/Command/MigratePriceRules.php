@@ -37,8 +37,7 @@ class MigratePriceRules extends Command
         \Packetery\Checkout\Model\ResourceModel\PricingruleRepository $pricingruleRepository,
         \Magento\Framework\App\Config\ValueFactory $configValueFactory,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
-    )
-    {
+    ) {
         parent::__construct();
         $this->configFactory = $configFactory;
         $this->pricingruleRepository = $pricingruleRepository;
@@ -71,6 +70,7 @@ class MigratePriceRules extends Command
 
         if ($configDataCollection->getSize() > 0) {
             $output->writeln("Multi scope not supported");
+
             return Cli::RETURN_FAILURE;
         }
 

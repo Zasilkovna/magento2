@@ -80,5 +80,4 @@ class Storeconfig implements HttpGetActionInterface
 
         return $this->resultJsonFactory->create()->setData($response);
     }
-
 }

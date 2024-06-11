@@ -16,4 +16,3 @@ class MethodSelect extends AbstractMethodSelect implements \Magento\Framework\Da
         ];
     }
 }
-

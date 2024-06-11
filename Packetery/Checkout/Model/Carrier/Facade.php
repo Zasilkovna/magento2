@@ -33,12 +33,14 @@ class Facade
      * @param int|null $carrierId
      * @throws \Exception
      */
-    public function updateCarrierName(string $carrierName, string $carrierCode, ?int $carrierId = null): void {
+    public function updateCarrierName(string $carrierName, string $carrierCode, ?int $carrierId = null): void
+    {
         $carrier = $this->getMagentoCarrier($carrierCode);
         $dynamicCarrier = $this->getDynamicCarrier($carrier, $carrierId);
 
         if ($dynamicCarrier !== null) {
             $carrier->getPacketeryBrain()->updateDynamicCarrierName($carrierName, $dynamicCarrier);
+
             return;
         }
 
@@ -52,8 +54,10 @@ class Facade
      * @param string $country
      * @return \Packetery\Checkout\Model\HybridCarrier
      */
-    public function createHybridCarrier(string $carrierCode, ?int $carrierId, string $method, string $country): HybridCarrier {
+    public function createHybridCarrier(string $carrierCode, ?int $carrierId, string $method, string $country): HybridCarrier
+    {
         $cache = [];
+
         return $this->createHybridCarrierCached($cache, $carrierCode, $carrierId, $method, $country);
     }
 
@@ -65,7 +69,8 @@ class Facade
      * @param string $country
      * @return \Packetery\Checkout\Model\HybridCarrier
      */
-    public function createHybridCarrierCached(array &$cache, string $carrierCode, ?int $carrierId, string $method, string $country): HybridCarrier {
+    public function createHybridCarrierCached(array &$cache, string $carrierCode, ?int $carrierId, string $method, string $country): HybridCarrier
+    {
         $cache['carriers'] = $cache['carriers'] ?? [];
         $cache['dynamicCarriers'] = $cache['dynamicCarriers'] ?? [];
 
@@ -97,7 +102,8 @@ class Facade
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[] $carriers
      * @return string[]
      */
-    public function getVendorCodesOptions(array $carriers): array {
+    public function getVendorCodesOptions(array $carriers): array
+    {
         $vendorCodesOptions = [];
         foreach ($carriers as $carrier) {
             if ($carrier instanceof VendorCarrier) {
@@ -115,7 +121,8 @@ class Facade
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[] $carriers
      * @return string[]
      */
-    public function getVendorGroups(array $carriers): array {
+    public function getVendorGroups(array $carriers): array
+    {
         $vendorGroups = [];
         foreach ($carriers as $carrier) {
             if ($carrier instanceof VendorCarrier) {
@@ -131,7 +138,8 @@ class Facade
      * @param $carrierId
      * @return bool
      */
-    public function isDynamicCarrier(string $carrierCode, $carrierId): bool {
+    public function isDynamicCarrier(string $carrierCode, $carrierId): bool
+    {
         $carrier = $this->getMagentoCarrier($carrierCode);
         $dynamicCarrier = $this->getDynamicCarrier($carrier, (is_numeric($carrierId) ? (int)$carrierId : null));
 
@@ -145,7 +153,8 @@ class Facade
     /**
      * @return AbstractCarrier[]
      */
-    public function getPacketeryAbstractCarriers(): array {
+    public function getPacketeryAbstractCarriers(): array
+    {
         $carriers = [];
 
         foreach ($this->shippingConfig->getAllCarriers() as $carrier) {
@@ -160,7 +169,8 @@ class Facade
     /**
      * @return array
      */
-    public function getAllAvailableCountries(): array {
+    public function getAllAvailableCountries(): array
+    {
         $countries = [];
 
         foreach ($this->getPacketeryAbstractCarriers() as $packeteryAbstractCarrier) {
@@ -175,7 +185,8 @@ class Facade
      * @param int $carrierId
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null
      */
-    private function getDynamicCarrier(AbstractCarrier $carrier, ?int $carrierId): ?AbstractDynamicCarrier {
+    private function getDynamicCarrier(AbstractCarrier $carrier, ?int $carrierId): ?AbstractDynamicCarrier
+    {
         return $carrier->getPacketeryBrain()->getDynamicCarrierById($carrierId);
     }
 
@@ -183,14 +194,16 @@ class Facade
      * @param string $carrierCode
      * @return \Packetery\Checkout\Model\Carrier\AbstractCarrier
      */
-    public function getMagentoCarrier(string $carrierCode): AbstractCarrier {
+    public function getMagentoCarrier(string $carrierCode): AbstractCarrier
+    {
         return $this->carrierFactory->get($carrierCode);
     }
 
     /**
      * @return array
      */
-    public static function getAllImplementedBranchIds(): array {
+    public static function getAllImplementedBranchIds(): array
+    {
         $branchIds = [];
         $classNames = self::getAllBrainClasses();
 
@@ -204,9 +217,10 @@ class Facade
     /**
      * @return array<class-string<\Packetery\Checkout\Model\Carrier\AbstractBrain>>
      */
-    public static function getAllBrainClasses(): array {
+    public static function getAllBrainClasses(): array
+    {
         $classNames = [];
-        $dirs = glob(__DIR__ . '/Imp/*', GLOB_ONLYDIR|GLOB_NOSORT);
+        $dirs = glob(__DIR__ . '/Imp/*', GLOB_ONLYDIR | GLOB_NOSORT);
 
         foreach ($dirs as $dir) {
             if ($dir === '.' || $dir === '..') {
@@ -223,7 +237,8 @@ class Facade
     /**
      * @return string[]
      */
-    public static function getAllCarrierCodes(): array {
+    public static function getAllCarrierCodes(): array
+    {
         $carrierCodes = [];
         /** @var \Packetery\Checkout\Model\Carrier\AbstractBrain[] $classNames */
         $classNames = self::getAllBrainClasses();
@@ -240,9 +255,11 @@ class Facade
      * @param int|null $carrierId
      * @return float|null
      */
-    public function getMaxWeight(string $carrierCode, ?int $carrierId): ?float {
+    public function getMaxWeight(string $carrierCode, ?int $carrierId): ?float
+    {
         $carrier = $this->getMagentoCarrier($carrierCode);
         $dynamicCarrier = $this->getDynamicCarrier($carrier, $carrierId);
+
         return $carrier->getPacketeryDynamicConfig($dynamicCarrier)->getMaxWeight();
     }
 }

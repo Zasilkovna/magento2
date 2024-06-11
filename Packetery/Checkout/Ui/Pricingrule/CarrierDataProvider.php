@@ -42,14 +42,16 @@ class CarrierDataProvider extends AbstractDataProvider
     /**
      * @return array
      */
-    public function getData(): array {
+    public function getData(): array
+    {
         return $this->modifier->modifyData(parent::getData());
     }
 
     /**
      * @return array
      */
-    public function getMeta(): array {
+    public function getMeta(): array
+    {
         return $this->modifier->modifyMeta(parent::getMeta());
     }
 }

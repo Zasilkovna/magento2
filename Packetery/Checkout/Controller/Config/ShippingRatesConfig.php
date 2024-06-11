@@ -59,7 +59,8 @@ class ShippingRatesConfig implements HttpPostActionInterface
      * @param string $methodCode
      * @return array
      */
-    private function getRateConfig(string $countryId, string $carrierCode, string $methodCode): array {
+    private function getRateConfig(string $countryId, string $carrierCode, string $methodCode): array
+    {
         $config = [
             'isPacketaRate' => false
         ];
@@ -104,7 +105,8 @@ class ShippingRatesConfig implements HttpPostActionInterface
      * @param AbstractDynamicCarrier[] $dynamicCarriers
      * @return array<int, array>
      */
-    public static function createWidgetVendors(array $dynamicCarriers, ?Pricingrule $relatedPricingRule): array {
+    public static function createWidgetVendors(array $dynamicCarriers, ?Pricingrule $relatedPricingRule): array
+    {
         $widgetVendors = [];
 
         if ($relatedPricingRule !== null) {
@@ -127,7 +129,8 @@ class ShippingRatesConfig implements HttpPostActionInterface
     /**
      * @return array<string, bool|string>
      */
-    private static function createWidgetVendor(string $countryId, string $group): array {
+    private static function createWidgetVendor(string $countryId, string $group): array
+    {
         $widgetVendor = [
             'country' => strtolower($countryId),
             'selected' => true,
@@ -140,7 +143,8 @@ class ShippingRatesConfig implements HttpPostActionInterface
         return $widgetVendor;
     }
 
-    public function execute() {
+    public function execute()
+    {
         $config = [];
         $ratesConfig = [];
         $postData = json_decode($this->request->getContent(), true);

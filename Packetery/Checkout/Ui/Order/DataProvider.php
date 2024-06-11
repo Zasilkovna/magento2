@@ -94,7 +94,6 @@ class DataProvider extends AbstractDataProvider
                 }
 
                 $result[$item->getId()]['general']['misc']['widgetVendors'] = json_encode($widgetVendors, JSON_THROW_ON_ERROR);
-
             } else {
                 $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = '0';
                 $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = '0';

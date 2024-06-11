@@ -20,7 +20,8 @@ class ComboPhrase extends Phrase
      * @param array $phrases
      * @param \Magento\Framework\Phrase|string $separator
      */
-    public function __construct(array $phrases, $separator = '') {
+    public function __construct(array $phrases, $separator = '')
+    {
         $this->phrases = $phrases;
         $this->separator = $separator;
     }
@@ -28,7 +29,8 @@ class ComboPhrase extends Phrase
     /**
      * @return string
      */
-    public function render(): string {
+    public function render(): string
+    {
         return implode(
             ($this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator),
             array_map(
@@ -43,7 +45,8 @@ class ComboPhrase extends Phrase
     /**
      * @return string
      */
-    public function getText(): string {
+    public function getText(): string
+    {
         return implode(
             ($this->separator instanceof Phrase ? $this->separator->render() : (string)$this->separator),
             array_map(
@@ -58,7 +61,8 @@ class ComboPhrase extends Phrase
     /**
      * @return array
      */
-    public function getArguments(): array {
+    public function getArguments(): array
+    {
         return [];
     }
 }

@@ -6,7 +6,6 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 
 class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 {
-
     /**
      * @var \Learning\Test\Model\ResourceModel\Info\CollectionFactory
      */
@@ -34,7 +33,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     protected function _construct()
     {
         parent::_construct();
-		$this->setId('order_items');
+        $this->setId('order_items');
         $this->setDefaultSort('id');
         $this->setDefaultDir('ASC');
     }
@@ -79,12 +78,11 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
      * @param false $onlyNotExported
      * @return string|null
      */
-    public function getCsvAllFileContents($onlyNotExported = FALSE): ?string
+    public function getCsvAllFileContents($onlyNotExported = false): ?string
     {
         $col = $this->loadDataSelection();
 
-        if ($onlyNotExported)
-        {
+        if ($onlyNotExported) {
             $col->getSelect()->where('exported = ?', 0);
         }
         $collection = $col->load();
@@ -152,25 +150,23 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     }
 
 
-	/**
-	 * Custom filtration for export status
-	 * @param $collection
-	 * @param $column
-	 */
-	public function filterOptionExport($collection, $column)
-	{
-		$filterValue = intval($column->getFilter()->getValue());
+    /**
+     * Custom filtration for export status
+     * @param $collection
+     * @param $column
+     */
+    public function filterOptionExport($collection, $column)
+    {
+        $filterValue = intval($column->getFilter()->getValue());
 
-		if($filterValue === 0)
-		{
-			$collection->getSelect()->where("exported = '' OR exported IS NULL");
-		}
+        if ($filterValue === 0) {
+            $collection->getSelect()->where("exported = '' OR exported IS NULL");
+        }
 
-		if($filterValue === 1)
-		{
-			$collection->getSelect()->where("exported = 1");
-		}
-	}
+        if ($filterValue === 1) {
+            $collection->getSelect()->where("exported = 1");
+        }
+    }
 
     /**
      * @param iterable $collection
@@ -189,6 +185,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         rewind($fp); // Set the pointer back to the start
         $contents = stream_get_contents($fp); // Fetch the contents of our CSV
         fclose($fp);
+
         return ($contents ?: null); // Close our pointer and free up memory and /tmp space
     }
 }

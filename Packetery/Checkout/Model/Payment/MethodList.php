@@ -22,7 +22,8 @@ class MethodList
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      */
-    public function __construct(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery, \Packetery\Checkout\Model\Pricing\Service $pricingService) {
+    public function __construct(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery, \Packetery\Checkout\Model\Pricing\Service $pricingService)
+    {
         $this->packetery = $packetery;
         $this->pricingService = $pricingService;
     }
@@ -67,7 +68,7 @@ class MethodList
         $config = $this->packetery->getPacketeryConfig();
         foreach ($availableMethods as $key => $method) {
             $isCodPaymentMethod = in_array($method->getCode(), $config->getCodMethods(), true);
-            if($isCodPaymentMethod && $exceedsLimit) {
+            if ($isCodPaymentMethod && $exceedsLimit) {
                 unset($availableMethods[$key]);
             }
         }
@@ -80,7 +81,8 @@ class MethodList
      * @param float|null $maxLimit
      * @return bool
      */
-    public static function exceedsValueMaxLimit(float $value, ?float $maxLimit): bool {
+    public static function exceedsValueMaxLimit(float $value, ?float $maxLimit): bool
+    {
         $exceedsLimit = false;
         if ($maxLimit !== null) {
             $exceedsLimit = $value > $maxLimit;

@@ -48,11 +48,13 @@ class ExportMass extends \Magento\Backend\App\Action
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function execute() {
+    public function execute()
+    {
         $selected = $this->getRequest()->getParam('selected');
         if ($selected === 'false') {
             $this->messageManager->addError(__('No orders to export.'));
             $this->_redirect($this->_redirect->getRefererUrl());
+
             return;
         }
 
@@ -61,6 +63,7 @@ class ExportMass extends \Magento\Backend\App\Action
         if (empty($orderIds)) {
             $this->messageManager->addError(__('No orders to export.'));
             $this->_redirect($this->_redirect->getRefererUrl());
+
             return;
         }
 
@@ -69,6 +72,7 @@ class ExportMass extends \Magento\Backend\App\Action
         if (!$content) {
             $this->messageManager->addError(__('Error! No export data found.'));
             $this->_redirect($this->_redirect->getRefererUrl());
+
             return;
         }
 
@@ -93,7 +97,8 @@ class ExportMass extends \Magento\Backend\App\Action
      * @param string|null $content
      * @param string $contentType
      */
-    protected function _sendUploadResponse(string $fileName, ?string $content, string $contentType = 'application/octet-stream') {
+    protected function _sendUploadResponse(string $fileName, ?string $content, string $contentType = 'application/octet-stream')
+    {
         $this->_response->setHttpResponseCode(200)
             ->setHeader('Pragma', 'public', true)
             ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)

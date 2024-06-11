@@ -9,7 +9,8 @@ class AvailableSelect implements \Magento\Framework\Data\OptionSourceInterface
     /**
      * @return array
      */
-    public function toOptionArray(): array {
+    public function toOptionArray(): array
+    {
         $options = [];
 
         $options[] = ['label' => __('Yes'), 'value' => 1];

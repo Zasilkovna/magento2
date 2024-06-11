@@ -7,7 +7,7 @@ define([
     'mage/storage',
     'mage/url',
     'jquery',
-], function(
+], function (
     _,
     uiRegistry,
     Component,
@@ -22,12 +22,12 @@ define([
     frontUrlBuilder.setBaseUrl(window.packetery.baseUrl);
 
     var config = {};
-    var loadConfig = function(onSuccess) {
+    var loadConfig = function (onSuccess) {
         jQuery('body').trigger('processStart');
         var configUrl = frontUrlBuilder.build('packetery/config/storeconfig');
         storage.get(configUrl).done(
-            function(response) {
-                if(response.success) {
+            function (response) {
+                if (response.success) {
                     config = JSON.parse(response.value);
                     onSuccess(config);
                 } else {
@@ -35,10 +35,10 @@ define([
                 }
             }
         ).fail(
-            function() {
+            function () {
                 console.error('Endpoint for packeta config failed');
             }
-        ).always(function() {
+        ).always(function () {
             jQuery('body').trigger('processStop');
         });
     };
@@ -49,22 +49,22 @@ define([
         pickedValidatedAddress: ko.observable(''),
         buttonLabel: ko.observable($t('Check delivery address')),
 
-        isPickupPointDelivery: function() {
+        isPickupPointDelivery: function () {
             return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
         },
 
-        isAnyAddressDelivery: function() {
+        isAnyAddressDelivery: function () {
             return uiRegistry.get('inputName = general[misc][isAnyAddressDelivery]').value() === '1';
         },
 
-        getPacketaSymbolUrl: function() {
+        getPacketaSymbolUrl: function () {
             return window.packetery.packetaSymbolUrl;
         },
 
-        initialize: function() {
+        initialize: function () {
 
             var fieldset = uiRegistry.get('index = general');
-            uiRegistry.get('inputName = general[address_validated]', function(item) {
+            uiRegistry.get('inputName = general[address_validated]', function (item) {
                 if (item.value() === '1') {
                     mixin.buttonLabel($t('Change delivery address'));
                 }
@@ -84,7 +84,7 @@ define([
             return this._super();
         },
 
-        packetaButtonClick: function() {
+        packetaButtonClick: function () {
             var packetaApiKey = config.apiKey;
             var countryId = uiRegistry.get('inputName = general[recipient_country_id]').value();
             var widgetVendors = JSON.parse(uiRegistry.get('inputName = general[misc][widgetVendors]').value());
@@ -100,8 +100,8 @@ define([
                 options.vendors = widgetVendors;
             }
 
-            var pickupPointSelected = function(point) {
-                if(!point) {
+            var pickupPointSelected = function (point) {
+                if (!point) {
                     return;
                 }
 
@@ -119,8 +119,8 @@ define([
             Packeta.Widget.pick(packetaApiKey, pickupPointSelected, options);
         },
 
-        packetaHDButtonClick: function() {
-            var getDestinationAddress = function() {
+        packetaHDButtonClick: function () {
+            var getDestinationAddress = function () {
                 return {
                     country: uiRegistry.get('inputName = general[recipient_country_id]').value().toLocaleLowerCase(),
                     street: uiRegistry.get('inputName = general[recipient_street]').value(),
@@ -149,7 +149,7 @@ define([
                 options.houseNumber = destinationAddress.houseNumber;
             }
 
-            var addressSelected = function(result) {
+            var addressSelected = function (result) {
                 mixin.errorValidationMessage('');
 
                 if (!result) {
@@ -179,7 +179,7 @@ define([
                 uiRegistry.get('inputName = general[recipient_latitude]').value(address.latitude || null);
 
                 mixin.pickedValidatedAddress(
-                    [ address.street, address.houseNumber, address.city ].filter(function(value) {
+                    [ address.street, address.houseNumber, address.city ].filter(function (value) {
                         return !!value;
                     }).join(' ')
                 );
@@ -189,7 +189,7 @@ define([
         }
     };
 
-    loadConfig(function() {
+    loadConfig(function () {
         mixin.isStoreConfigLoaded(true);
     });
 

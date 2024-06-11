@@ -16,7 +16,8 @@ class VendorGroups
      * @param string $group
      * @return \Magento\Framework\Phrase
      */
-    public static function getLabel(string $group): Phrase {
+    public static function getLabel(string $group): Phrase
+    {
         $mapping = [
             self::ZPOINT => __('Internal pickup points'),
             self::ALZABOX => __('AlzaBox'),
@@ -29,7 +30,8 @@ class VendorGroups
     /**
      * @param string[] $codes
      */
-    public static function encode(array $codes): string {
+    public static function encode(array $codes): string
+    {
         return json_encode(array_values($codes), JSON_THROW_ON_ERROR);
     }
 
@@ -37,7 +39,8 @@ class VendorGroups
      * @param string $encodedCodes
      * @return string[]
      */
-    public static function decode(string $encodedCodes): array {
+    public static function decode(string $encodedCodes): array
+    {
         return json_decode($encodedCodes, true, 512, JSON_THROW_ON_ERROR);
     }
 }

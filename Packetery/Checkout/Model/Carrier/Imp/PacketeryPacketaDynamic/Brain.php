@@ -46,7 +46,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param \Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier
      * @return Config
      */
-    public function createConfig(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
+    public function createConfig(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+    {
         return new Config($this->getConfigData($carrier->getCarrierCode(), $carrier->getStore()));
     }
 
@@ -54,21 +55,24 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      *
      * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect
      */
-    public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect {
+    public function getMethodSelect(): \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect
+    {
         return $this->methodSelect;
     }
 
     /**
      * @inheridoc
      */
-    protected static function getResolvableDestinationData(): array {
+    protected static function getResolvableDestinationData(): array
+    {
         return [];
     }
 
     /**
      * @return bool
      */
-    public function isAssignableToPricingRule(): bool {
+    public function isAssignableToPricingRule(): bool
+    {
         return false;
     }
 
@@ -76,7 +80,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param int|null $dynamicCarrierId
      * @return \Packetery\Checkout\Model\Carrier|null
      */
-    public function getDynamicCarrierById(?int $dynamicCarrierId): ?AbstractDynamicCarrier {
+    public function getDynamicCarrierById(?int $dynamicCarrierId): ?AbstractDynamicCarrier
+    {
         if ($dynamicCarrierId === null) {
             return null;
         }
@@ -92,7 +97,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     /**
      * @return DynamicCarrier[]
      */
-    public function findResolvableDynamicCarriers(): array {
+    public function findResolvableDynamicCarriers(): array
+    {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->resolvableOnly();
@@ -112,7 +118,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param array $methods
      * @return DynamicCarrier[]
      */
-    public function findConfigurableDynamicCarriers(string $country, array $methods): array {
+    public function findConfigurableDynamicCarriers(string $country, array $methods): array
+    {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->configurableOnly();
@@ -135,7 +142,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @return int|null
      * @throws \Exception
      */
-    public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int {
+    public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int
+    {
         if ($dynamicCarrier === null) {
             throw new \Exception('Dynamic carrier was not passed');
         }
@@ -152,7 +160,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
-    public function createDynamicConfig(\Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
+    public function createDynamicConfig(\Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+    {
         return new DynamicConfig(
             $config,
             $dynamicCarrier
@@ -163,7 +172,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param string $carrierName
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      */
-    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {
+    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void
+    {
         $collection = $this->carrierCollectionFactory->create();
         $collection->addFilter('carrier_id', $dynamicCarrier->getDynamicCarrierId());
         $collection->setDataToAll(
@@ -180,7 +190,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier
      * @return bool
      */
-    public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+    public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool
+    {
         if ($dynamicCarrier->getDeleted() === true) {
             return false;
         }
@@ -200,10 +211,12 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
      * @param array $methods
      * @return array
      */
-    public function getAvailableCountries(array $methods): array {
+    public function getAvailableCountries(array $methods): array
+    {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->forDeliveryMethods($methods);
+
         return $collection->getColumnValues('country');
     }
 }

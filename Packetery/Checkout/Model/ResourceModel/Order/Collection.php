@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model\ResourceModel\Order;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
@@ -20,7 +21,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     /**
      * @return string
      */
-    private function createSalesOrderCarrierCodeCondition(): string {
+    private function createSalesOrderCarrierCodeCondition(): string
+    {
         $carrierCodes = \Packetery\Checkout\Model\Carrier\Facade::getAllCarrierCodes();
 
         $carrierCodesConditions = [];
@@ -38,8 +40,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     /**
      * Joins Magento sale orders in a way that omits redirected orders from Packeta to foreign carrier.
      */
-    public function joinSalesOrder(): void {
+    public function joinSalesOrder(): void
+    {
         $carrierCodesImploded = $this->createSalesOrderCarrierCodeCondition();
-        $this->join(['sales_order' => 'sales_order'],  "`main_table`.`order_number` = `sales_order`.`increment_id` AND ($carrierCodesImploded)", '');
+        $this->join(['sales_order' => 'sales_order'], "`main_table`.`order_number` = `sales_order`.`increment_id` AND ($carrierCodesImploded)", '');
     }
 }

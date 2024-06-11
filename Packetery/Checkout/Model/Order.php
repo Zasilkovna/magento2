@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model;
 
 class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
@@ -29,35 +30,40 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
     /**
      * @return int
      */
-    public function getPointId(): int {
+    public function getPointId(): int
+    {
         return (int)$this->getData('point_id');
     }
 
     /**
      * @return string
      */
-    public function getPointName(): string {
+    public function getPointName(): string
+    {
         return (string)$this->getData('point_name');
     }
 
     /**
      * @return string
      */
-    public function getOrderNumber(): string {
+    public function getOrderNumber(): string
+    {
         return $this->getData('order_number');
     }
 
     /**
      * @return bool
      */
-    public function isAddressValidated(): bool {
+    public function isAddressValidated(): bool
+    {
         return $this->getData('address_validated') === '1';
     }
 
     /**
      * @return \Packetery\Checkout\Model\Address
      */
-    public function getRecipientAddress(): Address {
+    public function getRecipientAddress(): Address
+    {
         $address = new Address();
         $address->setStreet($this->getData('recipient_street'));
         $address->setHouseNumber($this->getData('recipient_house_number'));
@@ -67,6 +73,7 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
         $address->setCounty($this->getData('recipient_county'));
         $address->setLongitude($this->getData('recipient_longitude'));
         $address->setLatitude($this->getData('recipient_latitude'));
+
         return $address;
     }
 }

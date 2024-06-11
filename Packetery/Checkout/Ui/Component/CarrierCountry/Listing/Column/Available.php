@@ -38,7 +38,8 @@ class Available extends Column
      * @param array $dataSource
      * @return array
      */
-    public function prepareDataSource(array $dataSource): array {
+    public function prepareDataSource(array $dataSource): array
+    {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 if ($item['available'] === '1') {
@@ -52,7 +53,8 @@ class Available extends Column
         return $dataSource;
     }
 
-    protected function applySorting() {
+    protected function applySorting()
+    {
         // no DB select sorting
     }
 }

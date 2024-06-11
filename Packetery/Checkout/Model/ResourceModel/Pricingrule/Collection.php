@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model\ResourceModel\Pricingrule;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
@@ -37,6 +38,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     {
         $this->load();
         $items = $this->_items;
+
         return array_shift($items);
     }
 }

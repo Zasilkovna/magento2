@@ -33,7 +33,8 @@ class InlineEdit extends Action implements HttpPostActionInterface
     /**
      * @return \Magento\Framework\App\ResponseInterface
      */
-    public function execute() {
+    public function execute()
+    {
         $postItems = $this->getRequest()->getParam('items', []);
         foreach ($postItems as $modelId => $postItem) {
             $orderCollection = $this->orderCollectionFactory->create();

@@ -17,56 +17,64 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
      *
      * @param \Packetery\Checkout\Model\Carrier $model
      */
-    public function __construct(\Packetery\Checkout\Model\Carrier $model) {
+    public function __construct(\Packetery\Checkout\Model\Carrier $model)
+    {
         $this->model = $model;
     }
 
     /**
      * @return int
      */
-    public function getDynamicCarrierId(): int {
+    public function getDynamicCarrierId(): int
+    {
         return $this->model->getCarrierId();
     }
 
     /**
      * @return string
      */
-    public function getCountryId(): string {
+    public function getCountryId(): string
+    {
         return $this->model->getCountry();
     }
 
     /**
      * @return float|null
      */
-    public function getMaxWeight(): ?float {
+    public function getMaxWeight(): ?float
+    {
         return $this->model->getMaxWeight();
     }
 
     /**
      * @return bool
      */
-    public function getDeleted(): bool {
+    public function getDeleted(): bool
+    {
         return $this->model->getDeleted();
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->model->getName();
     }
 
     /**
      * @return string
      */
-    public function getFinalCarrierName(): string {
+    public function getFinalCarrierName(): string
+    {
         return $this->model->getFinalCarrierName();
     }
 
     /**
      * @return array
      */
-    public function getMethods(): array {
+    public function getMethods(): array
+    {
         return [$this->model->getMethod()];
     }
 }

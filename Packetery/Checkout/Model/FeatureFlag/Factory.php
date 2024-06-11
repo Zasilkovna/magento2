@@ -21,7 +21,8 @@ class Factory
      *
      * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(ObjectManagerInterface $objectManager) {
+    public function __construct(ObjectManagerInterface $objectManager)
+    {
         $this->objectManager = $objectManager;
     }
 
@@ -33,7 +34,8 @@ class Factory
      * @param array $data
      * @return T|Flag
      */
-    public function createLoaded(string $className, array $data = []): Flag {
+    public function createLoaded(string $className, array $data = []): Flag
+    {
         $flag = $this->objectManager->create($className, $data);
         $flag->loadSelf();
 

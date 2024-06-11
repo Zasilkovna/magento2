@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model\ResourceModel;
 
 class Weightrule extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb

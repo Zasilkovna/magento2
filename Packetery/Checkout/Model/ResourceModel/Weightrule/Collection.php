@@ -1,4 +1,5 @@
 <?php
+
 namespace Packetery\Checkout\Model\ResourceModel\Weightrule;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection

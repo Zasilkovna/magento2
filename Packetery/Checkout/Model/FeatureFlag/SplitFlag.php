@@ -13,7 +13,8 @@ class SplitFlag extends \Magento\Framework\Flag
      */
     protected $_flagCode = 'packetery_feature_split';
 
-    public function setActive(string $value = '1'): void {
+    public function setActive(string $value = '1'): void
+    {
         if (!in_array($value, ['0', '1'])) {
             throw new \InvalidArgumentException();
         }
@@ -26,7 +27,8 @@ class SplitFlag extends \Magento\Framework\Flag
         );
     }
 
-    public function setLastFetchTime(\DateTimeImmutable $time): void {
+    public function setLastFetchTime(\DateTimeImmutable $time): void
+    {
         $this->setFlagData(
             [
                 'lastFetchTime' => $time
@@ -37,7 +39,8 @@ class SplitFlag extends \Magento\Framework\Flag
         );
     }
 
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         $data = $this->getFlagDataAsArray();
         if (!isset($data['active'])) {
             return false;
@@ -46,7 +49,8 @@ class SplitFlag extends \Magento\Framework\Flag
         return $data['active'] === '1';
     }
 
-    public function getLastFetchTime(): ?\DateTimeImmutable {
+    public function getLastFetchTime(): ?\DateTimeImmutable
+    {
         $data = $this->getFlagDataAsArray();
         if (!isset($data['lastFetchTime'])) {
             return null;
@@ -55,7 +59,8 @@ class SplitFlag extends \Magento\Framework\Flag
         return \DateTimeImmutable::createFromFormat(\DateTimeImmutable::ATOM, $data['lastFetchTime'], new \DateTimeZone('UTC'));
     }
 
-    private function getFlagDataAsArray(): array {
+    private function getFlagDataAsArray(): array
+    {
         $flagData = $this->getFlagData();
         if (!is_array($flagData)) {
             return [];

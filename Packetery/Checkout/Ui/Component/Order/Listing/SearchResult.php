@@ -54,7 +54,8 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         );
     }
 
-    protected function _initSelect() {
+    protected function _initSelect()
+    {
         $subQuery = $this->orderCollectionFactory->create()->getSelect();
         $subQuery->reset('columns');
         $subQuery->columns(

@@ -11,7 +11,8 @@ trait ByFieldColumnTrait
      *
      * @return string
      */
-    private function getByField(): string {
+    private function getByField(): string
+    {
         return $this->getData('packetery/byField') ?? $this->getData('name');
     }
 }

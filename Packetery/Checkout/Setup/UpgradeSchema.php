@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Packetery\Checkout\Setup;
 
 use Magento\Framework\Setup\UpgradeSchemaInterface;

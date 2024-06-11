@@ -49,7 +49,8 @@ class Manager
         $this->adminNotificationInbox = $adminNotificationInbox;
     }
 
-    private function getFlag(string $className): Flag {
+    private function getFlag(string $className): Flag
+    {
         if (!isset($this->cachedFlags[$className])) {
             $this->cachedFlags[$className] = $this->flagFactory->createLoaded(SplitFlag::class);
         }

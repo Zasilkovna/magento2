@@ -22,7 +22,8 @@ abstract class AbstractConfig
         $this->data = $data ?? [];
     }
 
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return $this->data;
     }
 
@@ -30,7 +31,8 @@ abstract class AbstractConfig
      * @param string $key
      * @return mixed|null
      */
-    protected function getConfigData(string $key) {
+    protected function getConfigData(string $key)
+    {
         if (isset($this->data[$key])) {
             return $this->data[$key];
         }
@@ -60,6 +62,7 @@ abstract class AbstractConfig
     public function getMaxWeight(): ?float
     {
         $value = $this->getConfigData('max_weight');
+
         return (is_numeric($value) ? (float)$value : null);
     }
 
@@ -69,6 +72,7 @@ abstract class AbstractConfig
     protected function getFreeShippingEnable(): ?int
     {
         $value = $this->getConfigData('free_shipping_enable');
+
         return (is_numeric($value) ? (int)$value : null);
     }
 
@@ -79,6 +83,7 @@ abstract class AbstractConfig
     {
         if ($this->getFreeShippingEnable() === 1) {
             $value = $this->getConfigData('free_shipping_subtotal');
+
             return (is_numeric($value) ? (float)$value : null);
         }
 
@@ -91,6 +96,7 @@ abstract class AbstractConfig
     public function getAllowedMethods(): array
     {
         $value = $this->getConfigData('allowedMethods');
+
         return (is_string($value) ? explode(',', $value) : []);
     }
 }

@@ -56,7 +56,8 @@ class Modifier implements ModifierInterface
     /**
      * @return \Packetery\Checkout\Model\HybridCarrier[]
      */
-    public function getCarriers(string $country): array {
+    public function getCarriers(string $country): array
+    {
         $hybridCarriers = [];
 
         $staticCarriers = $this->carrierFacade->getPacketeryAbstractCarriers();
@@ -112,7 +113,8 @@ class Modifier implements ModifierInterface
      * @param \Packetery\Checkout\Model\HybridCarrier $carrier
      * @return string
      */
-    private function getCarrierFieldName(HybridCarrier $carrier): string {
+    private function getCarrierFieldName(HybridCarrier $carrier): string
+    {
         return $carrier->getData('carrier_code') . '_' . $carrier->getData('method_code'); // pure number wont work
     }
 
@@ -120,7 +122,8 @@ class Modifier implements ModifierInterface
      * @param array $meta
      * @return array
      */
-    public function modifyMeta(array $meta) {
+    public function modifyMeta(array $meta)
+    {
         $countryId = $this->request->getParam('country');
         $carriers = $this->getCarriers($countryId);
 
@@ -252,7 +255,8 @@ class Modifier implements ModifierInterface
      * @param string $countryId
      * @return array
      */
-    private function getPricingRuleFields(HybridCarrier $carrier, string $countryId): array {
+    private function getPricingRuleFields(HybridCarrier $carrier, string $countryId): array
+    {
         return [
             'id' => [
                 'arguments' => [
@@ -403,7 +407,8 @@ class Modifier implements ModifierInterface
     /**
      * @return array
      */
-    private function getWeightRules(HybridCarrier $carrier): array {
+    private function getWeightRules(HybridCarrier $carrier): array
+    {
         $weightUpperlimit = $this->carrierFacade->getMaxWeight($carrier->getCarrierCode(), $carrier->getCarrierId());
 
         $configRow = [
@@ -509,6 +514,7 @@ class Modifier implements ModifierInterface
                 ],
             ],
         ];
+
         return $configRow;
     }
 
@@ -517,7 +523,8 @@ class Modifier implements ModifierInterface
      * @param bool|null $enabled
      * @return array
      */
-    public function getPricingRulesForCountry(string $country, ?bool $enabled = null): array {
+    public function getPricingRulesForCountry(string $country, ?bool $enabled = null): array
+    {
         $data = $this->createData($country);
 
         $pricingRules = [];
@@ -541,7 +548,8 @@ class Modifier implements ModifierInterface
      * @param string $country
      * @return array
      */
-    public function createData(string $country): array {
+    public function createData(string $country): array
+    {
         $result = [
             'shipping_methods' => [],
         ];
@@ -594,9 +602,11 @@ class Modifier implements ModifierInterface
      * @param array $data
      * @return array
      */
-    public function modifyData(array $data) {
+    public function modifyData(array $data)
+    {
         $country = $this->request->getParam('country');
         $result = $this->createData($country);
+
         return [$country => $result]; // see packetery_pricingrule_multiDetail.xml DataProvider
     }
 }

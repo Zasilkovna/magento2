@@ -66,10 +66,12 @@ abstract class AbstractBrain
      * @param \Magento\Quote\Model\Quote\Address\RateRequest $request
      * @return float
      */
-    public function getRateRequestWeight(RateRequest $request): float {
+    public function getRateRequestWeight(RateRequest $request): float
+    {
         /** @var \Magento\Quote\Model\Quote\Item[] $allItems */
         $allItems = $request->getAllItems();
         $allItems = \Packetery\Checkout\Model\Weight\Item::transformItems($allItems);
+
         return $this->weightCalculator->getItemsWeight($allItems);
     }
 
@@ -84,21 +86,24 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
-    public function createDynamicConfig(AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): AbstractConfig {
+    public function createDynamicConfig(AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): AbstractConfig
+    {
         return $config;
     }
 
     /** Can pricing rule be attached to abstract carrier of this namespace
      * @return bool
      */
-    public function isAssignableToPricingRule(): bool {
+    public function isAssignableToPricingRule(): bool
+    {
         return true;
     }
 
     /**
      * @return \Magento\Shipping\Model\Rate\Result
      */
-    public function createRateResult(): \Magento\Shipping\Model\Rate\Result {
+    public function createRateResult(): \Magento\Shipping\Model\Rate\Result
+    {
         return $this->rateResultFactory->create();
     }
 
@@ -107,7 +112,8 @@ abstract class AbstractBrain
      * @param mixed $scope
      * @return mixed
      */
-    protected function getConfigData(string $carrierCode, $scope) {
+    protected function getConfigData(string $carrierCode, $scope)
+    {
         $path = 'carriers/' . $carrierCode;
 
         return $this->scopeConfig->getValue(
@@ -121,7 +127,8 @@ abstract class AbstractBrain
      *
      * @return string
      */
-    public function getCarrierCode(): string {
+    public function getCarrierCode(): string
+    {
         return static::getCarrierCodeStatic();
     }
 
@@ -129,10 +136,12 @@ abstract class AbstractBrain
      *
      * @return string
      */
-    public static function getCarrierCodeStatic(): string {
+    public static function getCarrierCodeStatic(): string
+    {
         $reflection = new \ReflectionClass(static::class);
         $fileName = $reflection->getFileName();
         $carrierDir = basename(dirname($fileName));
+
         return lcfirst($carrierDir);
     }
 
@@ -153,8 +162,10 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return int|null
      */
-    public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int {
+    public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int
+    {
         $data = $this::getResolvableDestinationData();
+
         return ($data[$method]['countryBranchIds'][$countryId] ?? null);
     }
 
@@ -162,14 +173,17 @@ abstract class AbstractBrain
      * @param string $carrierName
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      */
-    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {}
+    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void
+    {
+    }
 
     /** Used only by Packeta Dynamic
      *
      * @param int $id
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null
      */
-    public function getDynamicCarrierById(?int $id): ?AbstractDynamicCarrier {
+    public function getDynamicCarrierById(?int $id): ?AbstractDynamicCarrier
+    {
         return null;
     }
 
@@ -177,14 +191,16 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier
      * @return bool
      */
-    public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+    public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool
+    {
         return true;
     }
 
     /** What Mordor branch ids does carrier implement
      * @return array
      */
-    public static function getImplementedBranchIds(): array {
+    public static function getImplementedBranchIds(): array
+    {
         return [];
     }
 
@@ -194,7 +210,8 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return bool
      */
-    protected function isAvailableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
+    protected function isAvailableForCollection(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool
+    {
         if ($method !== Methods::PICKUP_POINT_DELIVERY) {
             if ($this->resolvePointId($method, $countryId, $dynamicCarrier) === null) {
                 return false;
@@ -202,6 +219,7 @@ abstract class AbstractBrain
         }
 
         $availableCountries = $this->getAvailableCountries([$method]);
+
         return in_array($countryId, $availableCountries) && $this->validateDynamicCarrier($method, $countryId, $dynamicCarrier);
     }
 
@@ -211,7 +229,8 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return \Magento\Shipping\Model\Rate\Result|null
      */
-    public function collectRates(AbstractCarrier $carrier, RateRequest $request, ?AbstractDynamicCarrier $dynamicCarrier = null): ?Result {
+    public function collectRates(AbstractCarrier $carrier, RateRequest $request, ?AbstractDynamicCarrier $dynamicCarrier = null): ?Result
+    {
         $brain = $carrier->getPacketeryBrain();
 
         $config = $this->createDynamicConfig(
@@ -257,7 +276,8 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
      * @return bool
      */
-    public function isCollectionPossible(AbstractConfig $config): bool {
+    public function isCollectionPossible(AbstractConfig $config): bool
+    {
         if ($this->httpRequest->getModuleName() == self::MULTI_SHIPPING_MODULE_NAME) {
             return false;
         }
@@ -274,7 +294,8 @@ abstract class AbstractBrain
      * @param array $methods
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
      */
-    public function findConfigurableDynamicCarriers(string $country, array $methods): array {
+    public function findConfigurableDynamicCarriers(string $country, array $methods): array
+    {
         return [];
     }
 
@@ -282,7 +303,8 @@ abstract class AbstractBrain
      *
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
      */
-    public function findResolvableDynamicCarriers(): array {
+    public function findResolvableDynamicCarriers(): array
+    {
         return [];
     }
 
@@ -290,7 +312,8 @@ abstract class AbstractBrain
      * @param array $methods
      * @return array
      */
-    public function getAvailableCountries(array $methods): array {
+    public function getAvailableCountries(array $methods): array
+    {
         return [];
     }
 
@@ -299,9 +322,11 @@ abstract class AbstractBrain
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractMethodSelect $methodSelect
      * @return array
      */
-    public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): array {
+    public function getFinalAllowedMethods(AbstractConfig $config, AbstractMethodSelect $methodSelect): array
+    {
         if ($config instanceof AbstractDynamicConfig) {
             $final = $this->getFinalAllowedMethods($config->getConfig(), $methodSelect);
+
             return array_intersect($config->getAllowedMethods(), $final);
         }
 

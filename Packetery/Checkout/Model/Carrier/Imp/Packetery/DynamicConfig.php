@@ -15,7 +15,8 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
     /** @var Config */
     private $config;
 
-    public function __construct(Config $config, AbstractDynamicCarrier $carrier) {
+    public function __construct(Config $config, AbstractDynamicCarrier $carrier)
+    {
         parent::__construct($config->toArray());
         $this->carrier = $carrier;
         $this->config = $config;
@@ -24,18 +25,21 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
     /**
      * @return \Magento\Framework\Phrase|string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->carrier->getFinalCarrierName();
     }
 
     /**
      * @return string[]
      */
-    public function getAllowedMethods(): array {
+    public function getAllowedMethods(): array
+    {
         return $this->carrier->getMethods();
     }
 
-    public function getConfig(): AbstractConfig {
+    public function getConfig(): AbstractConfig
+    {
         return $this->config;
     }
 }

@@ -52,6 +52,7 @@ class PaymentMethod implements \Magento\Framework\Data\OptionSourceInterface
             usort($options, function ($optionA, $optionB) {
                 $labelA = (string)$optionA['label'];
                 $labelB = (string)$optionB['label'];
+
                 return strcasecmp($labelA, $labelB);
             });
 

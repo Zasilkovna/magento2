@@ -19,7 +19,8 @@ class MethodCode
      * @param string $method
      * @param int|null $dynamicCarrierId
      */
-    public function __construct(string $method, ?int $dynamicCarrierId) {
+    public function __construct(string $method, ?int $dynamicCarrierId)
+    {
         $this->method = $method;
         $this->dynamicCarrierId = $dynamicCarrierId;
     }
@@ -28,7 +29,8 @@ class MethodCode
      * @param string $methodCode
      * @return \Packetery\Checkout\Model\Carrier\MethodCode
      */
-    public static function fromString(string $methodCode) {
+    public static function fromString(string $methodCode)
+    {
         $parts = explode('-', $methodCode);
         $method = array_pop($parts);
         $dynamicCarrierId = array_pop($parts);
@@ -43,7 +45,8 @@ class MethodCode
     /**
      * @return string
      */
-    public function toString(): string {
+    public function toString(): string
+    {
         if ($this->dynamicCarrierId !== null) {
             return "{$this->dynamicCarrierId}-{$this->method}";
         }
@@ -54,14 +57,16 @@ class MethodCode
     /**
      * @return string
      */
-    public function getMethod(): string {
+    public function getMethod(): string
+    {
         return $this->method;
     }
 
     /**
      * @return int|null
      */
-    public function getDynamicCarrierId(): ?int {
+    public function getDynamicCarrierId(): ?int
+    {
         return $this->dynamicCarrierId;
     }
 }

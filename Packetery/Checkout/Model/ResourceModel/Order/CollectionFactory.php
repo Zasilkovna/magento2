@@ -43,6 +43,7 @@ class CollectionFactory
         /** @var \Packetery\Checkout\Model\ResourceModel\Order\Collection $collection */
         $collection = $this->objectManager->create($this->instanceName, $data);
         $collection->joinSalesOrder();
+
         return $collection;
     }
 

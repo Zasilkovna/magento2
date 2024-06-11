@@ -38,7 +38,8 @@ class Save extends Action implements HttpPostActionInterface
      * @param mixed $default
      * @return mixed
      */
-    private function getDataItem(array $data, string $key, $default) {
+    private function getDataItem(array $data, string $key, $default)
+    {
         if (!array_key_exists($key, $data)) {
             return $default;
         }
