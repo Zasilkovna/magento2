@@ -45,6 +45,6 @@
     </type>
 
     <type name="Magento\Sales\Block\Adminhtml\Order\View">
-        <plugin name="packeta_submit" type="Packetery\Checkout\Block\Adminhtml\Order\View"/>
+        <plugin name="packetery_submit_button" type="Packetery\Checkout\Block\Adminhtml\Order\View"/>
     </type>
 </config>
