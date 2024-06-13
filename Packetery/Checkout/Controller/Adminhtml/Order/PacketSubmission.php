@@ -38,10 +38,11 @@ class PacketSubmission extends \Magento\Backend\App\Action
         $orderNumber = $this->getRequest()->getParam('order_number');
         $orderCollection = $this->orderCollectionFactory->create();
         $order = $orderCollection->getItemByColumnValue('order_number', $orderNumber);
-        if (empty($order)) {
+        if ($order === null) {
+            $orderId = $this->getRequest()->getParam('order_id');
             $this->messageManager->addErrorMessage(__('Page not found'));
 
-            return $this->resultRedirectFactory->create()->setPath('*/*/index');
+            return $this->resultRedirectFactory->create()->setPath('sales/order/view', ['order_id' => $orderId]);
         }
 
         return $resultPage;
