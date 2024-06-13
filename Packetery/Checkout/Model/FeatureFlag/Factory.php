@@ -32,7 +32,7 @@ class Factory
      * @template T
      * @param class-string<T> $className
      * @param array $data
-     * @return T|Flag
+     * @return \Magento\Framework\Flag
      */
     public function createLoaded(string $className, array $data = []): Flag
     {

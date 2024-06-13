@@ -93,7 +93,7 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     /**
      * getAllowedMethods
      *
-     * @param array
+     * @return  array
      */
     public function getAllowedMethods(): array
     {

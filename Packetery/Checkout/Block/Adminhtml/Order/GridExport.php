@@ -14,7 +14,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Helper\Data $backendHelper
-     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory
      * @param array $data
      */
     public function __construct(
