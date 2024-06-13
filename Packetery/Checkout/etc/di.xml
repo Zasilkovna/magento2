@@ -43,4 +43,8 @@
     <type name="Magento\Payment\Model\MethodList">
         <plugin name="packetery_restrict_payment_methods" type="Packetery\Checkout\Model\Payment\MethodList" sortOrder="99"/>
     </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="packeta_submit" type="Packetery\Checkout\Block\Adminhtml\Order\View"/>
+    </type>
 </config>
