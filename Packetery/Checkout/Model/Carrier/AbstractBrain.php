@@ -83,7 +83,7 @@ abstract class AbstractBrain
 
     /**
      * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
-     * @param \Packetery\Checkout\Model\Carrier|null $dynamicCarrier
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
      * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
     public function createDynamicConfig(AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): AbstractConfig

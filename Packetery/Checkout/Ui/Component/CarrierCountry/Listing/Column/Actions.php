@@ -27,7 +27,7 @@ class Actions extends Column
      *
      * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Magento\Framework\Url $urlBuilder
+     * @param \Magento\Backend\Model\UrlInterface $urlBuilder
      * @param string $viewUrl
      * @param array $components
      * @param array $data

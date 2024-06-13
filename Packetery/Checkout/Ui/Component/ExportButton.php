@@ -11,13 +11,13 @@ class ExportButton extends \Magento\Ui\Component\ExportButton
      */
     public function prepare()
     {
-        $config = $this->getConfig();
+        $config = $this->getData('config');
         $options = $config['options'];
 
         unset($options['xml']);
         unset($options['csv']);
         $config['options'] = $options;
-        $this->setConfig($config);
+        $this->setData('config', $config);
 
         parent::prepare();
     }

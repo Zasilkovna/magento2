@@ -18,7 +18,8 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
     private $config;
 
     /**
-     * @param array $data
+     * @param \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Config $config
+     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $carrier
      */
     public function __construct(Config $config, AbstractDynamicCarrier $carrier)
     {

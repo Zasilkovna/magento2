@@ -7,14 +7,14 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 {
     /**
-     * @var \Learning\Test\Model\ResourceModel\Info\CollectionFactory
+     * @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory
      */
     protected $_collectionFactory;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Helper\Data $backendHelper
-     * @param \Learning\Test\Model\ResourceModel\Info\CollectionFactory
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory
      * @param array $data
      */
     public function __construct(
@@ -33,7 +33,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     protected function _construct()
     {
         parent::_construct();
-        $this->setId('order_items');
+        $this->__call('setId', ['order_items']);
         $this->setDefaultSort('id');
         $this->setDefaultDir('ASC');
     }
