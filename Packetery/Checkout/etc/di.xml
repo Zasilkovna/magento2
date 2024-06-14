@@ -5,6 +5,7 @@
                 <item name="packetery_checkout_order_listing_data_source" xsi:type="string">OrderGridCollection</item>
                 <item name="packetery_checkout_pricingrule_items_data_source" xsi:type="string">PricingruleGridCollection</item>
                 <item name="packetery_checkout_carrierCountry_listing_data_source" xsi:type="string">CarrierCountryGridCollection</item>
+                <item name="packetery_checkout_log_listing_data_source" xsi:type="string">LogGridCollection</item>
             </argument>
         </arguments>
     </type>
@@ -27,6 +28,13 @@
         <arguments>
             <argument name="mainTable" xsi:type="string">packetery_carrier</argument>
             <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Carrier</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="LogGridCollection" type="Packetery\Checkout\Ui\Component\Log\Listing\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">packetery_log</argument>
+            <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Log</argument>
         </arguments>
     </virtualType>
 

@@ -19,5 +19,17 @@
         "index": {
             "PACKETERY_PACKET_DRAFT_ORDER_ID": true
         }
+    },
+    "packetery_log": {
+        "column": {
+            "id": true,
+            "title": true,
+            "status": true,
+            "action": true,
+            "date": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
     }
 }
