@@ -1,0 +1,23 @@
+{
+    "packetery_packet_draft": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "value": true,
+            "cod": true,
+            "weight": true,
+            "length": true,
+            "height": true,
+            "width": true,
+            "adult_content": true,
+            "dispatch_at": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_PACKET_DRAFT_ORDER_ID": true
+        }
+    }
+}
