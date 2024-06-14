@@ -4,8 +4,8 @@
     <table name="packetery_packet_draft" resource="default" engine="innodb" comment="Packetery Packet Draft Table">
         <column xsi:type="int" name="id" nullable="false" identity="true" unsigned="true" comment="Entity ID"/>
         <column xsi:type="int" name="order_id" nullable="false" unsigned="true" comment="Packeta Order ID"/>
-        <column xsi:type="decimal" name="value" nullable="true" precision="10" scale="4" comment="Order value"/>
-        <column xsi:type="decimal" name="cod" nullable="true" precision="10" scale="4" comment="COD value"/>
+        <column xsi:type="decimal" name="value" nullable="true" precision="20" scale="4" comment="Order value"/>
+        <column xsi:type="decimal" name="cod" nullable="true" precision="20" scale="4" comment="COD value"/>
         <column xsi:type="float" name="weight" nullable="true" comment="Packet weight"/>
         <column xsi:type="smallint" name="length" nullable="true" unsigned="true" comment="Packet length"/>
         <column xsi:type="smallint" name="height" nullable="true" unsigned="true" comment="Packet height"/>
