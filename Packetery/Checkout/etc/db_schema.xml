@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="packetery_packet_draft" resource="default" engine="innodb" comment="Packetery Packet Draft Table">
+        <column xsi:type="int" name="id" nullable="false" identity="true" unsigned="true" comment="Entity ID"/>
+        <column xsi:type="int" name="order_id" nullable="false" comment="Order ID"/>
+        <column xsi:type="decimal" name="value" nullable="true" scale="4" comment="Order value"/>
+        <column xsi:type="decimal" name="cod" nullable="true" scale="4" comment="COD value"/>
+        <column xsi:type="float" name="weight" nullable="true" comment="Packet weight"/>
+        <column xsi:type="int" name="length" nullable="true" comment="Packet length"/>
+        <column xsi:type="int" name="height" nullable="true" comment="Packet height"/>
+        <column xsi:type="int" name="width" nullable="true" comment="Packet width"/>
+        <column xsi:type="boolean" name="adult_content" nullable="false" default="0" comment="Packet contains adult content"/>
+        <column xsi:type="timestamp" name="dispatch_at" nullable="true" comment="Planned dispatch date"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+</schema>
