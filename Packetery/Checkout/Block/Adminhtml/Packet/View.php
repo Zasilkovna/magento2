@@ -2,20 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Block\Adminhtml\Order;
+namespace Packetery\Checkout\Block\Adminhtml\Packet;
 
 use Magento\Sales\Block\Adminhtml\Order\View as OrderView;
 
 class View
 {
-    /**
-     * Prepares Magento Layout.
-     *
-     * @param OrderView $subject
-     */
     public function beforeSetLayout(OrderView $subject): void
     {
-        $url = $subject->getUrl('packetery/order/packetSubmission', ['order_number' => $subject->getOrder()->getIncrementId()]);
+        $url = $subject->getUrl('packetery/packet/add');
 
         $subject->addButton(
             'packetery_submit_button',
