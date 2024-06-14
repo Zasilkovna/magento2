@@ -3,7 +3,7 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
     <table name="packetery_packet_draft" resource="default" engine="innodb" comment="Packetery Packet Draft Table">
         <column xsi:type="int" name="id" nullable="false" identity="true" unsigned="true" comment="Entity ID"/>
-        <column xsi:type="int" name="order_id" nullable="false" unsigned="true" comment="Order ID"/>
+        <column xsi:type="int" name="order_id" nullable="false" unsigned="true" comment="Packeta Order ID"/>
         <column xsi:type="decimal" name="value" nullable="true" precision="10" scale="4" comment="Order value"/>
         <column xsi:type="decimal" name="cod" nullable="true" precision="10" scale="4" comment="COD value"/>
         <column xsi:type="float" name="weight" nullable="true" comment="Packet weight"/>
@@ -16,6 +16,8 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
-        <constraint xsi:type="foreign" referenceId="SALES_ORDER_ENTITY_ID" table="packetery_packet_draft" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="IDX_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
     </table>
 </schema>
