@@ -44,9 +44,4 @@ class Status extends Column
 
         return $dataSource;
     }
-
-    protected function applySorting(): void
-    {
-        // no DB select sorting
-    }
 }
