@@ -37,8 +37,8 @@ class EmailOrderTemplateVarsBefore implements \Magento\Framework\Event\ObserverI
         $order = $transport['order'];
         $collection = $this->orderCollectionFactory->create();
         $collection->addFilter('order_number', $order->getData('increment_id'));
-        /** @var \Packetery\Checkout\Model\Order|null $packeteryOrder */
         $items = ( $collection->getItems() ?: [] );
+        /** @var \Packetery\Checkout\Model\Order|null $packeteryOrder */
         $packeteryOrder = array_shift($items);
 
         $transport['packetery_is_pickup_point'] = false;
