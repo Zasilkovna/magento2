@@ -11,13 +11,8 @@ use Packetery\Checkout\Ui\Component\Log\ActionSelect;
 
 class Action extends Column
 {
-    /** @var \Packetery\Checkout\Ui\Component\Log\ActionSelect */
-    protected $actionSelect;
+    protected \Packetery\Checkout\Ui\Component\Log\ActionSelect $actionSelect;
 
-    /**
-     * @param mixed[] $components
-     * @param mixed[] $data
-     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
@@ -29,10 +24,6 @@ class Action extends Column
         $this->actionSelect = $actionSelect;
     }
 
-    /**
-     * @param mixed[] $dataSource
-     * @return mixed[]
-     */
     public function prepareDataSource(array $dataSource): array
     {
         if (isset($dataSource['data']['items'])) {

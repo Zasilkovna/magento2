@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Packetery\Checkout\Controller\Adminhtml\Log;
 
 class Index extends \Magento\Backend\App\Action
 {
-    /** @var \Magento\Framework\View\Result\PageFactory */
-    protected $resultPageFactory;
+    protected \Magento\Framework\View\Result\PageFactory $resultPageFactory;
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -15,10 +16,7 @@ class Index extends \Magento\Backend\App\Action
         $this->resultPageFactory = $resultPageFactory;
     }
 
-    /**
-     * @return \Magento\Backend\Model\View\Result\Page
-     */
-    public function execute()
+    public function execute(): \Magento\Backend\Model\View\Result\Page
     {
         /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();

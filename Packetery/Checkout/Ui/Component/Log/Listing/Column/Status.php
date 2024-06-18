@@ -11,13 +11,8 @@ use Packetery\Checkout\Ui\Component\Log\StatusSelect;
 
 class Status extends Column
 {
-    /** @var \Packetery\Checkout\Ui\Component\Log\StatusSelect */
-    protected $statusSelect;
+    protected \Packetery\Checkout\Ui\Component\Log\StatusSelect $statusSelect;
 
-    /**
-     * @param mixed[] $components
-     * @param mixed[] $data
-     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
@@ -29,10 +24,6 @@ class Status extends Column
         $this->statusSelect = $statusSelect;
     }
 
-    /**
-     * @param mixed[] $dataSource
-     * @return mixed[]
-     */
     public function prepareDataSource(array $dataSource): array
     {
         if (isset($dataSource['data']['items'])) {

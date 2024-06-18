@@ -14,9 +14,6 @@ class ActionSelect implements \Magento\Framework\Data\OptionSourceInterface
     public const ACTION_SENDER_VALIDATION = 'sender-validation';
     public const ACTION_PACKET_CANCEL = 'packet-cancel';
 
-    /**
-     * @return mixed[]
-     */
     public function toOptionArray(): array
     {
         return [
