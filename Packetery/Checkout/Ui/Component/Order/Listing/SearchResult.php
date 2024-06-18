@@ -64,8 +64,6 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'recipient_fullname' => "CONCAT_WS('', main_table.recipient_firstname, ' ',main_table.recipient_lastname)",
                 'recipient_address' => "CONCAT_WS('', main_table.recipient_street, ' ', main_table.recipient_house_number, ' ', main_table.recipient_city, ' ', main_table.recipient_zip)",
                 'delivery_destination' => "CONCAT_WS('', main_table.point_name, ' ', main_table.point_id)",
-                'value_transformed' => "main_table.value",
-                'cod_transformed' => "IF(main_table.cod > 0, 1, 0)",
                 'exported_transformed' => "main_table.exported",
                 'exported_at_transformed' => "main_table.exported_at",
                 'order_status' => "sales_order.status",

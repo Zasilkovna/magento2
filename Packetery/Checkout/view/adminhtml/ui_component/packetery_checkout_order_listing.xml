@@ -176,14 +176,38 @@
                 </item>
             </argument>
         </column>
-        <column name="cod_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\YesNo">
+        <column name="value" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Value">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\YesNoSelect</item>
                 <item name="config" xsi:type="array">
-                    <item name="sortable" xsi:type="boolean">false</item>
-                    <item name="filter" xsi:type="string">select</item>
-                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="sortable" xsi:type="boolean">true</item>
+                    <item name="filter" xsi:type="string">textRange</item>
+                    <item name="label" xsi:type="string" translate="true">Total price</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                            <item name="pattern" xsi:type="string">^(([1-9][0-9]{0,2}(,[0-9]{3})*|([1-9][0-9]*))(,[0-9]{2})?(\.[0-9]+)?)$</item>
+                        </item>
+                    </item>
+                </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">value</item>
+                </item>
+            </argument>
+        </column>
+        <column name="cod" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Value">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">true</item>
+                    <item name="filter" xsi:type="string">textRange</item>
                     <item name="label" xsi:type="string" translate="true">Cash on delivery</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                            <item name="pattern" xsi:type="string">^((0|[1-9][0-9]{0,2}(,[0-9]{3})*|([0-9]+))(,[0-9]{2})?(\.[0-9]+)?)$</item>
+                        </item>
+                    </item>
                 </item>
                 <item name="packetery" xsi:type="array">
                     <item name="byField" xsi:type="string">cod</item>
@@ -199,28 +223,16 @@
                 </item>
             </argument>
         </column>
-        <column name="value_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Value">
+        <column name="weight">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="sortable" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">textRange</item>
-                    <item name="label" xsi:type="string" translate="true">Total price</item>
-                </item>
-                <item name="packetery" xsi:type="array">
-                    <item name="byField" xsi:type="string">value</item>
-                </item>
-            </argument>
-        </column>
-        <column name="weight">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="sortable" xsi:type="boolean">false</item>
                     <item name="editor" xsi:type="array">
                         <item name="editorType" xsi:type="string">text</item>
                         <item name="validation" xsi:type="array">
                             <item name="required-entry" xsi:type="boolean">true</item>
-                            <item name="validate-number" xsi:type="boolean">true</item>
-                            <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
+                            <item name="pattern" xsi:type="string">^(?=.*[1-9])\d*([.,]\d+)?$</item>
                         </item>
                     </item>
                     <item name="label" xsi:type="string" translate="true">Weight</item>
