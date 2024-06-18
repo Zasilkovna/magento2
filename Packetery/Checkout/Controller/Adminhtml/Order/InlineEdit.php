@@ -13,8 +13,7 @@ class InlineEdit extends Action implements HttpPostActionInterface
 {
     public const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
-    private $orderCollectionFactory;
+    private \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory;
 
     /**
      * Save constructor.
@@ -30,13 +29,16 @@ class InlineEdit extends Action implements HttpPostActionInterface
         parent::__construct($context);
     }
 
-    /**
-     * @return \Magento\Framework\App\ResponseInterface
-     */
-    public function execute()
+    public function execute(): \Magento\Framework\Controller\ResultInterface
     {
         $postItems = $this->getRequest()->getParam('items', []);
         foreach ($postItems as $modelId => $postItem) {
+            foreach ($postItem as $column => $value) {
+                if (is_numeric($value)) {
+                    $postItem[$column] = str_replace(',', '.', $value);
+                }
+            }
+
             $orderCollection = $this->orderCollectionFactory->create();
             $orderCollection->addFilter($orderCollection->getIdFieldName(), $modelId);
             $orderCollection->setDataToAll($postItem);
