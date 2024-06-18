@@ -186,7 +186,7 @@
                         <item name="editorType" xsi:type="string">text</item>
                         <item name="validation" xsi:type="array">
                             <item name="required-entry" xsi:type="boolean">true</item>
-                            <item name="pattern" xsi:type="string">^(?=.*[1-9])\d*([.,]\d+)?$</item>
+                            <item name="pattern" xsi:type="string">^(([1-9][0-9]{0,2}(,[0-9]{3})*|([1-9][0-9]*))(,[0-9]{2})?(\.[0-9]+)?)$</item>
                         </item>
                     </item>
                 </item>
@@ -205,7 +205,7 @@
                         <item name="editorType" xsi:type="string">text</item>
                         <item name="validation" xsi:type="array">
                             <item name="required-entry" xsi:type="boolean">true</item>
-                            <item name="pattern" xsi:type="string">^(?=.*[1-9])\d*([.,]\d+)?$</item>
+                            <item name="pattern" xsi:type="string">^((0|[1-9][0-9]{0,2}(,[0-9]{3})*|([0-9]+))(,[0-9]{2})?(\.[0-9]+)?)$</item>
                         </item>
                     </item>
                 </item>
