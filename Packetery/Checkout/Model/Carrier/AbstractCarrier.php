@@ -47,7 +47,7 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool|\Magento\Framework\DataObject|\Magento\Shipping\Model\Rate\Result|null
      */
     public function collectRates(RateRequest $request)
     {

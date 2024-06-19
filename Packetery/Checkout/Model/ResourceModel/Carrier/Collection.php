@@ -25,6 +25,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function getItems()
     {
+        // @phpstan-ignore-next-line
         return parent::getItems();
     }
 

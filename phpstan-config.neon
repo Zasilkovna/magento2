@@ -1,7 +1,7 @@
 parameters:
     bootstrapFiles:
         - phpstan-autoload.php
-    level: 2
+    level: 3
     fileExtensions:
         - php
         - phtml
