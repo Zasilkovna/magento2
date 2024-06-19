@@ -20,4 +20,14 @@
             <column name="order_id"/>
         </index>
     </table>
+    <table name="packetery_log" resource="default" engine="innodb">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" default=""/>
+        <column xsi:type="varchar" name="status" nullable="false" length="255" default=""/>
+        <column xsi:type="varchar" name="action" nullable="false" length="255" default=""/>
+        <column xsi:type="datetime" name="date" nullable="false"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
 </schema>
