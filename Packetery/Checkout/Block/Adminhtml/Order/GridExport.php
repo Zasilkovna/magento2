@@ -74,11 +74,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         return $this->createCsvContent($collection);
     }
 
-    /**
-     * @param false $onlyNotExported
-     * @return string|null
-     */
-    public function getCsvAllFileContents($onlyNotExported = false): ?string
+    public function getCsvAllFileContents(bool $onlyNotExported = false): ?string
     {
         $col = $this->loadDataSelection();
 

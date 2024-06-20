@@ -79,7 +79,5 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                     'main_table' => new Expression('(' . $subQuery->assemble() . ')'),
                 ]
             );
-
-        return $this;
     }
 }

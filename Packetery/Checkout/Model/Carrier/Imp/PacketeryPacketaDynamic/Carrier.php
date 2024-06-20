@@ -14,6 +14,9 @@ class Carrier extends \Packetery\Checkout\Model\Carrier\AbstractCarrier
     /** @var \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain */
     protected $packeteryBrain;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Config */
+    protected $packeteryConfig;
+
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
@@ -31,20 +34,14 @@ class Carrier extends \Packetery\Checkout\Model\Carrier\AbstractCarrier
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $brain, $data);
     }
 
-    /**
-     * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain
-     */
-    public function getPacketeryBrain(): \Packetery\Checkout\Model\Carrier\AbstractBrain
+    public function getPacketeryBrain(): \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Brain
     {
-        return parent::getPacketeryBrain();
+        return $this->packeteryBrain;
     }
 
-    /**
-     * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Config
-     */
-    public function getPacketeryConfig(): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+    public function getPacketeryConfig(): \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Config
     {
-        return parent::getPacketeryConfig();
+        return $this->packeteryConfig;
     }
 
     /**

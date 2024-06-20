@@ -100,7 +100,7 @@ class Facade
 
     /**
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[] $carriers
-     * @return string[]
+     * @return array{value: string, label: \Magento\Framework\Phrase}[]
      */
     public function getVendorCodesOptions(array $carriers): array
     {
@@ -190,12 +190,9 @@ class Facade
         return $carrier->getPacketeryBrain()->getDynamicCarrierById($carrierId);
     }
 
-    /**
-     * @param string $carrierCode
-     * @return \Packetery\Checkout\Model\Carrier\AbstractCarrier
-     */
     public function getMagentoCarrier(string $carrierCode): AbstractCarrier
     {
+        // @phpstan-ignore-next-line
         return $this->carrierFactory->get($carrierCode);
     }
 
