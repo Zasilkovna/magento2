@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Ui\Packeta;
+namespace Packetery\Checkout\Ui\Packetdraft;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Packetery\Checkout\Model\Order;
 
 class DataProvider extends AbstractDataProvider
 {
@@ -30,19 +31,20 @@ class DataProvider extends AbstractDataProvider
         $result = [];
         foreach ($this->collection->getItems() as $item) {
             $orderNumber = $item->getDataByKey('increment_id');
-            $order = $this->orderFactory->create()->getItemByColumnValue('order_number', $orderNumber)->getData();
+            /** @var Order $order */
+            $order = $this->orderFactory->create()->getItemByColumnValue('order_number', $orderNumber);
 
             $result[$item->getId()]['general'] = [
                 'magento_order_id' => $item->getDataByKey('entity_id'),
-                'order_id'         => $order['id'],
-                'order_value'      => $order['value'],
-                'cod_value'        => $order['cod'] ?? 0,
-                'weight'           => $order['weight'] ?? 0,
-                'length'           => $order['depth'] ?? 0,
-                'height'           => $order['height'] ?? 0,
-                'width'            => $order['width'] ?? 0,
-                'adult_content'    => $order['adult_content'] ?? false,
-                'planned_dispatch' => $order['delayed_delivery'] ?? null,
+                'order_id'         => $order->getId(),
+                'order_value'      => $order->getValue(),
+                'cod_value'        => $order->getCod(),
+                'weight'           => $order->getWeight(),
+                'length'           => $order->getLength(),
+                'height'           => $order->getHeight(),
+                'width'            => $order->getWidth(),
+                'adult_content'    => $order->hasAdultContent() ?? false,
+                'dispatch_at'      => $order->getPlannedDispatch(),
             ];
         }
 

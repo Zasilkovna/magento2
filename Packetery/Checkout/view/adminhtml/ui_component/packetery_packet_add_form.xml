@@ -34,7 +34,7 @@
     </argument>
     <dataSource name="packetery_packet_add_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">Packetery\Checkout\Ui\Packeta\DataProvider</argument>
+            <argument name="class" xsi:type="string">Packetery\Checkout\Ui\Packetdraft\DataProvider</argument>
             <argument name="name" xsi:type="string">packetery_packet_add_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
             <argument name="requestFieldName" xsi:type="string">order_id</argument>
@@ -168,7 +168,7 @@
                 </checkbox>
             </formElements>
         </field>
-        <field name="planned_dispatch" formElement="date">
+        <field name="dispatch_at" formElement="date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="options" xsi:type="array">
@@ -183,7 +183,7 @@
                 <dataType>text</dataType>
                 <label translate="true">Planned Dispatch</label>
                 <visible>true</visible>
-                <dataScope>planned_dispatch</dataScope>
+                <dataScope>dispatch_at</dataScope>
             </settings>
         </field>
     </fieldset>

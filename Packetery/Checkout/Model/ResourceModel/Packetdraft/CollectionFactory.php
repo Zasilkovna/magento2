@@ -4,31 +4,27 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\ResourceModel\Packetdraft;
 
+use Magento\Framework\ObjectManagerInterface;
+
 class CollectionFactory
 {
-    /**
-     * Object Manager instance
-     *
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    protected $objectManager;
-
     /**
      * Instance name to create
      *
      * @var string
      */
-    protected $instanceName;
+    protected string $instanceName;
 
     /**
      * Factory constructor
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      * @param string $instanceName
      */
-    public function __construct(\Magento\Framework\ObjectManagerInterface $objectManager, $instanceName = Collection::class)
-    {
-        $this->objectManager = $objectManager;
+    public function __construct(
+        protected ObjectManagerInterface $objectManager,
+        string $instanceName = Collection::class
+    ) {
         $this->instanceName = $instanceName;
     }
 
@@ -36,11 +32,11 @@ class CollectionFactory
      * Create class instance with specified parameters
      *
      * @param array $data Class constructor arguments to override auto-wiring or specify non-service arguments.
-     * @return \Packetery\Checkout\Model\ResourceModel\Packetdraft\Collection
+     * @return Collection
      */
-    public function create(array $data = [])
+    public function create(array $data = []): Collection
     {
-        /** @var \Packetery\Checkout\Model\ResourceModel\Packetdraft\Collection $collection */
+        /** @var Collection $collection */
         $collection = $this->objectManager->create($this->instanceName, $data);
 
         return $collection;
@@ -50,9 +46,9 @@ class CollectionFactory
      * Creates a Collection specifically for inserting new entries into the DB
      *
      * @param array $data Class constructor arguments to override auto-wiring or specify non-service arguments.
-     * @return \Packetery\Checkout\Model\ResourceModel\Packetdraft\Collection
+     * @return Collection
      */
-    public function createForDbInsert(array $data = []): \Packetery\Checkout\Model\ResourceModel\Packetdraft\Collection
+    public function createForDbInsert(array $data = []): Collection
     {
         $collection = $this->create($data);
         $collection->getSelect()->where('0');
