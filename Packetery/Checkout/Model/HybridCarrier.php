@@ -39,7 +39,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
      * @param string $method
      * @param string $country
      * @param array $vendorCodeOptions
-     * @return static
+     * @return self
      */
     public static function fromAbstract(\Packetery\Checkout\Model\Carrier\AbstractCarrier $carrier, string $method, string $country, array $vendorCodeOptions): self
     {

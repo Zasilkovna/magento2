@@ -39,7 +39,7 @@ class ShippingRateCode
 
     /**
      * @param string $rateCode
-     * @return static
+     * @return self
      */
     public static function fromString(string $rateCode): self
     {
