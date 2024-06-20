@@ -66,4 +66,36 @@ class Item extends \Magento\Framework\DataObject
 
         return $instance;
     }
+
+    /**
+     * @return string
+     */
+    public function getProductType()
+    {
+        return parent::getProductType();
+    }
+
+    /**
+     * @return self[]
+     */
+    public function getChildren()
+    {
+        return $this->getData('children');
+    }
+
+    /**
+     * @return int
+     */
+    public function getQty()
+    {
+        return $this->getData('qty');
+    }
+
+    /**
+     * @return \Magento\Catalog\Model\Product
+     */
+    public function getProduct()
+    {
+        return $this->getData('product');
+    }
 }

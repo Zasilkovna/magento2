@@ -78,7 +78,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
 
     /**
      * @param int|null $dynamicCarrierId
-     * @return \Packetery\Checkout\Model\Carrier|null
+     * @return \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\DynamicCarrier|null
      */
     public function getDynamicCarrierById(?int $dynamicCarrierId): ?AbstractDynamicCarrier
     {

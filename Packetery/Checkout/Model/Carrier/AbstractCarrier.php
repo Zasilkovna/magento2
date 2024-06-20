@@ -39,6 +39,14 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     }
 
     /**
+     * @return mixed
+     */
+    public function getStore()
+    {
+        return parent::getStore();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function collectRates(RateRequest $request)
