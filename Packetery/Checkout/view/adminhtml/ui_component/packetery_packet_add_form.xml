@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">
+                packetery_packet_add_form.packetery_packet_add_form_data_source
+            </item>
+            <item name="deps" xsi:type="string">packetery_packet_add_form.packetery_packet_add_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Packet Submission</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">packetery_packet_add_form</item>
+        </item>
+        <item name="layout" xsi:type="array">
+            <item name="type" xsi:type="string">tabs</item>
+        </item>
+        <item name="buttons" xsi:type="array">
+            <item name="back" xsi:type="array">
+                <item name="name" xsi:type="string">back</item>
+                <item name="label" xsi:type="string" translate="true">Back</item>
+                <item name="class" xsi:type="string">back</item>
+                <item name="url" xsi:type="string">packetery/order/index</item>
+            </item>
+            <item name="save" xsi:type="array">
+                <item name="name" xsi:type="string">save</item>
+                <item name="label" xsi:type="string" translate="true">Save as Draft</item>
+                <item name="class" xsi:type="string">primary</item>
+                <item name="url" xsi:type="string">*/*/savedraft</item>
+            </item>
+        </item>
+    </argument>
+    <dataSource name="packetery_packet_add_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Packetery\Checkout\Ui\Packetdraft\DataProvider</argument>
+            <argument name="name" xsi:type="string">packetery_packet_add_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">order_id</argument>
+            <argument name="collectionFactory" xsi:type="object">
+                Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory
+            </argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="*/*/savedraft"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+                <item name="submit_url" xsi:type="url" path="*/*/savedraft"/>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="general">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Details</item>
+                <item name="additionalClasses" xsi:type="string">packetery-order-packetSubmission-form</item>
+            </item>
+        </argument>
+        <field name="order_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Order ID</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">order_id</item>
+                </item>
+            </argument>
+        </field>
+        <field name="order_value">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Order Value</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="validate-number" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="additionalClasses" xsi:type="string">packetery-draft-form-input</item>
+                    <item name="dataScope" xsi:type="string">order_value</item>
+                </item>
+            </argument>
+        </field>
+        <field name="cod_value">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">COD Value</item>
+                    <item name="dataType" xsi:type="string">float</item>
+                    <item name="validate-number" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="additionalClasses" xsi:type="string">packetery-draft-form-input</item>
+                    <item name="dataScope" xsi:type="string">cod_value</item>
+                </item>
+            </argument>
+        </field>
+        <field name="weight">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Weight</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="validate-number" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">weight</item>
+                    <item name="additionalClasses" xsi:type="string">packetery-draft-form-input</item>
+                    <item name="addafter" xsi:type="string">kg</item>
+                </item>
+            </argument>
+        </field>
+        <field name="height">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Height</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="validate-number" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">height</item>
+                    <item name="additionalClasses" xsi:type="string">packetery-draft-form-input</item>
+                    <item name="addafter" xsi:type="string">mm</item>
+                </item>
+            </argument>
+        </field>
+        <field name="length">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Length</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="validate-number" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">length</item>
+                    <item name="additionalClasses" xsi:type="string">packetery-draft-form-input</item>
+                    <item name="addafter" xsi:type="string">mm</item>
+                </item>
+            </argument>
+        </field>
+        <field name="width">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Width</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="validate-number" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">width</item>
+                    <item name="additionalClasses" xsi:type="string">packetery-draft-form-input</item>
+                    <item name="addafter" xsi:type="string">mm</item>
+                </item>
+            </argument>
+        </field>
+        <field name="adult_content" formElement="checkbox">
+            <settings>
+                <label translate="true">Adult Content</label>
+                <tooltip>
+                    <description translate="true">Does the parcel contain any 18+ items?</description>
+                </tooltip>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="boolean">false</map>
+                            <map name="true" xsi:type="boolean">true</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="dispatch_at" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="options" xsi:type="array">
+                        <item name="minDate" xsi:type="string">new Date()+ 1</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Planned Dispatch</label>
+                <visible>true</visible>
+                <dataScope>dispatch_at</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Packetery\Checkout\Model\ResourceModel;
+
+class Packetdraft extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+{
+    public function __construct(
+        \Magento\Framework\Model\ResourceModel\Db\Context $context
+    ) {
+        parent::__construct($context);
+    }
+
+    protected function _construct()
+    {
+        $this->_init('packetery_packet_draft', 'id');
+    }
+}
