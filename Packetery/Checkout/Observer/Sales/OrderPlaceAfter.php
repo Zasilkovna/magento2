@@ -247,7 +247,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $magentoOrderCollection = $this->magentoOrderCollectionFactory->create();
         $magentoOrderCollection->addFilter('increment_id', $orderIdOriginal);
         $magentoOrderCollection->load();
-        /** @var \Magento\Sales\Model\Order $magentoOrder */
+        /** @var \Magento\Sales\Model\Order|bool $magentoOrder */
         $magentoOrder = $magentoOrderCollection->fetchItem();
 
         if (!$magentoOrder || $order->getShippingMethod() !== $magentoOrder->getShippingMethod()) {

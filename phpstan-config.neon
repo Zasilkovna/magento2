@@ -1,7 +1,7 @@
 parameters:
     bootstrapFiles:
         - phpstan-autoload.php
-    level: 3
+    level: 4
     fileExtensions:
         - php
         - phtml
@@ -10,3 +10,4 @@ parameters:
     ignoreErrors:
         - '#Call to an undefined method Magento\\(.*)+\(\)\.#' # It is typical for Magento related code to use PHP magic.
         - '#Call to an undefined static method Magento\\(.*)+\(\)\.#'
+    treatPhpDocTypesAsCertain: false
