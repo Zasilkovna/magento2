@@ -57,6 +57,9 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         return new Config($this->getConfigData($carrier->getCarrierCode(), $carrier->getStore()));
     }
 
+    /**
+     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config $config
+     */
     public function createDynamicConfig(\Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
     {
         if ($dynamicCarrier === null) {

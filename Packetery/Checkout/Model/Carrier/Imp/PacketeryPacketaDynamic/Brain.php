@@ -86,6 +86,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
             return null;
         }
 
+        /** @var \Packetery\Checkout\Model\Carrier $model */
         $model = $this->carrierCollectionFactory->create()->getItemByColumnValue('carrier_id', $dynamicCarrierId);
         if ($model === null) {
             return null;
@@ -156,9 +157,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     }
 
     /**
-     * @param \Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config
-     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
-     * @return \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
+     * @param \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Config $config
      */
     public function createDynamicConfig(\Packetery\Checkout\Model\Carrier\Config\AbstractConfig $config, ?AbstractDynamicCarrier $dynamicCarrier = null): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
     {
@@ -175,7 +174,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void
     {
         $collection = $this->carrierCollectionFactory->create();
-        $collection->addFilter('carrier_id', $dynamicCarrier->getDynamicCarrierId());
+        $collection->addFilter('carrier_id', (string) $dynamicCarrier->getDynamicCarrierId());
         $collection->setDataToAll(
             [
                 'carrier_name' => $carrierName,

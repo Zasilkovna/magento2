@@ -10,4 +10,19 @@ parameters:
     ignoreErrors:
         - '#Call to an undefined method Magento\\(.*)+\(\)\.#' # It is typical for Magento related code to use PHP magic.
         - '#Call to an undefined static method Magento\\(.*)+\(\)\.#'
+        - # Magento modules also pass Phrases
+            message: '#.+ of method Magento\\Framework\\Message\\ManagerInterface::add.+\(\) expects string, .+Phrase given\.#'
+            identifier: argument.type
+        - # Magento modules also pass Phrases
+            message: '#.+ method Magento\\Framework\\View\\Page\\Title::prepend\(\) expects string, .+Phrase given\.#'
+            identifier: argument.type
+        - # Magento logic handles array input as well
+            message: '#.+ method Magento\\Framework\\Data\\Collection::setDataToAll\(\) expects string, array.* given\.#'
+            identifier: argument.type
+        - # Magento logic contains ifelse block tha handles strings as well
+            message: '#.+ class Magento\\Framework\\DB\\Sql\\UnionExpression constructor expects array<Magento\\Framework\\DB\\Select>, array<.+, string> given\.#'
+            identifier: argument.type
+        - # Magento modules use it too
+            message: '#.+ method Magento\\AdminNotification\\Model\\Inbox::addNotice\(\) expects .+, .+Phrase given\.#'
+            identifier: argument.type
     treatPhpDocTypesAsCertain: false

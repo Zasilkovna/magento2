@@ -39,7 +39,9 @@ class Item extends \Magento\Framework\DataObject
 
         $children = [];
         foreach ($item->getChildren() as $child) {
-            $children[] = self::fromQuoteItem($child);
+            if ($child instanceof \Magento\Quote\Model\Quote\Item) {
+                $children[] = self::fromQuoteItem($child);
+            }
         }
 
         $instance->setData('children', $children);

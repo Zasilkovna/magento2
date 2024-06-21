@@ -238,6 +238,7 @@ class PricingServiceTest extends BaseTest
             ['getWeightRulesByPricingRule' => $weightRules, 'resolvePricingRule' => $pricingRule]
         );
 
+        /** @var \Magento\Quote\Model\Quote\Address\RateRequest $request */
         $request = $this->createProxyWithMethods(
             \Magento\Quote\Model\Quote\Address\RateRequest::class,
             [],

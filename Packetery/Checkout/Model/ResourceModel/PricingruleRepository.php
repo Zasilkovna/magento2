@@ -205,8 +205,8 @@ class PricingruleRepository
     {
         /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection $collection */
         $collection = $this->pricingRuleCollectionFactory->create();
-        $collection->addFilter('id', $id);
-        $collection->setDataToAll('enabled', $enabled);
+        $collection->addFilter('id', (string) $id);
+        $collection->setDataToAll('enabled', $enabled ? '1' : '0');
         $collection->save();
     }
 
@@ -233,7 +233,7 @@ class PricingruleRepository
     {
         $collection = $this->pricingRuleCollectionFactory->create();
         $collection->addFilter('main_table.country_id', $country);
-        $collection->addFilter('main_table.enabled', $enabled);
+        $collection->addFilter('main_table.enabled', $enabled ? '1' : '0');
 
         return $collection->getItems();
     }
