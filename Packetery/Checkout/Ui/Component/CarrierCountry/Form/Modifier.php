@@ -280,7 +280,7 @@ class Modifier implements ModifierInterface
                             'componentType' => 'field',
                             'visible' => false,
                             'required' => true,
-                            'value' => $carrier->getData('carrier_id'), // Mordor ID
+                            'value' => $carrier->getData('carrier_id'), // Dynamic ID
                         ],
                     ],
                 ],

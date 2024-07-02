@@ -196,7 +196,7 @@ abstract class AbstractBrain
         return true;
     }
 
-    /** What Mordor branch ids does carrier implement
+    /** What branch ids does carrier implement
      * @return array
      */
     public static function getImplementedBranchIds(): array

@@ -11,7 +11,8 @@
             "width": true,
             "adult_content": true,
             "dispatch_at": true,
-            "created_at": true
+            "created_at": true,
+            "depth": true
         },
         "constraint": {
             "PRIMARY": true,
@@ -72,7 +73,8 @@
         },
         "constraint": {
             "PRIMARY": true,
-            "PACKETERY_ORDER_STORE_ID_STORE_STORE_ID": true
+            "PACKETERY_ORDER_STORE_ID_STORE_STORE_ID": true,
+            "PACKETERY_ORDER_ORDER_NUMBER_STORE_ID": true
         }
     },
     "packetery_pricing_rule": {
@@ -90,6 +92,9 @@
         },
         "constraint": {
             "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_PRICING_RULE_CARRIER_ID": true
         }
     },
     "packetery_weight_rule": {
@@ -102,6 +107,9 @@
         "constraint": {
             "PRIMARY": true,
             "FK_618E992384200282F65A78FC84A3DFF2": true
+        },
+        "index": {
+            "PACKETERY_WEIGHT_RULE_ID": true
         }
     },
     "packetery_carrier": {
@@ -125,6 +133,9 @@
         },
         "constraint": {
             "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_CARRIER_CARRIER_ID": true
         }
     }
 }
