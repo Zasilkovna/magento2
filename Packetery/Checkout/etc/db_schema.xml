@@ -88,7 +88,7 @@
         <column xsi:type="varchar" name="vendor_groups" length="255" comment="Vendor groups"/>
         <column xsi:type="boolean" name="enabled" nullable="false" default="0"/>
         <column xsi:type="varchar" name="address_validation" nullable="false" default="none" length="10" comment="Address validation"/>
-        <column xsi:type="decimal" name="max_cod" scale="4" precision="20" nullable="true" comment="Minimal value to hide COD payment methods"/>
+        <column xsi:type="decimal" name="max_cod" scale="4" precision="20" nullable="true" comment="minimal value to hide COD payment methods"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
