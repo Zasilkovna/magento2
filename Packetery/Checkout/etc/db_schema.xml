@@ -202,7 +202,7 @@
         <column xsi:type="varchar" name="currency" length="3" nullable="true" comment="Currency"/>
         <column xsi:type="decimal" name="weight" scale="4" precision="12" unsigned="true" nullable="false" comment="Weight"/>
         <column xsi:type="varchar" name="note" length="128" nullable="true" comment="Note"/>
-        <column xsi:type="varchar" name="carrier_service" length="128" nullable="true" comment="Optional services provided by carrier"/>
+        <column xsi:type="varchar" name="carrier_service" length="255" nullable="true" comment="Optional services provided by carrier"/>
         <column xsi:type="boolean" name="has_adult_content" nullable="false" default="false" comment="Does the shipment contain item(s) 18+?"/>
         <column xsi:type="date" name="deliver_on" nullable="true" comment="Planned delivery date"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Date created"/>
