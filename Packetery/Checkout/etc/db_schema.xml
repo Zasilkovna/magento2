@@ -35,7 +35,6 @@
 
     <table name="packetery_order" resource="default" engine="innodb" comment="Zásilkovna objednávky">
         <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
-        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" comment="Store ID"/>
         <column xsi:type="varchar" name="order_number" nullable="false" length="128" comment="Order_number"/>
         <column xsi:type="varchar" name="recipient_firstname" nullable="false" length="128" comment="Recipient_firstname"/>
         <column xsi:type="varchar" name="recipient_lastname" nullable="false" length="128" comment="Recipient_lastname"/>
@@ -71,11 +70,9 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
-        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_ORDER_STORE_ID_STORE_STORE_ID" table="packetery_order" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="SET NULL"/>
-        <constraint xsi:type="unique" referenceId="IDX_PACKETERY_ORDER_ORDER_NUMBER_STORE_ID">
+        <index referenceId="IDX_PACKETERY_ORDER_ORDER_NUMBER" indexType="btree">
             <column name="order_number"/>
-            <column name="store_id"/>
-        </constraint>
+        </index>
     </table>
 
     <table name="packetery_pricing_rule" resource="default" engine="innodb" comment="Packetery pricing rules. Relates to packetery_weight_rules.">

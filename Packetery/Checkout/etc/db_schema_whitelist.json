@@ -37,7 +37,6 @@
     "packetery_order": {
         "column": {
             "id": true,
-            "store_id": true,
             "order_number": true,
             "recipient_firstname": true,
             "recipient_lastname": true,
@@ -72,9 +71,10 @@
             "exported_at": true
         },
         "constraint": {
-            "PRIMARY": true,
-            "PACKETERY_ORDER_STORE_ID_STORE_STORE_ID": true,
-            "PACKETERY_ORDER_ORDER_NUMBER_STORE_ID": true
+            "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_ORDER_ORDER_NUMBER": true
         }
     },
     "packetery_pricing_rule": {
