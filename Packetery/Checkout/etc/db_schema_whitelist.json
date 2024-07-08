@@ -11,8 +11,7 @@
             "width": true,
             "adult_content": true,
             "dispatch_at": true,
-            "created_at": true,
-            "depth": true
+            "created_at": true
         },
         "constraint": {
             "PRIMARY": true,
@@ -136,6 +135,95 @@
         },
         "index": {
             "PACKETERY_CARRIER_CARRIER_ID": true
+        }
+    },
+    "packetery_size": {
+        "column": {
+            "id": true,
+            "length": true,
+            "height": true,
+            "width": true,
+            "created_at": true
+        },
+        "index": {
+            "PACKETERY_SIZE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "packetery_address": {
+        "column": {
+            "id": true,
+            "street": true,
+            "house_number": true,
+            "county": true,
+            "city": true,
+            "zip": true,
+            "created_at": true
+        },
+        "index": {
+            "PACKETERY_ADDRESS_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "packetery_packet": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "packet_id": true,
+            "point_id": true,
+            "carrier_id": true,
+            "size_id": true,
+            "name": true,
+            "surname": true,
+            "company": true,
+            "email": true,
+            "phone": true,
+            "address_id": true,
+            "value": true,
+            "cod": true,
+            "currency": true,
+            "weight": true,
+            "note": true,
+            "carrier_service": true,
+            "has_adult_content": true,
+            "deliver_on": true,
+            "created_at": true
+        },
+        "index": {
+            "PACKETERY_PACKET_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "PACKETERY_PACKET_ORDER_ID_PACKETERY_ORDER_ID": true,
+            "PACKETERY_PACKET_CARRIER_ID_PACKETERY_CARRIER_ID": true,
+            "PACKETERY_PACKET_ADDRESS_ID_PACKETERY_ADDRESS_ID": true,
+            "PACKETERY_PACKET_SIZE_ID_PACKETERY_SIZE_ID": true
+        }
+    },
+    "packetery_packet_claim": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "packet_id": true,
+            "email": true,
+            "phone": true,
+            "value": true,
+            "currency": true,
+            "consign_country": true,
+            "password": true,
+            "send_customer_email": true,
+            "created_at": true
+        },
+        "index": {
+            "PACKETERY_PACKET_CLAIM_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "PACKETERY_PACKET_CLAIM_ORDER_ID_PACKETERY_ORDER_ID": true
         }
     }
 }

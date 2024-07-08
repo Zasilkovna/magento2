@@ -132,4 +132,89 @@
             <column name="carrier_id"/>
         </index>
     </table>
+
+    <table name="packetery_size" resource="default" engine="innodb" comment="Packetery size">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="smallint" name="length" padding="4" unsigned="true" nullable="false" comment="Length"/>
+        <column xsi:type="smallint" name="height" padding="4" unsigned="true" nullable="false" comment="Height"/>
+        <column xsi:type="smallint" name="width" padding="4" unsigned="true" nullable="false" comment="Width"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Date created"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="IDX_PACKETERY_SIZE_ID" indexType="btree">
+            <column name="id"/>
+        </index>
+    </table>
+
+    <table name="packetery_address" resource="default" engine="innodb" comment="Packetery address">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="varchar" name="street" length="128" nullable="true" comment="Street"/>
+        <column xsi:type="varchar" name="house_number" length="16" nullable="true" comment="House number"/>
+        <column xsi:type="varchar" name="county" length="128" nullable="true" comment="County"/>
+        <column xsi:type="varchar" name="city" length="128" nullable="false" comment="City"/>
+        <column xsi:type="varchar" name="zip" length="32" nullable="false" comment="Zip"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Date created"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="IDX_PACKETERY_ADDRESS_ID" indexType="btree">
+            <column name="id"/>
+        </index>
+    </table>
+
+    <table name="packetery_packet_claim" resource="default" engine="innodb" comment="Packetery claim">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="int" name="packet_id" padding="10" unsigned="true" nullable="false" comment="Packet ID"/>
+        <column xsi:type="varchar" name="email" length="128" nullable="false" comment="Email"/>
+        <column xsi:type="varchar" name="phone" length="32" nullable="false" comment="Phone number"/>
+        <column xsi:type="decimal" name="value" scale="4" precision="20" nullable="false" comment="Value"/>
+        <column xsi:type="varchar" name="currency" length="3" nullable="false" comment="Currency"/>
+        <column xsi:type="varchar" name="consign_country" length="2" nullable="false" comment="Country of consignment"/>
+        <column xsi:type="varchar" name="password" length="255" nullable="false" comment="Claim password"/>
+        <column xsi:type="boolean" name="send_customer_email" nullable="false" default="false" comment="Do you want to send an email with password to customer?"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Date created"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_PACKET_CLAIM_ORDER_ID_PACKETERY_ORDER_ID" table="packetery_packet_claim" column="order_id" referenceTable="packetery_order" referenceColumn="id" onDelete="NO ACTION"/>
+        <index referenceId="IDX_PACKETERY_PACKET_CLAIM_ID" indexType="btree">
+            <column name="id"/>
+        </index>
+    </table>
+
+    <table name="packetery_packet" resource="default" engine="innodb" comment="Packetery packet">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="int" name="packet_id" padding="10" unsigned="true" nullable="false" comment="Packet ID"/>
+        <column xsi:type="int" name="point_id" padding="10" unsigned="true" nullable="true" comment="Point ID"/>
+        <column xsi:type="int" name="carrier_id" padding="10" unsigned="true" nullable="true" comment="Carrier ID"/>
+        <column xsi:type="int" name="size_id" padding="10" unsigned="true" nullable="true" comment="Size ID"/>
+        <column xsi:type="varchar" name="name" length="32" nullable="false" comment="Name"/>
+        <column xsi:type="varchar" name="surname" length="32" nullable="true" comment="Surname"/>
+        <column xsi:type="varchar" name="company" length="32" nullable="true" comment="Company name"/>
+        <column xsi:type="varchar" name="email" length="128" nullable="true" comment="Email"/>
+        <column xsi:type="varchar" name="phone" length="32" nullable="true" comment="Phone number"/>
+        <column xsi:type="int" name="address_id" padding="10" unsigned="true" nullable="true" comment="Address ID"/>
+        <column xsi:type="decimal" name="value" scale="4" precision="20" unsigned="true" nullable="false" comment="Value"/>
+        <column xsi:type="decimal" name="cod" scale="4" precision="20" unsigned="true" nullable="true" comment="Cash on delivery"/>
+        <column xsi:type="varchar" name="currency" length="3" nullable="true" comment="Currency"/>
+        <column xsi:type="decimal" name="weight" scale="4" precision="12" unsigned="true" nullable="false" comment="Weight"/>
+        <column xsi:type="varchar" name="note" length="128" nullable="true" comment="Note"/>
+        <column xsi:type="varchar" name="carrier_service" length="255" nullable="true" comment="Optional services provided by carrier"/>
+        <column xsi:type="boolean" name="has_adult_content" nullable="false" default="false" comment="Does the shipment contain item(s) 18+?"/>
+        <column xsi:type="date" name="deliver_on" nullable="true" comment="Planned delivery date"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Date created"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_PACKET_ORDER_ID_PACKETERY_ORDER_ID" table="packetery_packet" column="order_id" referenceTable="packetery_order" referenceColumn="id" onDelete="NO ACTION"/>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_PACKET_CARRIER_ID_PACKETERY_CARRIER_ID" table="packetery_packet" column="carrier_id" referenceTable="packetery_carrier" referenceColumn="id" onDelete="NO ACTION"/>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_PACKET_ADDRESS_ID_PACKETERY_ORDER_ID" table="packetery_packet" column="address_id" referenceTable="packetery_address" referenceColumn="id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_PACKET_SIZE_ID_PACKETERY_ORDER_ID" table="packetery_packet" column="size_id" referenceTable="packetery_size" referenceColumn="id" onDelete="CASCADE"/>
+        <index referenceId="IDX_PACKETERY_PACKET_ID" indexType="btree">
+            <column name="id"/>
+        </index>
+    </table>
 </schema>
