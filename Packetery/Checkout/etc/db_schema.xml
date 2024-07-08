@@ -19,7 +19,9 @@
         <index referenceId="IDX_PACKETERY_PACKET_DRAFT_ORDER_ID" indexType="btree">
             <column name="order_id"/>
         </index>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_PACKET_DRAFT_ORDER_ID_PACKETERY_ORDER_ID" table="packetery_packet_draft" column="order_id" referenceTable="packetery_order" referenceColumn="id" onDelete="CASCADE"/>
     </table>
+
     <table name="packetery_log" resource="default" engine="innodb">
         <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true"/>
         <column xsi:type="varchar" name="title" nullable="false" length="255" default=""/>
@@ -29,5 +31,105 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
+    </table>
+
+    <table name="packetery_order" resource="default" engine="innodb" comment="Zásilkovna objednávky">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="varchar" name="order_number" nullable="false" length="128" comment="Order_number"/>
+        <column xsi:type="varchar" name="recipient_firstname" nullable="false" length="128" comment="Recipient_firstname"/>
+        <column xsi:type="varchar" name="recipient_lastname" nullable="false" length="128" comment="Recipient_lastname"/>
+        <column xsi:type="varchar" name="recipient_company" length="128" nullable="true" comment="Recipient_company"/>
+        <column xsi:type="varchar" name="recipient_email" length="128" nullable="true" comment="Recipient_email"/>
+        <column xsi:type="varchar" name="recipient_phone" length="32" nullable="true" comment="Recipient_phone"/>
+        <column xsi:type="decimal" name="cod" scale="4" precision="20" nullable="true"/>
+        <column xsi:type="varchar" name="currency" length="8" nullable="true" comment="Currency"/>
+        <column xsi:type="decimal" name="value" scale="4" precision="20" nullable="true"/>
+        <column xsi:type="decimal" name="weight" scale="4" precision="12" nullable="true"/>
+        <column xsi:type="varchar" name="point_id" length="32" nullable="false" comment="Point_id"/>
+        <column xsi:type="text" name="point_name" nullable="true" comment="Point_name"/>
+        <column xsi:type="boolean" name="is_carrier" nullable="false" default="0" comment="Is Point_id ID of external carrier?"/>
+        <column xsi:type="varchar" name="carrier_pickup_point" length="40" nullable="true" comment="External carrier pickup point ID"/>
+        <column xsi:type="varchar" name="sender_label" length="64" nullable="true" comment="Sender_label"/>
+        <column xsi:type="boolean" name="adult_content" nullable="true" comment="Adult_content"/>
+        <column xsi:type="date" name="delayed_delivery" nullable="true" comment="Delayed_delivery"/>
+        <column xsi:type="boolean" name="address_validated" nullable="false" default="0" comment="Is recipient address validated?"/>
+        <column xsi:type="varchar" name="recipient_street" length="128" nullable="true" comment="Recipient_street"/>
+        <column xsi:type="varchar" name="recipient_house_number" length="32" nullable="true" comment="Recipient_house_number"/>
+        <column xsi:type="varchar" name="recipient_city" length="128" nullable="true" comment="Recipient_city"/>
+        <column xsi:type="varchar" name="recipient_zip" length="32" nullable="true" comment="Recipient_zip"/>
+        <column xsi:type="varchar" name="recipient_country_id" length="2" nullable="true" comment="Recipient_country_id"/>
+        <column xsi:type="varchar" name="recipient_county" length="128" nullable="true" comment="Recipient_county"/>
+        <column xsi:type="decimal" name="recipient_longitude" scale="8" precision="11" nullable="true" comment="Recipient_longitude"/>
+        <column xsi:type="decimal" name="recipient_latitude" scale="8" precision="10" nullable="true" comment="Recipient_latitude"/>
+        <column xsi:type="varchar" name="carrier_point" length="64" nullable="true" comment="Carrier_point"/>
+        <column xsi:type="int" name="width" padding="11" nullable="true" comment="Width"/>
+        <column xsi:type="int" name="height" padding="11" nullable="true" comment="Height"/>
+        <column xsi:type="int" name="depth" padding="11" nullable="true" comment="Depth"/>
+        <column xsi:type="boolean" name="exported" nullable="true" comment="Exported"/>
+        <column xsi:type="datetime" name="exported_at" nullable="true" comment="Exported_at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="IDX_PACKETERY_ORDER_ORDER_NUMBER" indexType="btree">
+            <column name="order_number"/>
+        </index>
+    </table>
+
+    <table name="packetery_pricing_rule" resource="default" engine="innodb" comment="Packetery pricing rules. Relates to packetery_weight_rules.">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="decimal" name="free_shipment" scale="4" precision="20" nullable="true" comment="From what order value will be shipping for free?"/>
+        <column xsi:type="varchar" name="country_id" nullable="false" length="2" comment="Country that relates to specified price"/>
+        <column xsi:type="varchar" name="method" nullable="false" length="64" comment="Related delivery method"/>
+        <column xsi:type="varchar" name="carrier_code" nullable="false" length="64" comment="Magento unique carrier class identifier"/>
+        <column xsi:type="int" name="carrier_id" padding="11" nullable="true" comment="Dynamic carrier id from Mordor"/>
+        <column xsi:type="varchar" name="vendor_groups" length="255" comment="Vendor groups"/>
+        <column xsi:type="boolean" name="enabled" nullable="false" default="0" comment="Enabled"/>
+        <column xsi:type="varchar" name="address_validation" nullable="false" default="none" length="10" comment="Address validation"/>
+        <column xsi:type="decimal" name="max_cod" scale="4" precision="20" nullable="true" comment="minimal value to hide COD payment methods"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="IDX_PACKETERY_PRICING_RULE_CARRIER_ID" indexType="btree">
+            <column name="carrier_id"/>
+        </index>
+    </table>
+
+    <table name="packetery_weight_rule" resource="default" engine="innodb" comment="Packetery weight rules. Relates to packetery pricing rules.">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="packetery_pricing_rule_id" unsigned="true" nullable="false" comment="Packetery_pricing_rule_id"/>
+        <column xsi:type="decimal" name="price" scale="4" precision="20" nullable="false" comment="Price for given constrains"/>
+        <column xsi:type="decimal" name="max_weight" scale="4" precision="12" nullable="true" comment="Maximum weight in kilograms"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_PACKETERY_WR_PACKETERY_PR_ID_PACKETERY_PR_ID" table="packetery_weight_rule" column="packetery_pricing_rule_id" referenceTable="packetery_pricing_rule" referenceColumn="id" onDelete="NO ACTION"/>
+        <index referenceId="IDX_PACKETERY_WEIGHT_RULE_ID" indexType="btree">
+            <column name="id"/>
+        </index>
+    </table>
+
+    <table name="packetery_carrier" resource="default" engine="innodb" comment="Packetery carriers regulary updated via cron job">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="carrier_id" padding="11" nullable="false" comment="Carrier_id"/>
+        <column xsi:type="varchar" name="name" length="64" nullable="false" comment="Name"/>
+        <column xsi:type="varchar" name="carrier_name" length="64" nullable="true" comment="Carrier_name"/>
+        <column xsi:type="boolean" name="is_pickup_points" nullable="false" comment="Is_pickup_points"/>
+        <column xsi:type="boolean" name="has_carrier_direct_label" nullable="false" comment="Has_carrier_direct_label"/>
+        <column xsi:type="boolean" name="separate_house_number" nullable="false" comment="Separate_house_number"/>
+        <column xsi:type="boolean" name="customs_declarations" nullable="false" comment="Customs_declarations"/>
+        <column xsi:type="boolean" name="requires_email" nullable="false" comment="Requires_email"/>
+        <column xsi:type="boolean" name="requires_phone" nullable="false" comment="Requires_phone"/>
+        <column xsi:type="boolean" name="requires_size" nullable="false" comment="Requires_size"/>
+        <column xsi:type="boolean" name="disallows_cod" nullable="false" comment="Disallows_cod"/>
+        <column xsi:type="varchar" name="country" length="3" nullable="false" comment="Country"/>
+        <column xsi:type="varchar" name="currency" length="3" nullable="false" comment="Currency"/>
+        <column xsi:type="decimal" name="max_weight" scale="4" precision="12" nullable="false" comment="Max_weight"/>
+        <column xsi:type="boolean" name="deleted" nullable="false" comment="Deleted"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="IDX_PACKETERY_CARRIER_CARRIER_ID" indexType="btree">
+            <column name="carrier_id"/>
+        </index>
     </table>
 </schema>

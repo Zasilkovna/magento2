@@ -11,10 +11,12 @@
             "width": true,
             "adult_content": true,
             "dispatch_at": true,
-            "created_at": true
+            "created_at": true,
+            "depth": true
         },
         "constraint": {
-            "PRIMARY": true
+            "PRIMARY": true,
+            "PACKETERY_PACKET_DRAFT_ORDER_ID_PACKETERY_ORDER_ID": true
         },
         "index": {
             "PACKETERY_PACKET_DRAFT_ORDER_ID": true
@@ -30,6 +32,110 @@
         },
         "constraint": {
             "PRIMARY": true
+        }
+    },
+    "packetery_order": {
+        "column": {
+            "id": true,
+            "order_number": true,
+            "recipient_firstname": true,
+            "recipient_lastname": true,
+            "recipient_company": true,
+            "recipient_email": true,
+            "recipient_phone": true,
+            "cod": true,
+            "currency": true,
+            "value": true,
+            "weight": true,
+            "point_id": true,
+            "point_name": true,
+            "is_carrier": true,
+            "carrier_pickup_point": true,
+            "sender_label": true,
+            "adult_content": true,
+            "delayed_delivery": true,
+            "address_validated": true,
+            "recipient_street": true,
+            "recipient_house_number": true,
+            "recipient_city": true,
+            "recipient_zip": true,
+            "recipient_country_id": true,
+            "recipient_county": true,
+            "recipient_longitude": true,
+            "recipient_latitude": true,
+            "carrier_point": true,
+            "width": true,
+            "height": true,
+            "depth": true,
+            "exported": true,
+            "exported_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_ORDER_ORDER_NUMBER": true
+        }
+    },
+    "packetery_pricing_rule": {
+        "column": {
+            "id": true,
+            "free_shipment": true,
+            "country_id": true,
+            "method": true,
+            "carrier_code": true,
+            "carrier_id": true,
+            "vendor_groups": true,
+            "enabled": true,
+            "address_validation": true,
+            "max_cod": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_PRICING_RULE_CARRIER_ID": true
+        }
+    },
+    "packetery_weight_rule": {
+        "column": {
+            "id": true,
+            "packetery_pricing_rule_id": true,
+            "price": true,
+            "max_weight": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_618E992384200282F65A78FC84A3DFF2": true
+        },
+        "index": {
+            "PACKETERY_WEIGHT_RULE_ID": true
+        }
+    },
+    "packetery_carrier": {
+        "column": {
+            "id": true,
+            "carrier_id": true,
+            "name": true,
+            "carrier_name": true,
+            "is_pickup_points": true,
+            "has_carrier_direct_label": true,
+            "separate_house_number": true,
+            "customs_declarations": true,
+            "requires_email": true,
+            "requires_phone": true,
+            "requires_size": true,
+            "disallows_cod": true,
+            "country": true,
+            "currency": true,
+            "max_weight": true,
+            "deleted": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "PACKETERY_CARRIER_CARRIER_ID": true
         }
     }
 }
