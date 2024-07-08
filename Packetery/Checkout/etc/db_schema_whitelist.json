@@ -169,28 +169,6 @@
             "PRIMARY": true
         }
     },
-    "packetery_claim": {
-        "column": {
-            "id": true,
-            "order_id": true,
-            "packet_id": true,
-            "email": true,
-            "phone": true,
-            "value": true,
-            "currency": true,
-            "consign_country": true,
-            "password": true,
-            "send_customer_email": true,
-            "created_at": true
-        },
-        "index": {
-            "PACKETERY_CLAIM_ID": true
-        },
-        "constraint": {
-            "PRIMARY": true,
-            "PACKETERY_CLAIM_ORDER_ID_PACKETERY_ORDER_ID": true
-        }
-    },
     "packetery_packet": {
         "column": {
             "id": true,
@@ -224,6 +202,28 @@
             "PACKETERY_PACKET_CARRIER_ID_PACKETERY_CARRIER_ID": true,
             "PACKETERY_PACKET_ADDRESS_ID_PACKETERY_ADDRESS_ID": true,
             "PACKETERY_PACKET_SIZE_ID_PACKETERY_SIZE_ID": true
+        }
+    },
+    "packetery_packet_claim": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "packet_id": true,
+            "email": true,
+            "phone": true,
+            "value": true,
+            "currency": true,
+            "consign_country": true,
+            "password": true,
+            "send_customer_email": true,
+            "created_at": true
+        },
+        "index": {
+            "PACKETERY_PACKET_CLAIM_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "PACKETERY_PACKET_CLAIM_ORDER_ID_PACKETERY_ORDER_ID": true
         }
     }
 }
