@@ -2,6 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Packetery_Checkout::css/styles.css"/>
+        <css src="Packetery_Checkout::css/custom_styles.css"/>
     </head>
     <body>
         <referenceContainer name="js">
