@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Block\Adminhtml\Order\View\Tab;
 
 use Magento\Backend\Block\Widget\Container;
+use Magento\Backend\Block\Widget\Context;
 use Magento\Backend\Block\Widget\Tab\TabInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Phrase;
@@ -13,11 +14,11 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 
 class Packets extends Container implements TabInterface
 {
-
     private const NAME = 'Packets';
+    private const PACKETERY_CARRIER_CODE = 'packetery';
 
     public function __construct(
-        \Magento\Backend\Block\Widget\Context $context,
+        Context $context,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly RequestInterface $request,
         array $data = []
@@ -25,8 +26,7 @@ class Packets extends Container implements TabInterface
         parent::__construct($context, $data);
     }
 
-    protected function _construct(
-    ): void
+    protected function _construct(): void
     {
         parent::_construct();
         $this->setTemplate('Packetery_Checkout::packets.phtml');
@@ -45,9 +45,12 @@ class Packets extends Container implements TabInterface
     public function canShowTab(): bool
     {
         $order = $this->getOrder();
-        if ($order) {
-            $shippingMethod = $order->getShippingMethod();
-            return $shippingMethod === 'your_shipping_method';
+        if ($order === null) {
+            return false;
+        }
+
+        if ($this->isPacketeryShippingGroup($order->getShippingMethod())) {
+            return true;
         }
 
         return false;
@@ -55,7 +58,7 @@ class Packets extends Container implements TabInterface
 
     public function isHidden(): bool
     {
-        return false;
+        return !$this->canShowTab();
     }
 
     private function getOrder(): ?OrderInterface
@@ -63,5 +66,10 @@ class Packets extends Container implements TabInterface
         $orderId = (int) $this->request->getParam('order_id');
 
         return $this->orderRepository->get($orderId);
+    }
+
+    private function isPacketeryShippingGroup($shippingMethod): bool
+    {
+        return str_starts_with($shippingMethod, self::PACKETERY_CARRIER_CODE);
     }
 }
