@@ -7,10 +7,9 @@ namespace Packetery\Checkout\Block\Adminhtml\Order\View\Tab;
 use Magento\Backend\Block\Widget\Container;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Backend\Block\Widget\Tab\TabInterface;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Block\Adminhtml\Order\View as OrderViewBlock;
 use Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain;
 
 class Packets extends Container implements TabInterface
@@ -20,8 +19,7 @@ class Packets extends Container implements TabInterface
     public function __construct(
         Context $context,
         private readonly Brain $carrierBrain,
-        private readonly OrderRepositoryInterface $orderRepository,
-        private readonly RequestInterface $request,
+        private readonly OrderViewBlock $orderViewBlock,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -55,8 +53,6 @@ class Packets extends Container implements TabInterface
 
     private function getOrder(): OrderInterface
     {
-        $orderId = (int) $this->request->getParam('order_id');
-
-        return $this->orderRepository->get($orderId);
+        return $this->orderViewBlock->getOrder();
     }
 }
