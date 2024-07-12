@@ -10,7 +10,7 @@ use Magento\Backend\Block\Widget\Tab\TabInterface;
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as OrderViewBlock;
-use Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain;
+use Packetery\Checkout\Model\Carrier\ShippingRateCode;
 
 class Packets extends Container implements TabInterface
 {
@@ -18,7 +18,6 @@ class Packets extends Container implements TabInterface
 
     public function __construct(
         Context $context,
-        private readonly Brain $carrierBrain,
         private readonly OrderViewBlock $orderViewBlock,
         array $data = []
     ) {
@@ -28,7 +27,7 @@ class Packets extends Container implements TabInterface
     protected function _construct(): void
     {
         parent::_construct();
-        $this->setTemplate('Packetery_Checkout::packets.phtml');
+        $this->setTemplate('Packetery_Checkout::packets-grid.phtml');
     }
 
     public function getTabLabel(): Phrase
@@ -43,7 +42,7 @@ class Packets extends Container implements TabInterface
 
     public function canShowTab(): bool
     {
-        return $this->carrierBrain->isPacketeryShippingGroup($this->getOrder()->getShippingMethod());
+        return ShippingRateCode::isPacketery($this->getOrder()->getShippingMethod());
     }
 
     public function isHidden(): bool
