@@ -11,14 +11,15 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain;
 
 class Packets extends Container implements TabInterface
 {
     private const NAME = 'Packets';
-    private const PACKETERY_CARRIER_CODE = 'packetery';
 
     public function __construct(
         Context $context,
+        private readonly Brain $carrierBrain,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly RequestInterface $request,
         array $data = []
@@ -44,16 +45,7 @@ class Packets extends Container implements TabInterface
 
     public function canShowTab(): bool
     {
-        $order = $this->getOrder();
-        if ($order === null) {
-            return false;
-        }
-
-        if ($this->isPacketeryShippingGroup($order->getShippingMethod())) {
-            return true;
-        }
-
-        return false;
+        return $this->carrierBrain->isPacketeryShippingGroup($this->getOrder()->getShippingMethod());
     }
 
     public function isHidden(): bool
@@ -61,15 +53,10 @@ class Packets extends Container implements TabInterface
         return !$this->canShowTab();
     }
 
-    private function getOrder(): ?OrderInterface
+    private function getOrder(): OrderInterface
     {
         $orderId = (int) $this->request->getParam('order_id');
 
         return $this->orderRepository->get($orderId);
-    }
-
-    private function isPacketeryShippingGroup($shippingMethod): bool
-    {
-        return str_starts_with($shippingMethod, self::PACKETERY_CARRIER_CODE);
     }
 }

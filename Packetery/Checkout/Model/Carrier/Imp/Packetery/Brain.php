@@ -250,4 +250,9 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 
         return $carriers;
     }
+
+    public function isPacketeryShippingGroup($shippingMethod): bool
+    {
+        return str_starts_with($shippingMethod, $this->getCarrierCode());
+    }
 }
