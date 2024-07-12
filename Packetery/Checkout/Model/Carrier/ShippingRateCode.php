@@ -34,7 +34,7 @@ class ShippingRateCode
      */
     public static function isPacketery(string $code): bool
     {
-        return strpos($code, AbstractBrain::PREFIX) !== false;
+        return str_starts_with($code, AbstractBrain::PREFIX);
     }
 
     /**
