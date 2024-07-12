@@ -27,7 +27,7 @@ class Packets extends Container implements TabInterface
     protected function _construct(): void
     {
         parent::_construct();
-        $this->setTemplate('Packetery_Checkout::packets-grid.phtml');
+        $this->setTemplate('Packetery_Checkout::order-view-tab-packets.phtml');
     }
 
     public function getTabLabel(): Phrase
