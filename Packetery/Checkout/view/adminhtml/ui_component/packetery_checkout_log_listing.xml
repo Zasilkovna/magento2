@@ -67,14 +67,14 @@
                 </item>
             </argument>
         </column>
-        <column name="action" class="Packetery\Checkout\Ui\Component\Log\Listing\Column\Action">
+        <column name="request_name" class="Packetery\Checkout\Ui\Component\Log\Listing\Column\RequestName">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\Log\ActionSelect</item>
+                <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\Log\RequestSelect</item>
                 <item name="config" xsi:type="array">
                     <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">select</item>
-                    <item name="label" xsi:type="string" translate="true">Action</item>
+                    <item name="label" xsi:type="string" translate="true">Request name</item>
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
                 </item>
             </argument>
@@ -90,6 +90,14 @@
                 </item>
             </argument>
         </column>
+        <actionsColumn name="actions" class="Packetery\Checkout\Ui\Component\Log\Listing\Column\Actions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="indexField" xsi:type="string">id</item>
+                </item>
+            </argument>
+        </actionsColumn>
     </columns>
 </listing>
 

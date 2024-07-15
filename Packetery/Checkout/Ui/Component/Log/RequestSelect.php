@@ -6,7 +6,7 @@ namespace Packetery\Checkout\Ui\Component\Log;
 
 use Magento\Framework\Phrase;
 
-class ActionSelect implements \Magento\Framework\Data\OptionSourceInterface
+class RequestSelect implements \Magento\Framework\Data\OptionSourceInterface
 {
     public const ACTION_PACKET_SENDING = 'packet-sending';
     public const ACTION_LABEL_PRINT = 'label-print';
