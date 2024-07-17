@@ -5,8 +5,8 @@
     </head>
     <body>
         <referenceContainer name="content">
+            <block template="Packetery_Checkout::popout.phtml" name="packetery_log_details"/>
             <uiComponent name="packetery_checkout_log_listing"/>
-            <uiComponent name="packetery_log_modal"/>
         </referenceContainer>
     </body>
 </page>

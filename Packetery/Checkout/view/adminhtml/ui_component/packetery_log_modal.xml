@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <form name="log_modal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
-<!--    <settings>-->
-<!--        <buttons>-->
-<!--&lt;!&ndash;            <button name="openModal" class="Packetery\Checkout\Block\Adminhtml\Log\AddModalButton"/>&ndash;&gt;-->
-<!--            <button name="openModal" class="Packetery\Checkout\Ui\Component\Log\Listing\Column\Actions"/>-->
-<!--        </buttons>-->
-<!--    </settings>-->
     <modal name="test_modal">
         <settings>
             <options>

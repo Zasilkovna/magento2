@@ -1,0 +1,23 @@
+<div style="display:none" id="popup-menu" class="popup-menu" data-role="popup-menu" >
+    <div style="margin: 30px 0;">
+        <span><?php echo $block->escapeHtml(__('Some kind of text here inside your modal')) ?></span>
+    </div>
+    <div>
+        <?php dump($block) ?>
+    </div>
+</div>
+<div class="page-main-actions">
+    <?php echo $block->escapeHtml(__('For additional help, please click ')) ?><a href="javascript:void(0);" id="open-modal"><?php echo $block->escapeHtml(__('here.')) ?></a>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "#open-modal": {
+            "Packetery_Checkout/js/popout": {
+                "modalId": "#popup-menu",
+                "modalTarget": "#open-modal",
+                "modalTitle": "Details"
+            }
+        }
+    }
+</script>

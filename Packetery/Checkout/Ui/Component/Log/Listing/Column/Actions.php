@@ -20,14 +20,14 @@ class Actions extends Column
                             'Magento_Ui/js/form/button-adapter' => [
                                 'actions' => [
                                     [
-                                        'targetName' => 'packetery_log_modal.modal',
+                                        'targetName' => 'packetery_log_modal.packetery_log_modal.test_modal',
                                         'actionName' => 'openModal'
                                     ]
                                 ]
                             ]
                         ]
                     ],
-                    'on_click' => '',
+                    'on_click' => 'console.log(1)',
                     'sort_order' => 10
                 ];
             }

@@ -17,7 +17,7 @@ class AddModalButton implements ButtonProviderInterface
                         'actions' => [
                             [
                                 'targetName' => 'product_form.product_form.test_modal',
-                                'actionName' => 'toggleModal'
+                                'actionName' => 'openModal'
                             ]
                         ]
                     ]
