@@ -14,15 +14,14 @@ class Actions extends Column
             foreach ($dataSource['data']['items'] as &$item) {
                 $name = $this->getData('name');
                 $item[$name]['view'] = [
-                    'href' => '#',
                     'label' => __('View'),
                     'data_attribute' => [
                         'mage-init' => [
                             'Magento_Ui/js/form/button-adapter' => [
                                 'actions' => [
                                     [
-                                        'targetName' => 'packetery_.log_modal',
-                                        'actionName' => 'toggleModal'
+                                        'targetName' => 'packetery_log_modal.modal',
+                                        'actionName' => 'openModal'
                                     ]
                                 ]
                             ]

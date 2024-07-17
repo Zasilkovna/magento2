@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <settings>
+        <buttons>
+            <button name="openModel" class="Packetery\Checkout\Block\Adminhtml\Product\Edit\AddModalButton"/>
+        </buttons>
+    </settings>
+    <modal name="test_modal">
+        <settings>
+            <options>
+<!--                <option name="buttons" xsi:type="array">-->
+<!--                    <item name="0" xsi:type="array">-->
+<!--                        <item name="text" xsi:type="string">Done</item>-->
+<!--                        <item name="class" xsi:type="string">action-primary</item>-->
+<!--                        <item name="actions" xsi:type="array">-->
+<!--                            <item name="0" xsi:type="array">-->
+<!--                                <item name="targetName" xsi:type="string">${ $.name }</item>-->
+<!--                                <item name="actionName" xsi:type="string">actionDone</item>-->
+<!--                            </item>-->
+<!--                        </item>-->
+<!--                    </item>-->
+<!--                </option>-->
+                <option name="title" xsi:type="string">Details</option>
+            </options>
+            <onCancel>actionDone</onCancel>
+        </settings>
+<!--        <fieldset name="general" sortOrder="10">-->
+<!--            <settings>-->
+<!--                <label/>-->
+<!--            </settings>-->
+<!--            <field name="test1" sortOrder="10" formElement="input">-->
+<!--                <settings>-->
+<!--                    <dataType>text</dataType>-->
+<!--                    <label translate="true">Test 1</label>-->
+<!--                    <dataScope>test1</dataScope>-->
+<!--                </settings>-->
+<!--            </field>-->
+<!--            <field name="test2" sortOrder="20" formElement="textarea">-->
+<!--                <settings>-->
+<!--                    <label translate="true">Test 2</label>-->
+<!--                    <dataType>text</dataType>-->
+<!--                    <dataScope>test2</dataScope>-->
+<!--                </settings>-->
+<!--            </field>-->
+<!--        </fieldset>-->
+    </modal>
+</form>
