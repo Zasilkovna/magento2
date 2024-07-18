@@ -32,7 +32,7 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
      */
     public function getPointId(): int
     {
-        return (int)$this->getData('point_id');
+        return $this->getData('point_id');
     }
 
     /**
@@ -40,15 +40,7 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
      */
     public function getPointName(): string
     {
-        return (string)$this->getData('point_name');
-    }
-
-    /**
-     * @return string
-     */
-    public function getOrderNumber(): string
-    {
-        return $this->getData('order_number');
+        return $this->getData('point_name');
     }
 
     /**
@@ -56,7 +48,87 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
      */
     public function isAddressValidated(): bool
     {
-        return $this->getData('address_validated') === '1';
+        return $this->getData('address_validated');
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return (int)parent::getId();
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getCod(): ?float
+    {
+        return $this->getData('cod');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCurrency(): ?string
+    {
+        return $this->getData('currency');
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getValue(): ?float
+    {
+        return $this->getData('value');
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getWeight(): ?float
+    {
+        return $this->getData('weight');
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function hasAdultContent(): ?bool
+    {
+        return $this->getData('adult_content');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPlannedDispatch(): ?string
+    {
+        return $this->getData('delayed_delivery');
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getWidth(): ?int
+    {
+        return $this->getData('width');
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getHeight(): ?int
+    {
+        return $this->getData('height');
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLength(): ?int
+    {
+        return $this->getData('depth');
     }
 
     /**
