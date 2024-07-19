@@ -19,20 +19,25 @@ class Actions extends Column
                 $item[$name]['edit'] = [
                     'callback' => [
                         [
+                            'provider' => 'packetery_log_listing.test_modal'
+                                . '.log_detail.info',
+                            'target' => 'destroyInserted',
+                        ],
+                        [
                             'provider' => 'packetery_checkout_log_listing.test_modal',
                             'target' => 'openModal',
                         ],
-//                        [
-//                            'provider' => 'customer_form.areas.address.address'
-//                                . '.customer_address_update_modal.update_customer_address_form_loader',
-//                            'target' => 'render',
-//                            'params' => [
-//                                'entity_id' => $item['entity_id'],
-//                            ],
-//                        ]
+                        [
+                            'provider' => 'packetery_log_listing.test_modal'
+                                . '.log_detail.info',
+                            'target' => 'render',
+                            'params' => [
+                                'entity_id' => $item['id'],
+                            ],
+                        ]
                     ],
                     'href' => '#',
-                    'label' => __('Edit'),
+                    'label' => __('View'),
                     'hidden' => false,
                 ];
             }
