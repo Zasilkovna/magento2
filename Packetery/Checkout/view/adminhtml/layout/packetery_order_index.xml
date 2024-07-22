@@ -3,6 +3,7 @@
     <body>
         <referenceContainer name="content">
             <uiComponent name="packetery_checkout_order_listing"/>
+            <uiComponent name="packetery_checkout_log_listing"/>
         </referenceContainer>
     </body>
 </page>
