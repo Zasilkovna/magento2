@@ -7,7 +7,7 @@ class ApiPasswordValidate extends \Magento\Framework\App\Config\Value
     private const API_PASSWORD_LENGTH = 32;
 
     /**
-     * @return void
+     * @return self
      * @throws \Magento\Framework\Exception\ValidatorException
      */
     public function beforeSave()
@@ -21,6 +21,6 @@ class ApiPasswordValidate extends \Magento\Framework\App\Config\Value
             throw new \Magento\Framework\Exception\ValidatorException($message);
         }
 
-        parent::beforeSave();
+        return parent::beforeSave();
     }
 }

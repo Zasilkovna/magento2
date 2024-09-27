@@ -178,14 +178,9 @@ class PricingServiceTest extends BaseTest
         return $this->createFactoryMock($this->createObject($methods));
     }
 
-    /**
-     * @param $willCreate
-     * @param null $classsName
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createFactoryMock($willCreate, $classsName = null)
+    protected function createFactoryMock(mixed $willCreate, ?string $className = null): \PHPUnit\Framework\MockObject\MockObject
     {
-        $factory = $this->getMockBuilder(($classsName ?: \stdClass::class))
+        $factory = $this->getMockBuilder(($className ?: \stdClass::class))
             ->disableOriginalConstructor()
             ->disableOriginalClone()
             ->disableArgumentCloning()

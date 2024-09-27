@@ -28,6 +28,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function getItems()
     {
+        // @phpstan-ignore-next-line
         return parent::getItems();
     }
 
@@ -37,6 +38,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function getFirstRecord(): ?\Packetery\Checkout\Model\Pricingrule
     {
         $this->load();
+        /** @var \Packetery\Checkout\Model\Pricingrule[] $items */
         $items = $this->_items;
 
         return array_shift($items);

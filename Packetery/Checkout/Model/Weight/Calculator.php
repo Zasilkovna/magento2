@@ -32,7 +32,6 @@ class Calculator
 
         foreach ($allVisibleItems as $item) {
             if ($item->getProductType() === 'configurable') {
-                /** @var \Magento\Catalog\Model\Product $configurableProduct */
                 $configurableProduct = $item->getProduct();
                 if ($configurableProduct->isVirtual()) {
                     $configurableWeight = 0.0;
@@ -40,10 +39,8 @@ class Calculator
                     $configurableWeight = $configurableProduct->getWeight();
                 }
 
-                /** @var Item[] $children */
                 $children = ($item->getChildren() ?: []); // contains only ordered items
                 foreach ($children as $child) {
-                    /** @var \Magento\Catalog\Model\Product $childProduct */
                     $childProduct = $child->getProduct();
                     if ($childProduct->isVirtual()) {
                         $productWeights[$childProduct->getId()] = 0.0;
@@ -62,7 +59,6 @@ class Calculator
         }
 
         foreach ($allVisibleItems as $item) {
-            /** @var \Magento\Catalog\Model\Product $product */
             $product = $item->getProduct();
             if ($item->getProductType() === 'simple' && !array_key_exists($product->getId(), $productWeights)) {
                 if ($product->isVirtual()) {

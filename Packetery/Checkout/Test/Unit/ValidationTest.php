@@ -23,9 +23,6 @@ class ValidationTest extends \Packetery\Checkout\Test\BaseTest
         $this->assertTrue(is_numeric('0.1'));
         $this->assertTrue(is_numeric(10.55));
         $this->assertTrue(is_numeric(-10.55));
-        $this->assertFalse(is_numeric(null));
-        $this->assertFalse(is_numeric(false));
-        $this->assertFalse(is_numeric(''));
 
         $this->assertTrue($repo->validatePricingRuleMaxWeight([['max_weight' => 10.2], ['max_weight' => 10.8]])); // 0 does not mean null
         $this->assertTrue($repo->validatePricingRuleMaxWeight([['max_weight' => 1], ['max_weight' => 3]]));

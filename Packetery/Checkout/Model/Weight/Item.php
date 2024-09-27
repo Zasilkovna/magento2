@@ -29,7 +29,7 @@ class Item extends \Magento\Framework\DataObject
 
     /**
      * @param \Magento\Quote\Model\Quote\Item $item
-     * @return static
+     * @return self
      */
     public static function fromQuoteItem(\Magento\Quote\Model\Quote\Item $item): self
     {
@@ -49,7 +49,7 @@ class Item extends \Magento\Framework\DataObject
 
     /**
      * @param \Magento\Sales\Model\Order\Item $item
-     * @return static
+     * @return self
      */
     public static function fromOrderItem(\Magento\Sales\Model\Order\Item $item): self
     {
@@ -65,5 +65,37 @@ class Item extends \Magento\Framework\DataObject
         $instance->setData('children', $children);
 
         return $instance;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductType()
+    {
+        return parent::getProductType();
+    }
+
+    /**
+     * @return self[]
+     */
+    public function getChildren()
+    {
+        return $this->getData('children');
+    }
+
+    /**
+     * @return int
+     */
+    public function getQty()
+    {
+        return $this->getData('qty');
+    }
+
+    /**
+     * @return \Magento\Catalog\Model\Product
+     */
+    public function getProduct()
+    {
+        return $this->getData('product');
     }
 }
