@@ -19,6 +19,15 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     }
 
     /**
+     * @return \Packetery\Checkout\Model\Order[]
+     */
+    public function getItems()
+    {
+        // @phpstan-ignore-next-line
+        return parent::getItems();
+    }
+
+    /**
      * @return string
      */
     private function createSalesOrderCarrierCodeCondition(): string

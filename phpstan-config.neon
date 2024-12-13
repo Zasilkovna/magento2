@@ -1,9 +1,12 @@
 parameters:
     bootstrapFiles:
         - phpstan-autoload.php
-    level: 1
+    level: 3
     fileExtensions:
         - php
         - phtml
     paths:
         - ./Packetery/Checkout
+    ignoreErrors:
+        - '#Call to an undefined method Magento\\(.*)+\(\)\.#' # It is typical for Magento related code to use PHP magic.
+        - '#Call to an undefined static method Magento\\(.*)+\(\)\.#'

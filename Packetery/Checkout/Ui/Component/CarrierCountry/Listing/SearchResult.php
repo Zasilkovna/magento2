@@ -79,7 +79,5 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
             );
 
         $this->addFilterToMap('availableName', 'available');
-
-        return $this;
     }
 }

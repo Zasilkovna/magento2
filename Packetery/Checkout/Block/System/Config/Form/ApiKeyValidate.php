@@ -9,7 +9,7 @@ class ApiKeyValidate extends \Magento\Framework\App\Config\Value
     private const API_KEY_LENGTH = 16;
 
     /**
-     * @return void
+     * @return self
      * @throws \Magento\Framework\Exception\ValidatorException
      * @throws \Magento\Framework\Exception\FileSystemException
      */
@@ -23,6 +23,6 @@ class ApiKeyValidate extends \Magento\Framework\App\Config\Value
             throw new \Magento\Framework\Exception\ValidatorException($message);
         }
 
-        parent::beforeSave();
+        return parent::beforeSave();
     }
 }
