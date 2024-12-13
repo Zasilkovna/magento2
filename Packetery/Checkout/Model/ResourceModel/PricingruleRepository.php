@@ -203,9 +203,11 @@ class PricingruleRepository
      */
     public function setPricingRuleEnabled(int $id, bool $enabled): void
     {
-        $rule = $this->pricingRuleCollectionFactory->create()->getItemById($id);
-        $rule->setData('enabled', $enabled);
-        $rule->save();
+        /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\Collection $collection */
+        $collection = $this->pricingRuleCollectionFactory->create();
+        $collection->addFilter('id', $id);
+        $collection->setDataToAll('enabled', $enabled);
+        $collection->save();
     }
 
     /**
