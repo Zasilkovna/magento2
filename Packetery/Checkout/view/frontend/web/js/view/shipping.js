@@ -248,7 +248,7 @@ define(
 
         var resetPickedValidatedAddress = function() {
             mixin.pickedValidatedAddress('');
-            localStorage.packetaValidatedAddress = '';
+            packeteryService.resetPacketaValidatedAddress();
         };
 
         var createChangeSubscriber = function(callback, comparator, lastVal) {
@@ -342,27 +342,20 @@ define(
                 return;
             }
 
-            localStorage.packetaValidatedAddress = JSON.stringify({
-                city: address.city || null,
-                street: address.street || null,
-                houseNumber: address.houseNumber || null,
-                postcode: address.postcode || null,
-                countryId: destinationAddress.countryId,
-                county: address.county || null,
-                longitude: address.longitude || null,
-                latitude: address.latitude || null,
-            });
+            packeteryService.setPacketaValidatedAddress(
+                {
+                    city: address.city || null,
+                    street: address.street || null,
+                    houseNumber: address.houseNumber || null,
+                    postcode: address.postcode || null,
+                    countryId: destinationAddress.countryId,
+                    county: address.county || null,
+                    longitude: address.longitude || null,
+                    latitude: address.latitude || null,
+                }
+            );
 
             mixin.pickedValidatedAddress(formatPacketaAddress(packeteryService.getPacketaValidatedAddress('')));
-            quote.shippingAddress(Object.assign(quote.shippingAddress(), {
-                city: address.city || null,
-                street: [ address.street || '', address.houseNumber || '' ],
-                postcode: address.postcode || null,
-                countryId: destinationAddress.countryId,
-                region: address.county || null,
-                regionCode: null,
-                regionId: null
-            }));
         }
 
         var loadStoreConfig = function(onSuccess) {
