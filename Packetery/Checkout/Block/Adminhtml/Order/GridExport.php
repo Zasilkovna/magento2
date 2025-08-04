@@ -6,6 +6,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 
 class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
 {
+    public const AFFIALIATED_ID = "48efd6a5bf5c6fce";
 
     /**
      * @var \Learning\Test\Model\ResourceModel\Info\CollectionFactory
@@ -147,7 +148,11 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
             $row->getData('width'),
             $row->getData('height'),
             $row->getData('depth'),
-            ''
+            '', // Note
+            '', // Allow public tracking
+            '', // Allow tracking for users
+            '', // Romania CIF Number
+            self::AFFIALIATED_ID,
         ];
     }
 
@@ -180,7 +185,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     {
         // Write to memory (unless buffer exceeds limit then it will write to /tmp)
         $fp = fopen('php://temp', 'w+');
-        fputcsv($fp, ['version 5']);
+        fputcsv($fp, ['version 8']);
         fputcsv($fp, []);
         foreach ($collection as $row) {
             $fields = $this->getExportRow($row);
