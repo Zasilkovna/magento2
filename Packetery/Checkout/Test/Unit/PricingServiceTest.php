@@ -189,7 +189,7 @@ class PricingServiceTest extends BaseTest
             ->disableOriginalClone()
             ->disableArgumentCloning()
             ->disallowMockingUnknownTypes()
-            ->setMethods(
+            ->onlyMethods(
                 [
                     'create'
                 ]
