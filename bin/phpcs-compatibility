@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+VERSION="$1"
+vendor/bin/phpcs --standard=PHPCompatibility --extensions=php,phtml --runtime-set testVersion ${VERSION} -w --ignore=Packetery/Checkout/vendor Packetery/Checkout

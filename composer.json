@@ -1,0 +1,22 @@
+{
+    "name": "packetery/app-code",
+    "description": "Composer configuration for Packetery modules",
+    "type": "project",
+    "minimum-stability": "alpha",
+    "prefer-stable": true,
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0",
+        "phpcompatibility/php-compatibility": "^10.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+    },
+    "scripts": {
+        "phpcs-compatibility81": "bash bin/phpcs-compatibility 8.1",
+        "phpcs-compatibility84": "bash bin/phpcs-compatibility 8.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
+
