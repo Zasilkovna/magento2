@@ -51,6 +51,21 @@ If all countries are selected, migration is not performed.
 
 Price rules are created as unavailable, without set maximum weight.
 
+### Development
+
+#### PHP Compatibility Checks
+
+The module includes PHPCompatibility checks to ensure compatibility with PHP 8.1 and PHP 8.4.
+
+To run PHP compatibility checks:
+
+```bash
+composer phpcs-compatibility81  # Check PHP 8.1 compatibility
+composer phpcs-compatibility84  # Check PHP 8.4 compatibility
+```
+
+These commands use PHP_CodeSniffer with the PHPCompatibility standard to detect compatibility issues.
+
 ### Configuration and "How to" guide
 
 ### Information about the module
@@ -62,8 +77,8 @@ Price rules are created as unavailable, without set maximum weight.
 
 #### Supported versions:
 
-- Magento 2.4
-- php 7.4 - 8.2
+- Magento 2.4.4+
+- php 8.1 - 8.4
 - If you have a problem using the module, please contact us by email: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com)
 
 #### Supported features:
@@ -142,6 +157,21 @@ V případě, že jsou zvoleny všechny země, migrace se neprovádí.
 
 Cenová pravidla jsou vytvořena jako nedostupná, bez nastavené maximální hmotnosti.
 
+### Vývoj
+
+#### Kontrola kompatibility PHP
+
+Modul obsahuje kontroly PHPCompatibility pro zajištění kompatibility s PHP 8.1 a PHP 8.4.
+
+Pro spuštění kontrol kompatibility PHP:
+
+```bash
+composer phpcs-compatibility81  # Kontrola kompatibility s PHP 8.1
+composer phpcs-compatibility84  # Kontrola kompatibility s PHP 8.4
+```
+
+Tyto příkazy používají PHP_CodeSniffer se standardem PHPCompatibility pro detekci problémů s kompatibilitou.
+
 ### Konfigurace a návod k použití
 
 [Uživatelská dokumentace](https://github.com/Zasilkovna/magento2/wiki/U%C5%BEivatelsk%C3%A1-dokumentace)
@@ -155,8 +185,8 @@ Cenová pravidla jsou vytvořena jako nedostupná, bez nastavené maximální hm
 
 #### Podporované verze:
 
-- Magento 2.4
-- php 7.4 - 8.2
+- Magento 2.4.4+
+- php 8.1 - 8.4
 - Při problému s použitím modulu nás kontaktujte na emailu: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com)
 
 #### Poskytované funkce:
