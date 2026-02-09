@@ -57,11 +57,12 @@ Price rules are created as unavailable, without set maximum weight.
 
 The module includes PHPCompatibility checks to ensure compatibility with PHP 8.1 and PHP 8.4.
 
-To run PHP compatibility checks:
+Requirements to run the checks: PHP 8.4 and Composer 2.8.6. From the module directory (where `composer.json` lives), run:
 
 ```bash
-composer phpcs-compatibility81  # Check PHP 8.1 compatibility
-composer phpcs-compatibility84  # Check PHP 8.4 compatibility
+composer install
+composer phpcs-compatibility:81  # Check PHP 8.1 compatibility
+composer phpcs-compatibility:84  # Check PHP 8.4 compatibility
 ```
 
 These commands use PHP_CodeSniffer with the PHPCompatibility standard to detect compatibility issues.
@@ -163,11 +164,12 @@ Cenová pravidla jsou vytvořena jako nedostupná, bez nastavené maximální hm
 
 Modul obsahuje kontroly PHPCompatibility pro zajištění kompatibility s PHP 8.1 a PHP 8.4.
 
-Pro spuštění kontrol kompatibility PHP:
+Pro spuštění kontrol je potřeba PHP 8.4 a Composer 2.8.6. V adresáři modulu (kde je `composer.json`) spusťte:
 
 ```bash
-composer phpcs-compatibility81  # Kontrola kompatibility s PHP 8.1
-composer phpcs-compatibility84  # Kontrola kompatibility s PHP 8.4
+composer install
+composer phpcs-compatibility:81  # Kontrola kompatibility s PHP 8.1
+composer phpcs-compatibility:84  # Kontrola kompatibility s PHP 8.4
 ```
 
 Tyto příkazy používají PHP_CodeSniffer se standardem PHPCompatibility pro detekci problémů s kompatibilitou.

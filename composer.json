@@ -4,14 +4,17 @@
     "type": "project",
     "minimum-stability": "alpha",
     "prefer-stable": true,
+    "require": {
+        "php": "^8.4"
+    },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",
         "phpcompatibility/php-compatibility": "^10.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
     },
     "scripts": {
-        "phpcs-compatibility81": "bash bin/phpcs-compatibility 8.1",
-        "phpcs-compatibility84": "bash bin/phpcs-compatibility 8.4"
+        "phpcs-compatibility:81": "bash bin/phpcs-compatibility 8.1",
+        "phpcs-compatibility:84": "bash bin/phpcs-compatibility 8.4"
     },
     "config": {
         "allow-plugins": {

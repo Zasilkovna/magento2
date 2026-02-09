@@ -181,15 +181,15 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
      * @param iterable $collection
      * @return string|null
      */
-    private function createCsvContent(iterable $collection): ?string
+    protected function createCsvContent(iterable $collection): ?string
     {
         // Write to memory (unless buffer exceeds limit then it will write to /tmp)
         $fp = fopen('php://temp', 'w+');
-        fputcsv($fp, ['version 8'], ',', '"', '\\', false);
-        fputcsv($fp, [], ',', '"', '\\', false);
+        fputcsv($fp, ['version 8'], ',', '"', '\\');
+        fputcsv($fp, [], ',', '"', '\\');
         foreach ($collection as $row) {
             $fields = $this->getExportRow($row);
-            fputcsv($fp, $fields, ',', '"', '\\', false);
+            fputcsv($fp, $fields, ',', '"', '\\');
         }
         rewind($fp); // Set the pointer back to the start
         $contents = stream_get_contents($fp); // Fetch the contents of our CSV
