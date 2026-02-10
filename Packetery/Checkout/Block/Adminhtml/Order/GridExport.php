@@ -181,7 +181,7 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
      * @param iterable $collection
      * @return string|null
      */
-    protected function createCsvContent(iterable $collection): ?string
+    private function createCsvContent(iterable $collection): ?string
     {
         // Write to memory (unless buffer exceeds limit then it will write to /tmp)
         $fp = fopen('php://temp', 'w+');
