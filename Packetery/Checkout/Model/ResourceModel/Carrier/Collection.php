@@ -31,6 +31,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function resolvableOnly(): void {
         $this->whereDeleted(false);
+        $this->whereAvailable(true);
         $this->supportedOnly();
     }
 
@@ -39,6 +40,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function configurableOnly(): void {
         $this->whereDeleted(false);
+        $this->whereAvailable(true);
         $this->supportedOnly();
     }
 
@@ -47,6 +49,13 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function whereDeleted(bool $value): void {
         $this->addFilter('main_table.deleted', $value);
+    }
+
+    /**
+     * @param bool $value
+     */
+    public function whereAvailable(bool $value): void {
+        $this->addFilter('main_table.available', $value);
     }
 
     /**

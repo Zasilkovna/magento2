@@ -111,6 +111,7 @@ class ImportFeedCarriers extends Command
                 'country' => strtoupper($carrier->country),
                 'currency' => $carrier->currency,
                 'max_weight' => (float)$carrier->maxWeight,
+                'available' => $this->parseBool($carrier->available ?? true),
                 'deleted' => false,
             ];
 

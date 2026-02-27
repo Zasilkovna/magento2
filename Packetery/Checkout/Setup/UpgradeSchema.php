@@ -239,6 +239,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), '2.4.0', '<')) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_carrier'),
+                'available',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                    'nullable' => false,
+                    'default' => 1,
+                    'comment' => 'Carrier available in feed (available = true)',
+                    'after' => 'max_weight'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 }

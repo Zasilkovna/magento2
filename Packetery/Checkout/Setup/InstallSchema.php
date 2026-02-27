@@ -482,11 +482,18 @@ class InstallSchema implements InstallSchemaInterface
                     'after' => 'currency',
                 ],
             ],
-            'deleted' => [
+            'available' => [
                 'type' => Table::TYPE_BOOLEAN,
                 'attr' => [
                     'nullable' => false,
                     'after' => 'max_weight',
+                ],
+            ],
+            'deleted' => [
+                'type' => Table::TYPE_BOOLEAN,
+                'attr' => [
+                    'nullable' => false,
+                    'after' => 'available',
                 ],
             ],
         ]);
