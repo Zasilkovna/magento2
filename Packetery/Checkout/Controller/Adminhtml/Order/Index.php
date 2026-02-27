@@ -6,17 +6,12 @@ class Index extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory = false;
 
-    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
-    private $featureFlagManager;
-
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
-        $this->featureFlagManager = $featureFlagManager;
     }
 
     public function execute()
@@ -25,8 +20,6 @@ class Index extends \Magento\Backend\App\Action
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Packetery_Checkout::orders');
         $resultPage->getConfig()->getTitle()->prepend(__('Orders'));
-
-        $this->featureFlagManager->isSplitActive();
 
         return $resultPage;
     }

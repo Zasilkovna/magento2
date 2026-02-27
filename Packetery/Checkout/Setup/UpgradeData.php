@@ -55,7 +55,7 @@ class UpgradeData implements UpgradeDataInterface
 
             // Static Vendor groups snapshot for given module version 2.3.0
             $vendorGroupsMapping = [
-                'CZ' => '["zpoint","alzabox","zbox"]',
+                'CZ' => '["zpoint","zbox"]',
                 'SK' => '["zpoint","zbox"]',
                 'HU' => '["zpoint","zbox"]',
                 'RO' => '["zpoint","zbox"]',

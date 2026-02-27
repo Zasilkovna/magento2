@@ -16,12 +16,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
     private $carrierCollectionFactory;
 
-    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
-    private $featureFlagManager;
-
     /**
-     * Brain constructor.
-     *
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -39,13 +34,11 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
-        \Magento\Framework\App\State $appState,
-        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
+        \Magento\Framework\App\State $appState
     ) {
         parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory, $appState);
         $this->methodSelect = $methodSelect;
         $this->carrierCollectionFactory = $carrierCollectionFactory;
-        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -162,10 +155,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         $zpointTitle = 'Packeta internal pickup points';
         $zboxTitle = 'Packeta - Z-BOX';
 
-        if (!$this->featureFlagManager->isSplitActive()) {
-            return [];
-        }
-
         return [
             new VendorCarrier(
                 1,
@@ -177,12 +166,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
                 2,
                 VendorGroups::ZBOX,
                 $zboxTitle,
-                'CZ',
-            ),
-            new VendorCarrier(
-                3,
-                VendorGroups::ALZABOX,
-                'Packeta - AlzaBox',
                 'CZ',
             ),
             new VendorCarrier(

@@ -28,12 +28,7 @@ class Modifier implements ModifierInterface
     /** @var \Packetery\Checkout\Model\AddressValidationSelect */
     private $addressValidationSelect;
 
-    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager  */
-    private $featureFlagManager;
-
     /**
-     * Modifier constructor.
-     *
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
@@ -43,14 +38,12 @@ class Modifier implements ModifierInterface
         \Magento\Framework\App\RequestInterface $request,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
-        \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect,
-        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
+        \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect
     ) {
         $this->request = $request;
         $this->pricingService = $pricingService;
         $this->carrierFacade = $carrierFacade;
         $this->addressValidationSelect = $addressValidationSelect;
-        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -332,7 +325,7 @@ class Modifier implements ModifierInterface
                             'dataType' => 'text',
                             'componentType' => 'field',
                             'additionalClasses' => 'packetery-checkboxset',
-                            'visible' => $carrier->hasVendorGroupsOptions() && $this->featureFlagManager->isSplitActive(),
+                            'visible' => $carrier->hasVendorGroupsOptions(),
                             'disabled' => $carrier->hasNonInteractableVendorGroupsOptions(),
                             'required' => false,
                             'multiple' => true,
@@ -580,6 +573,10 @@ class Modifier implements ModifierInterface
             }
 
             if ($resolvedPricingRule === null && $carrier->hasNonInteractableVendorGroupsOptions()) {
+                $pricingRule['vendor_groups'] = $carrier->getVendorCodesOptionsValues();
+            }
+
+            if (($pricingRule['vendor_groups'] ?? []) === [] && $carrier->hasVendorGroupsOptions()) {
                 $pricingRule['vendor_groups'] = $carrier->getVendorCodesOptionsValues();
             }
 

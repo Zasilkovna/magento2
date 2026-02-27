@@ -86,19 +86,14 @@ define([
 
         packetaButtonClick: function() {
             var packetaApiKey = config.apiKey;
-            var countryId = uiRegistry.get('inputName = general[recipient_country_id]').value();
             var widgetVendors = JSON.parse(uiRegistry.get('inputName = general[misc][widgetVendors]').value());
 
             var options = {
                 webUrl: config.packetaOptions.webUrl,
                 appIdentity: config.packetaOptions.appIdentity,
-                country: countryId.toLocaleLowerCase(),
                 language: config.packetaOptions.language,
+                vendors: widgetVendors
             };
-
-            if (widgetVendors.length > 0) {
-                options.vendors = widgetVendors;
-            }
 
             var pickupPointSelected = function(point) {
                 if(!point) {
