@@ -20,7 +20,7 @@
                     <label>Title</label>
                     <validate>required-entry</validate>
                 </field>
-                <field id="allowedMethods" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="allowedMethods" translate="label" type="multiselect" sortOrder="40" showInDefault="0" showInWebsite="0" showInStore="0" canRestore="1">
                     <label>Allowed Methods</label>
                     <source_model>Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect</source_model>
                     <can_be_empty>1</can_be_empty>
@@ -61,7 +61,7 @@
                     <label>Enabled for Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="allowedMethods" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="allowedMethods" translate="label" type="multiselect" sortOrder="40" showInDefault="0" showInWebsite="0" showInStore="0" canRestore="1">
                     <label>Allowed Methods</label>
                     <source_model>Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect</source_model>
                     <can_be_empty>1</can_be_empty>
