@@ -27,7 +27,7 @@
         text="method.carrier_title" />
 </tr>
 
-<tr if="method.carrier_code == 'packetery'"
+<tr if="method.carrier_code.indexOf('packetery') === 0"
     visible="element.isStoreConfigLoaded() && element.shippingRatesConfig() != null && element.isSelected() == element.getShippingRateCode(method) && element.getRateConfig(method).isPacketaRate && element.getRateConfig(method).isPickupPointDelivery"
     class="packetery-zas-box">
     <td colspan="4">

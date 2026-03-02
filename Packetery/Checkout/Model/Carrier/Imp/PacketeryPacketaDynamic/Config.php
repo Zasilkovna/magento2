@@ -13,6 +13,6 @@ class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
      */
     public function getAllowedMethods(): array
     {
-        return [Methods::DIRECT_ADDRESS_DELIVERY];
+        return [Methods::PICKUP_POINT_DELIVERY, Methods::DIRECT_ADDRESS_DELIVERY];
     }
 }

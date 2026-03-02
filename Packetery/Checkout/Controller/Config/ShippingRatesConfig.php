@@ -112,6 +112,9 @@ class ShippingRatesConfig implements HttpPostActionInterface
             if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\VendorCarrier) {
                 $widgetVendors[] = self::createWidgetVendor($dynamicCarrier->getCountryId(), $dynamicCarrier->getGroup());
             }
+            if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\DynamicCarrier) {
+                $widgetVendors[] = self::createWidgetVendorForCarrierId($dynamicCarrier->getCountryId(), $dynamicCarrier->getDynamicCarrierId());
+            }
         }
 
         return $widgetVendors;
@@ -142,6 +145,17 @@ class ShippingRatesConfig implements HttpPostActionInterface
         }
 
         return $widgetVendor;
+    }
+
+    /**
+     * @return array{country: string, selected: bool, carrierId: int}
+     */
+    private static function createWidgetVendorForCarrierId(string $countryId, int $carrierId): array {
+        return [
+            'country' => strtolower($countryId),
+            'selected' => true,
+            'carrierId' => $carrierId,
+        ];
     }
 
     public function execute() {
