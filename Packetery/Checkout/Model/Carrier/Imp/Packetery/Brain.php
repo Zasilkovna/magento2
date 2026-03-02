@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
-use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Carrier\VendorGroups;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
@@ -13,15 +12,11 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect */
     private $methodSelect;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
-    private $carrierCollectionFactory;
-
     /**
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect
-     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      * @param \Magento\Framework\App\State $appState
@@ -31,14 +26,12 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect,
-        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
         \Magento\Framework\App\State $appState
     ) {
         parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory, $appState);
         $this->methodSelect = $methodSelect;
-        $this->carrierCollectionFactory = $carrierCollectionFactory;
     }
 
     /**
@@ -72,19 +65,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return array
      */
     public function getAvailableCountries(array $methods): array {
-        $result = [];
-
-        if (in_array(Methods::PICKUP_POINT_DELIVERY, $methods)) {
-            $fixedCountries = $this->getBaseCountries();
-
-            $collection = $this->carrierCollectionFactory->create();
-            $collection->forDeliveryMethod(Methods::PICKUP_POINT_DELIVERY);
-            $countries = $collection->getColumnValues('country');
-
-            $result = array_merge($result, array_unique(array_merge($fixedCountries, $countries)));
-        }
-
-        return $result;
+        return $this->getBaseCountries();
     }
 
     /**
