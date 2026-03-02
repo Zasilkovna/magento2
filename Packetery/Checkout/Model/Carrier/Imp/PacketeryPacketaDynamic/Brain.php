@@ -59,13 +59,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     }
 
     /**
-     * @inheridoc
-     */
-    protected static function getResolvableDestinationData(): array {
-        return [];
-    }
-
-    /**
      * @return bool
      */
     public function isAssignableToPricingRule(): bool {
@@ -96,7 +89,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->resolvableOnly();
-        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
         $items = $collection->getItems();
 
         return array_map(
@@ -118,7 +110,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
         $collection->configurableOnly();
         $collection->whereCountry($country);
         $collection->forDeliveryMethods($methods);
-        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
         $items = $collection->getItems();
 
         return array_map(

@@ -141,12 +141,6 @@ abstract class AbstractBrain
      */
     abstract public function getMethodSelect(): AbstractMethodSelect;
 
-    /** Returns data that are used to figure out destination point id
-     *
-     * @return array
-     */
-    abstract protected static function getResolvableDestinationData(): array;
-
     /**
      * @param string $method
      * @param string $countryId
@@ -154,8 +148,7 @@ abstract class AbstractBrain
      * @return int|null
      */
     public function resolvePointId(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): ?int {
-        $data = $this::getResolvableDestinationData();
-        return ($data[$method]['countryBranchIds'][$countryId] ?? null);
+        return null;
     }
 
     /**
@@ -179,13 +172,6 @@ abstract class AbstractBrain
      */
     public function validateDynamicCarrier(string $method, string $countryId, ?AbstractDynamicCarrier $dynamicCarrier = null): bool {
         return true;
-    }
-
-    /** What Mordor branch ids does carrier implement
-     * @return array
-     */
-    public static function getImplementedBranchIds(): array {
-        return [];
     }
 
     /**

@@ -68,39 +68,11 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
-     * @inheridoc
-     */
-    protected static function getResolvableDestinationData(): array {
-        return [
-            Methods::ADDRESS_DELIVERY => [
-                'countryBranchIds' => [
-                    'CZ' => 106,
-                    'SK' => 131,
-                    'HU' => 4159,
-                    'RO' => 4161,
-                    'PL' => 4162,
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public static function getImplementedBranchIds(): array {
-        return array_values(self::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds']);
-    }
-
-    /**
      * @param array $methods
      * @return array
      */
     public function getAvailableCountries(array $methods): array {
         $result = [];
-
-        if (in_array(Methods::ADDRESS_DELIVERY, $methods)) {
-            $result = array_merge($result, array_keys($this::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds'] ?? []));
-        }
 
         if (in_array(Methods::PICKUP_POINT_DELIVERY, $methods)) {
             $fixedCountries = $this->getBaseCountries();

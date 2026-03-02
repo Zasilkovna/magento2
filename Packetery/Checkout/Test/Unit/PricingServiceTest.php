@@ -116,18 +116,12 @@ class PricingServiceTest extends BaseTest
             $this->createWeightRule(100.01, 4.9),
         ];
 
-        $methods = $this->createMethodsWithLabels([Methods::ADDRESS_DELIVERY]);
-        $result = $this->collectRates($pricingRule, $weightRules, 5, 300, $pricingRule->getCountryId(), 10.0, 333.58, $methods);
-        $this->assertRateMethod($result, [
-            'cost' => 100.01, // free shipping
-            'method' => Methods::ADDRESS_DELIVERY, // for CZ there is address delivery
-        ]);
+        $methods = $this->createMethodsWithLabels([Methods::LEGACY_BEST_DELIVERY_SOLUTION]);
+        $result = $this->collectRates($pricingRule, $weightRules, 5, 300, $pricingRule->getCountryId(), 10.0, 333.58, $methods, true);
+        $this->assertTrue($result === null || $result->getAllRates() === [], 'Packeta carrier no longer offers legacy BDS');
 
-        $result = $this->collectRates($pricingRule, $weightRules, 5, 400, $pricingRule->getCountryId(), 10.0, 333.58, $methods);
-        $this->assertRateMethod($result, [
-            'cost' => 0, // free shipping
-            'method' => Methods::ADDRESS_DELIVERY, // for CZ there is address delivery
-        ]);
+        $result = $this->collectRates($pricingRule, $weightRules, 5, 400, $pricingRule->getCountryId(), 10.0, 333.58, $methods, true);
+        $this->assertTrue($result === null || $result->getAllRates() === [], 'Packeta carrier no longer offers legacy BDS');
 
         $result = $this->collectRates($pricingRule, $weightRules, 1000000, 400, $pricingRule->getCountryId(), 10.0, 333.58, $methods);
         $this->assertNull($result);
@@ -136,7 +130,7 @@ class PricingServiceTest extends BaseTest
         $result = $this->collectRates($pricingRule, $weightRules, 10, 400, $pricingRule->getCountryId(), 10.0, 333.58, $methods);
         $this->assertEmpty($result->getAllRates(), 'empty methods results in empty result');
 
-        $methods = $this->createMethodsWithLabels([Methods::ADDRESS_DELIVERY, Methods::PICKUP_POINT_DELIVERY]);
+        $methods = $this->createMethodsWithLabels([Methods::LEGACY_BEST_DELIVERY_SOLUTION, Methods::PICKUP_POINT_DELIVERY]);
         $result = $this->collectRates($pricingRule, $weightRules, 10, 400, $pricingRule->getCountryId(), 10.0, 333.58, $methods);
         $this->assertNotEmpty($result->getAllRates());
     }
@@ -189,11 +183,7 @@ class PricingServiceTest extends BaseTest
             ->disableOriginalClone()
             ->disableArgumentCloning()
             ->disallowMockingUnknownTypes()
-            ->onlyMethods(
-                [
-                    'create'
-                ]
-            )
+            ->onlyMethods(['create'])
             ->getMock();
 
         $factory->method('create')->willReturn($willCreate);
@@ -227,7 +217,8 @@ class PricingServiceTest extends BaseTest
         return $weightRule;
     }
 
-    private function collectRates(?Pricingrule $pricingRule, array $weightRules, int $cartWeight, int $cartValue, string $country, float $maxGlobalWeight, $globalfreeShipment, array $methods): ?\Magento\Shipping\Model\Rate\Result {
+    private function collectRates(?Pricingrule $pricingRule, array $weightRules, int $cartWeight, int $cartValue, string $country, float $maxGlobalWeight, $globalfreeShipment, array $methods, bool $resolvePricingRuleReturnsNull = false): ?\Magento\Shipping\Model\Rate\Result {
+        $resolvePricingRuleResult = $resolvePricingRuleReturnsNull ? null : $pricingRule;
         /** @var \Packetery\Checkout\Model\Pricing\Service|MockObject $service */
         $service = $this->createProxy(
             Pricing\Service::class,
@@ -235,7 +226,7 @@ class PricingServiceTest extends BaseTest
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
                 'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
-            ['getWeightRulesByPricingRule' => $weightRules, 'resolvePricingRule' => $pricingRule]
+            ['getWeightRulesByPricingRule' => $weightRules, 'resolvePricingRule' => $resolvePricingRuleResult]
         );
 
         $request = $this->createProxyWithMethods(

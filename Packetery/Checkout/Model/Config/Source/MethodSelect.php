@@ -13,7 +13,7 @@ class MethodSelect extends AbstractMethodSelect implements \Magento\Framework\Da
     {
         return [
             ['value' => Methods::PICKUP_POINT_DELIVERY, 'label' => __('Pickup Point Delivery')],
-            ['value' => Methods::ADDRESS_DELIVERY, 'label' => __('Best Address Delivery')],
+            ['value' => Methods::LEGACY_BEST_DELIVERY_SOLUTION, 'label' => __('Best Address Delivery')],
             ['value' => Methods::DIRECT_ADDRESS_DELIVERY, 'label' => __('Address Delivery')],
         ];
     }

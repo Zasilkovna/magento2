@@ -11,7 +11,7 @@ class Methods
 {
     public const PICKUP_POINT_DELIVERY = 'pickupPointDelivery';
     public const LEGACY_PICKUP_POINT_DELIVERY = 'packetery';
-    public const ADDRESS_DELIVERY = 'addressDelivery'; // BDS
+    public const LEGACY_BEST_DELIVERY_SOLUTION = 'addressDelivery';
     public const DIRECT_ADDRESS_DELIVERY = 'directAddressDelivery'; // home delivery for specific dynamic carriers
 
     /**
@@ -21,7 +21,7 @@ class Methods
         return [
             self::PICKUP_POINT_DELIVERY,
             self::LEGACY_PICKUP_POINT_DELIVERY,
-            self::ADDRESS_DELIVERY,
+            self::LEGACY_BEST_DELIVERY_SOLUTION,
             self::DIRECT_ADDRESS_DELIVERY,
         ];
     }
@@ -31,7 +31,7 @@ class Methods
      * @return bool
      */
     public static function isAnyAddressDelivery(string $method): bool {
-        return in_array($method, [self::ADDRESS_DELIVERY, self::DIRECT_ADDRESS_DELIVERY]);
+        return in_array($method, [self::LEGACY_BEST_DELIVERY_SOLUTION, self::DIRECT_ADDRESS_DELIVERY]);
     }
 
     /** Is method pickup point delivery? Includes legacy naming.

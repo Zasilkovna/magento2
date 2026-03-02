@@ -59,13 +59,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     }
 
     /**
-     * @param int[] $excludeCarrierIds
-     */
-    public function whereCarrierIdNotIn(array $excludeCarrierIds): void {
-        $this->addFieldToFilter('main_table.carrier_id', ['nin' => $excludeCarrierIds]);
-    }
-
-    /**
      * dynamic carriers with attributes not supported by Packetery extension are omitted
      */
     private function supportedOnly(): void {

@@ -188,20 +188,6 @@ class Facade
     }
 
     /**
-     * @return array
-     */
-    public static function getAllImplementedBranchIds(): array {
-        $branchIds = [];
-        $classNames = self::getAllBrainClasses();
-
-        foreach ($classNames as $className) {
-            $branchIds[] = $className::getImplementedBranchIds();
-        }
-
-        return array_merge([], ...$branchIds);
-    }
-
-    /**
      * @return array<class-string<\Packetery\Checkout\Model\Carrier\AbstractBrain>>
      */
     public static function getAllBrainClasses(): array {
