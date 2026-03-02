@@ -6,7 +6,7 @@ namespace Packetery\Checkout\Controller\Config;
 
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Packetery\Checkout\Model\AddressValidationSelect;
+use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\Carrier\AbstractCarrier;
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 use Packetery\Checkout\Model\Carrier\MethodCode;
@@ -28,22 +28,28 @@ class ShippingRatesConfig implements HttpPostActionInterface
     /** @var \Packetery\Checkout\Model\Pricing\Service */
     private $pricingService;
 
+    /** @var AddressValidationResolver */
+    private $addressValidationResolver;
+
     /**
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param AddressValidationResolver $addressValidationResolver
      */
     public function __construct(
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Shipping\Model\CarrierFactory $carrierFactory,
-        \Packetery\Checkout\Model\Pricing\Service $pricingService
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        AddressValidationResolver $addressValidationResolver
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->request = $request;
         $this->carrierFactory = $carrierFactory;
         $this->pricingService = $pricingService;
+        $this->addressValidationResolver = $addressValidationResolver;
     }
 
     /**
@@ -80,7 +86,7 @@ class ShippingRatesConfig implements HttpPostActionInterface
 
         $config['isPacketaRate'] = true;
         $config['directionId'] = $directionId; // for Packeta PP it returns null because it is provided by widget
-        $config['addressValidation'] = $relatedPricingRule ? $relatedPricingRule->getAddressValidation() : AddressValidationSelect::NONE;
+        $config['addressValidation'] = $this->addressValidationResolver->resolve($relatedPricingRule);
         $config['isAnyAddressDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($methodCodeObject->getMethod());
         $config['isPickupPointDelivery'] = \Packetery\Checkout\Model\Carrier\Methods::isPickupPointDelivery($methodCodeObject->getMethod());
         $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCodeObject->getDynamicCarrierId());

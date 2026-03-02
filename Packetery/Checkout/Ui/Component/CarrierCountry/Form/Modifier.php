@@ -6,6 +6,7 @@ namespace Packetery\Checkout\Ui\Component\CarrierCountry\Form;
 
 use Magento\Ui\Component\Form;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\Carrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\HybridCarrier;
@@ -359,7 +360,7 @@ class Modifier implements ModifierInterface
                             'formElement' => 'select',
                             'dataType' => 'text',
                             'componentType' => 'field',
-                            'visible' => Methods::isAnyAddressDelivery($carrier->getMethod()),
+                            'visible' => AddressValidationResolver::isEligibleForAddressValidation($carrier->getMethod(), $countryId),
                             'required' => false,
                             'validation' => [
                                 'required-entry' => false,
