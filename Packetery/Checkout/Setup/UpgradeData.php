@@ -41,7 +41,7 @@ class UpgradeData implements UpgradeDataInterface
             $configModel->save();
         }
 
-        if (version_compare($context->getVersion(), '2.3.0', '<')) {
+        if (version_compare($context->getVersion(), '2.4.0', '<')) {
             $packeteryOrderTable = $setup->getTable('packetery_order');
             $salesOrderTable = $setup->getTable('sales_order');
             $salesOrderAddressTable = $setup->getTable('sales_order_address');

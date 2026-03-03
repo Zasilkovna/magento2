@@ -93,10 +93,6 @@ class ShippingRatesConfig implements HttpPostActionInterface
         $config['widgetVendors'] = [];
         if (Methods::isPickupPointDelivery($methodCodeObject->getMethod())) {
             $config['widgetVendors'] = self::createWidgetVendors([$dynamicCarrier], $relatedPricingRule);
-            $pricingRuleCountryId = $relatedPricingRule?->getCountryId();
-            if ($config['widgetVendors'] === [] && $pricingRuleCountryId !== null) {
-                $config['widgetVendors'] = self::createAllWidgetVendorsForCountry($pricingRuleCountryId);
-            }
         }
 
         return $config;
@@ -124,17 +120,6 @@ class ShippingRatesConfig implements HttpPostActionInterface
             if ($dynamicCarrier instanceof \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\DynamicCarrier) {
                 $widgetVendors[] = self::createWidgetVendorForCarrierId($dynamicCarrier->getCountryId(), $dynamicCarrier->getDynamicCarrierId());
             }
-        }
-
-        return $widgetVendors;
-    }
-
-    public static function createAllWidgetVendorsForCountry(string $countryId): array {
-        $groups = VendorGroups::getAll();
-        $widgetVendors = [];
-
-        foreach ($groups as $group) {
-            $widgetVendors[] = self::createWidgetVendorForGroup($countryId, $group);
         }
 
         return $widgetVendors;

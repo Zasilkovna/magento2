@@ -86,10 +86,6 @@ class AddressValidationResolverTest extends TestCase
         $this->assertSame(AddressValidationSelect::OPTIONAL, $resolver->resolve($pricingRule));
     }
 
-    /**
-     * @param string|null $method
-     * @param string|null $countryId
-     */
     private function createPricingRuleMock(?string $method, ?string $countryId, string $addressValidation): Pricingrule
     {
         $pricingRule = $this->createMock(Pricingrule::class);

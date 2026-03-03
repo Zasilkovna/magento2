@@ -1,3 +1,7 @@
+2.4.0 - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
+      - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible
+      - Updated: pickup point selection in checkout and in order detail now shows only the relevant carriers for the chosen delivery type
+
 2.3.2 - Updated: Add new fields to CSV export and update version number to 8
 
 2.3.1 - Fixed: installation issues

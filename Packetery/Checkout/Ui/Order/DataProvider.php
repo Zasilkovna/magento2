@@ -72,8 +72,7 @@ class DataProvider extends AbstractDataProvider
                     $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCode->getDynamicCarrierId());
 
                     if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier && $dynamicCarrier === null) {
-                        $shippingAddressCountryId = $order->getShippingAddress()->getCountryId();
-                        $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($shippingAddressCountryId, [$methodCode->getMethod()]);
+                        $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($order->getShippingAddress()->getCountryId(), [$methodCode->getMethod()]);
                         $widgetVendors = ShippingRatesConfig::createWidgetVendors(
                             $dynamicCarriers,
                             null
@@ -86,14 +85,9 @@ class DataProvider extends AbstractDataProvider
                             null
                         );
                     }
-
-                    if ($widgetVendors === []) {
-                        $widgetVendors = ShippingRatesConfig::createAllWidgetVendorsForCountry($order->getShippingAddress()->getCountryId());
-                    }
                 }
 
                 $result[$item->getId()]['general']['misc']['widgetVendors'] = json_encode($widgetVendors, JSON_THROW_ON_ERROR);
-
             } else {
                 $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = '0';
                 $result[$item->getId()]['general']['misc']['isAddressValidationEligible'] = '0';

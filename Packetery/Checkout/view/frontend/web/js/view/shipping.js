@@ -167,6 +167,10 @@ define(
 
                 var packetaApiKey = config.apiKey;
                 var rateConfig = getSelectedRateConfig();
+                if (!rateConfig) {
+                    console.warn('Packeta: no selected rate config for pickup point widget');
+                    return;
+                }
 
                 var options = {
                     webUrl: config.packetaOptions.webUrl,
