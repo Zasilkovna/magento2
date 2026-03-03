@@ -67,27 +67,29 @@ class DataProvider extends AbstractDataProvider
                 $countryId = $order->getShippingAddress()->getCountryId();
                 $result[$item->getId()]['general']['misc']['isAddressValidationEligible'] = (AddressValidationResolver::isEligibleForAddressValidation($methodCode->getMethod(), $countryId) ? '1' : '0');
                 $widgetVendors = [];
-                $carrier = $this->carrierFacade->getMagentoCarrier($shippingRateCode->getCarrierCode());
-                $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCode->getDynamicCarrierId());
+                if (Methods::isPickupPointDelivery($methodCode->getMethod())) {
+                    $carrier = $this->carrierFacade->getMagentoCarrier($shippingRateCode->getCarrierCode());
+                    $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCode->getDynamicCarrierId());
 
-                if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier && $dynamicCarrier === null) {
-                    $shippingAddressCountryId = $order->getShippingAddress()->getCountryId();
-                    $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($shippingAddressCountryId, [$methodCode->getMethod()]);
-                    $widgetVendors = ShippingRatesConfig::createWidgetVendors(
-                        $dynamicCarriers,
-                        null
-                    );
-                }
+                    if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier && $dynamicCarrier === null) {
+                        $shippingAddressCountryId = $order->getShippingAddress()->getCountryId();
+                        $dynamicCarriers = $carrier->getPacketeryBrain()->findConfigurableDynamicCarriers($shippingAddressCountryId, [$methodCode->getMethod()]);
+                        $widgetVendors = ShippingRatesConfig::createWidgetVendors(
+                            $dynamicCarriers,
+                            null
+                        );
+                    }
 
-                if ($dynamicCarrier !== null) {
-                    $widgetVendors = ShippingRatesConfig::createWidgetVendors(
-                        [$dynamicCarrier],
-                        null
-                    );
-                }
+                    if ($dynamicCarrier !== null) {
+                        $widgetVendors = ShippingRatesConfig::createWidgetVendors(
+                            [$dynamicCarrier],
+                            null
+                        );
+                    }
 
-                if ($widgetVendors === [] && Methods::isPickupPointDelivery($methodCode->getMethod())) {
-                    $widgetVendors = ShippingRatesConfig::createAllWidgetVendorsForCountry($order->getShippingAddress()->getCountryId());
+                    if ($widgetVendors === []) {
+                        $widgetVendors = ShippingRatesConfig::createAllWidgetVendorsForCountry($order->getShippingAddress()->getCountryId());
+                    }
                 }
 
                 $result[$item->getId()]['general']['misc']['widgetVendors'] = json_encode($widgetVendors, JSON_THROW_ON_ERROR);
