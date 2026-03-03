@@ -3,6 +3,9 @@
 namespace Packetery\Checkout\Controller\Adminhtml\Order;
 
 use Magento\Framework\Controller\AbstractResult;
+use Packetery\Checkout\Model\AddressValidationResolver;
+use Packetery\Checkout\Model\Carrier\Methods;
+use Packetery\Checkout\Model\Carrier\ShippingRateCode;
 
 class Detail extends \Magento\Backend\App\Action
 {
@@ -56,16 +59,30 @@ class Detail extends \Magento\Backend\App\Action
         }
 
         $magentoOrder = $this->orderFactory->create()->loadByIncrementId($order->getData('order_number'));
-        $shippingMethod = $magentoOrder->getShippingMethod(true);
-
-        if (!$shippingMethod) {
+        $shippingMethodString = $magentoOrder->getShippingMethod();
+        if (!$shippingMethodString || !ShippingRateCode::isPacketery($shippingMethodString)) {
             $this->messageManager->addErrorMessage(__('Page not found'));
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
+        }
+
+        $shippingRateCode = ShippingRateCode::fromString($shippingMethodString);
+        $methodCode = $shippingRateCode->getMethodCode();
+        $countryId = $magentoOrder->getShippingAddress() ? $magentoOrder->getShippingAddress()->getCountryId() : '';
+        $isPickupPointDelivery = Methods::isPickupPointDelivery($methodCode->getMethod());
+        $isAddressValidationEligible = AddressValidationResolver::isEligibleForAddressValidation($methodCode->getMethod(), $countryId);
+        $showNotice = !$isPickupPointDelivery && !$isAddressValidationEligible;
+
+        $noChangesNoticeBlock = $resultPage->getLayout()->getBlock('packetery_order_detail_no_changes_notice');
+        $noChangesNoticeBlock->setData('showNotice', $showNotice);
+
+        if ($showNotice) {
+            $resultPage->getLayout()->unsetElement('packetery_order_detail_form');
         }
 
         $addressDetailBlock = $resultPage->getLayout()->getBlock('packetery_order_address_detail');
         $addressDetailBlock->setData('order', $order);
         $addressDetailBlock->setData('magentoOrder', $magentoOrder);
+        $addressDetailBlock->setData('isAddressValidationEligible', $isAddressValidationEligible);
 
         return $resultPage;
     }

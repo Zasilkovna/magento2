@@ -53,8 +53,8 @@ define([
             return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
         },
 
-        isAnyAddressDelivery: function() {
-            return uiRegistry.get('inputName = general[misc][isAnyAddressDelivery]').value() === '1';
+        isAddressValidationEligible: function() {
+            return uiRegistry.get('inputName = general[misc][isAddressValidationEligible]').value() === '1';
         },
 
         getPacketaSymbolUrl: function() {
@@ -77,7 +77,7 @@ define([
                 fieldset.label = $t('Pickup point selection');
             }
 
-            if (mixin.isAnyAddressDelivery()) {
+            if (mixin.isAddressValidationEligible()) {
                 fieldset.label = $t('Shipping address validation');
             }
 

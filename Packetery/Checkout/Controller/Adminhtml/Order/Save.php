@@ -62,7 +62,7 @@ class Save extends Action implements HttpPostActionInterface
         $collection = $this->orderCollectionFactory->create();
         $collection->addFilter('id', $id);
 
-        if ($misc['isAnyAddressDelivery'] === '1') {
+        if ($misc['isAddressValidationEligible'] === '1') {
             $collection->setDataToAll(
                 [
                     'address_validated' => $postData['address_validated'],

@@ -1,15 +1,11 @@
 <?php
-/** @var \Packetery\Checkout\Block\Adminhtml\Order\AddressDetail $block */
 /** @var \Packetery\Checkout\Model\Order $packeteryOrder */
 $packeteryOrder = $block->getData('order');
 $packeteryMagentoOrder = $block->getData('magentoOrder');
-$order = $block->getData('magentoOrder');
 $packeteryAddress = $packeteryOrder->getRecipientAddress();
-$shippingMethod = $packeteryMagentoOrder->getShippingMethod(true)->getData('method');
-$methodCode = \Packetery\Checkout\Model\Carrier\MethodCode::fromString($shippingMethod);
-?>
+$isAddressValidationEligible = (bool) $block->getData('isAddressValidationEligible');
 
-<?php if (\Packetery\Checkout\Model\Carrier\Methods::isAnyAddressDelivery($methodCode->getMethod())) { ?>
+if ($isAddressValidationEligible) { ?>
 
 <section class="admin__page-section order-addresses">
     <div class="admin__page-section-title">
