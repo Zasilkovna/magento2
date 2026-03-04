@@ -36,7 +36,7 @@ class MethodList
     public function afterGetAvailableMethods(
         \Magento\Payment\Model\MethodList $subject,
         $availableMethods,
-        \Magento\Quote\Model\Quote $quote = null
+        ?\Magento\Quote\Model\Quote $quote = null
     ) {
         if ($quote === null) {
             return $availableMethods;

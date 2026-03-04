@@ -185,11 +185,11 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
     {
         // Write to memory (unless buffer exceeds limit then it will write to /tmp)
         $fp = fopen('php://temp', 'w+');
-        fputcsv($fp, ['version 8']);
-        fputcsv($fp, []);
+        fputcsv($fp, ['version 8'], ',', '"', '\\');
+        fputcsv($fp, [], ',', '"', '\\');
         foreach ($collection as $row) {
             $fields = $this->getExportRow($row);
-            fputcsv($fp, $fields);
+            fputcsv($fp, $fields, ',', '"', '\\');
         }
         rewind($fp); // Set the pointer back to the start
         $contents = stream_get_contents($fp); // Fetch the contents of our CSV
