@@ -40,4 +40,9 @@ abstract class AbstractDynamicCarrier
      * @return array
      */
     abstract public function getMethods(): array;
+
+    /**
+     * @return bool
+     */
+    abstract public function disallowsCod(): bool;
 }

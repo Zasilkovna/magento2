@@ -29,6 +29,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
         $hybridCarrier->setData('method', $method);
         $hybridCarrier->setData('method_code', (new MethodCode($method, $dynamicCarrier->getDynamicCarrierId()))->toString());
         $hybridCarrier->setData('vendor_groups_options', []);
+        $hybridCarrier->setData('disallows_cod', $dynamicCarrier->disallowsCod());
         return $hybridCarrier;
     }
 

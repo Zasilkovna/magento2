@@ -386,7 +386,7 @@ class Modifier implements ModifierInterface
                             'formElement' => 'input',
                             'dataType' => 'text',
                             'componentType' => 'field',
-                            'visible' => true,
+                            'visible' => !$carrier->getData('disallows_cod'),
                             'required' => false,
                             'validation' => [
                                 'required-entry' => false,

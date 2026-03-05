@@ -11,6 +11,7 @@ use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Carrier\ShippingRateCode;
 use Packetery\Checkout\Model\Payment\MethodList;
+use Packetery\Checkout\Model\MaxCodResolver;
 
 class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -47,6 +48,9 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     /** @var PriceCurrencyInterface */
     private $priceCurrency;
 
+    /** @var MaxCodResolver */
+    private $maxCodResolver;
+
     /**
      * OrderPlaceAfter constructor.
      *
@@ -61,6 +65,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
      * @param \Magento\Sales\Model\Order\AddressRepository $orderAddressRepository
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $magentoOrderCollectionFactory
+     * @param MaxCodResolver $maxCodResolver
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -73,7 +78,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         AddressValidationResolver $addressValidationResolver,
         \Magento\Sales\Model\Order\AddressRepository $orderAddressRepository,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $magentoOrderCollectionFactory
+        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $magentoOrderCollectionFactory,
+        MaxCodResolver $maxCodResolver
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -86,6 +92,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $this->orderAddressRepository = $orderAddressRepository;
         $this->priceCurrency = $priceCurrency;
         $this->magentoOrderCollectionFactory = $magentoOrderCollectionFactory;
+        $this->maxCodResolver = $maxCodResolver;
     }
 
     /**
@@ -132,7 +139,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             throw new InputException(__('Pricing rule was not found. Please choose delivery method.'));
         }
 
-        if ($isCOD && MethodList::exceedsValueMaxLimit($order->getGrandTotal(), $relatedPricingRule->getMaxCOD())) {
+        $maxCod = $this->maxCodResolver->resolve($relatedPricingRule);
+        if ($isCOD && MethodList::exceedsValueMaxLimit($order->getGrandTotal(), $maxCod)) {
             throw new InputException(__('Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.', $this->priceCurrency->format($relatedPricingRule->getMaxCOD(), false)));
         }
 

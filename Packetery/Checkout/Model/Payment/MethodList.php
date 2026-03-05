@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Payment;
 
 use Packetery\Checkout\Model\Carrier\ShippingRateCode;
+use Packetery\Checkout\Model\MaxCodResolver;
 
 class MethodList
 {
@@ -18,13 +19,21 @@ class MethodList
      */
     private $pricingService;
 
+    /** @var MaxCodResolver */
+    private $maxCodResolver;
+
     /**
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      */
-    public function __construct(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery, \Packetery\Checkout\Model\Pricing\Service $pricingService) {
+    public function __construct(
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        MaxCodResolver $maxCodResolver
+    ) {
         $this->packetery = $packetery;
         $this->pricingService = $pricingService;
+        $this->maxCodResolver = $maxCodResolver;
     }
 
     /**
@@ -62,7 +71,8 @@ class MethodList
         }
 
         $grandTotal = (float) $quote->getGrandTotal();
-        $exceedsLimit = self::exceedsValueMaxLimit($grandTotal, $relatedPricingRule->getMaxCOD());
+        $maxCod = $this->maxCodResolver->resolve($relatedPricingRule);
+        $exceedsLimit = self::exceedsValueMaxLimit($grandTotal, $maxCod);
 
         $config = $this->packetery->getPacketeryConfig();
         foreach ($availableMethods as $key => $method) {

@@ -87,4 +87,8 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
     public function getDeleted(): bool {
         return (bool)$this->getData('deleted');
     }
+
+    public function disallowsCod(): bool {
+        return (bool)$this->getData('disallows_cod');
+    }
 }
