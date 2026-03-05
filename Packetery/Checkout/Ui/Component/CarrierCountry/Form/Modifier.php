@@ -326,8 +326,7 @@ class Modifier implements ModifierInterface
                             'dataType' => 'text',
                             'componentType' => 'field',
                             'additionalClasses' => 'packetery-checkboxset',
-                            'visible' => $carrier->hasVendorGroupsOptions(),
-                            'disabled' => $carrier->hasNonInteractableVendorGroupsOptions(),
+                            'visible' => $carrier->hasVendorGroupsOptions() && !$carrier->hasNonInteractableVendorGroupsOptions(),
                             'required' => false,
                             'multiple' => true,
                             'options' => $carrier->getVendorGroupsOptions()
