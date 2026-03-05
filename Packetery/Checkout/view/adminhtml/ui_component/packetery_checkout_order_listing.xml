@@ -232,7 +232,7 @@
                 <item name="config" xsi:type="array">
                     <item name="sortable" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Pickup point address</item>
+                    <item name="label" xsi:type="string" translate="true">Pick up point or carrier</item>
                 </item>
             </argument>
         </column>

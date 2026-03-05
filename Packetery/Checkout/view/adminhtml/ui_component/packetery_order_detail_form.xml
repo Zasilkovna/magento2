@@ -95,7 +95,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Pickup point address</item>
+                    <item name="label" xsi:type="string" translate="true">Pick up point or carrier</item>
                     <item name="visible" xsi:type="boolean">true</item>
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
