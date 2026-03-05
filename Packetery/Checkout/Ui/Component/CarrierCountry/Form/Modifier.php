@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Ui\Component\CarrierCountry\Form;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Ui\Component\Form;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Packetery\Checkout\Model\AddressValidationResolver;
@@ -29,22 +31,28 @@ class Modifier implements ModifierInterface
     /** @var \Packetery\Checkout\Model\AddressValidationSelect */
     private $addressValidationSelect;
 
+    /** @var ScopeConfigInterface */
+    private $scopeConfig;
+
     /**
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      * @param \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         \Magento\Framework\App\RequestInterface $request,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
-        \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect
+        \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->request = $request;
         $this->pricingService = $pricingService;
         $this->carrierFacade = $carrierFacade;
         $this->addressValidationSelect = $addressValidationSelect;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -393,6 +401,10 @@ class Modifier implements ModifierInterface
         ];
     }
 
+    private function getWeightUnitLabel(): string {
+        return (string)$this->scopeConfig->getValue('general/locale/weight_unit', ScopeInterface::SCOPE_STORE);
+    }
+
     /**
      * @return array
      */
@@ -447,7 +459,7 @@ class Modifier implements ModifierInterface
                                         'label' => new ComboPhrase(
                                             [
                                                 __('Max. weight'),
-                                                $weightUpperlimit === null ? '' : new ComboPhrase(['(max ', $weightUpperlimit, ')']),
+                                                $weightUpperlimit === null ? '' : new ComboPhrase(['(max ', $weightUpperlimit, ' ', $this->getWeightUnitLabel(), ')']),
                                             ],
                                             ' '
                                         ),
