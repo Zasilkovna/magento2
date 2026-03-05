@@ -8,6 +8,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 {
     protected $_idFieldName = 'id';
 
+    private const EVENING_DELIVERY_CARRIER_IDS = [132, 134, 136, 257, 18928, 26637];
+
     protected $_eventPrefix = 'packetery_checkout_carrier_collection';
 
     protected $_eventObject = 'carrier_collection';
@@ -62,7 +64,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      * dynamic carriers with attributes not supported by Packetery extension are omitted
      */
     private function supportedOnly(): void {
-        $this->addFieldToFilter('main_table.carrier_id', ['nin' => [257, 136, 134, 132]]); // večerní doručení todo implement ZIP code logic
+        $this->addFieldToFilter('main_table.carrier_id', ['nin' => self::EVENING_DELIVERY_CARRIER_IDS]);
     }
 
     /**
