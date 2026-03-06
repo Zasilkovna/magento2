@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
-use Packetery\Checkout\Model\Carrier\IDynamicCarrierNameUpdater;
 
-class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements IDynamicCarrierNameUpdater
+class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
     /** @var \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect */
     private $methodSelect;
@@ -148,21 +147,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
             $config,
             $dynamicCarrier
         );
-    }
-
-    /**
-     * @param string $carrierName
-     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
-     */
-    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {
-        $collection = $this->carrierCollectionFactory->create();
-        $collection->addFilter('carrier_id', $dynamicCarrier->getDynamicCarrierId());
-        $collection->setDataToAll(
-            [
-                'carrier_name' => $carrierName,
-            ]
-        );
-        $collection->save();
     }
 
     /**

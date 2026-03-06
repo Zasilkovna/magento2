@@ -151,12 +151,6 @@ abstract class AbstractBrain
         return null;
     }
 
-    /**
-     * @param string $carrierName
-     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
-     */
-    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {}
-
     /** Used only by Packeta Dynamic
      *
      * @param int $id

@@ -15,13 +15,22 @@ class EmailOrderTemplateVarsBefore implements \Magento\Framework\Event\ObserverI
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
 
+    /** @var \Packetery\Checkout\Model\Pricing\Service */
+    private $pricingService;
+
     /**
      * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+     * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      */
-    public function __construct(\Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory, \Packetery\Checkout\Model\Carrier\Facade $carrierFacade) {
+    public function __construct(
+        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
+        \Packetery\Checkout\Model\Pricing\Service $pricingService
+    ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->carrierFacade = $carrierFacade;
+        $this->pricingService = $pricingService;
     }
 
     /**
@@ -50,6 +59,8 @@ class EmailOrderTemplateVarsBefore implements \Magento\Framework\Event\ObserverI
             $rate = $order->getShippingMethod(true);
             $carrierCode = $rate->getData('carrier_code');
             $methodCode = MethodCode::fromString($rate->getData('method'));
+            $country = $order->getShippingAddress() ? (string)$order->getShippingAddress()->getCountryId() : '';
+            $pricingRule = $this->pricingService->resolvePricingRule($methodCode->getMethod(), $country, $carrierCode, $methodCode->getDynamicCarrierId());
             $cache = [];
             $hybridCarrier = $this->carrierFacade->createHybridCarrierCached($cache, $carrierCode, $methodCode->getDynamicCarrierId(), $methodCode->getMethod(), '');
 
@@ -57,7 +68,9 @@ class EmailOrderTemplateVarsBefore implements \Magento\Framework\Event\ObserverI
             $transport['packetery_is_address_delivery'] = Methods::isAnyAddressDelivery($methodCode->getMethod());
             $transport['packetery_point_id'] = $packeteryOrder->getPointId();
             $transport['packetery_point_name'] = $packeteryOrder->getPointName();
-            $transport['packetery_carrier_name'] = $hybridCarrier->getFinalCarrierName();
+            $transport['packetery_carrier_name'] = ($pricingRule !== null && $pricingRule->getCarrierName() !== null)
+                ? $pricingRule->getCarrierName()
+                : $hybridCarrier->getFinalCarrierName();
         }
     }
 }

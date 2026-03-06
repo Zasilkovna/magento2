@@ -247,8 +247,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
                     'nullable' => false,
                     'default' => 1,
-                    'comment' => 'Carrier available in feed (available = true)',
+                    'comment' => 'Carrier available in feed',
                     'after' => 'max_weight'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable('packetery_pricing_rule'),
+                'carrier_name',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'length' => '64',
+                    'comment' => 'Custom carrier name',
+                    'after' => 'max_cod'
                 ]
             );
         }

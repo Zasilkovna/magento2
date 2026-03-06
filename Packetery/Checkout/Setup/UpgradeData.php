@@ -89,6 +89,19 @@ class UpgradeData implements UpgradeDataInterface
                     ],
                 );
             }
+
+            $pricingRuleTable = $setup->getTable('packetery_pricing_rule');
+            $carrierTable = $setup->getTable('packetery_carrier');
+            $connection = $setup->getConnection();
+            if ($connection->isTableExists($carrierTable) && $connection->tableColumnExists($carrierTable, 'carrier_name')) {
+                $connection->query("
+                    UPDATE `$pricingRuleTable` pr
+                    INNER JOIN `$carrierTable` c ON c.carrier_id = pr.carrier_id AND pr.carrier_id IS NOT NULL
+                    SET pr.carrier_name = c.carrier_name
+                    WHERE c.carrier_name IS NOT NULL AND c.carrier_name != ''
+                ");
+                $connection->dropColumn($carrierTable, 'carrier_name');
+            }
         }
     }
 }

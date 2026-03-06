@@ -307,6 +307,15 @@ class InstallSchema implements InstallSchemaInterface
                     'comment' => 'minimal value to hide COD payment methods'
                 ],
             ],
+            'carrier_name' => [
+                'type' => Table::TYPE_TEXT,
+                'attr' => [
+                    'nullable' => true,
+                    'length' => '64',
+                    'comment' => 'Custom carrier name',
+                    'after' => 'max_cod'
+                ],
+            ],
         ]);
 
         $table->setComment('Packetery pricing rules. Relates to packetery_weight_rules.');
@@ -392,14 +401,6 @@ class InstallSchema implements InstallSchemaInterface
                     'nullable' => false,
                     'length' => '64',
                     'after' => 'carrier_id'
-                ]
-            ],
-            'carrier_name' => [
-                'type' => Table::TYPE_TEXT,
-                'attr' => [
-                    'nullable' => true,
-                    'length' => '64',
-                    'after' => 'name'
                 ]
             ],
             'is_pickup_points' => [

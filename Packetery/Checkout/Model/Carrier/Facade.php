@@ -28,24 +28,6 @@ class Facade
     }
 
     /**
-     * @param string $carrierName
-     * @param string $carrierCode
-     * @param int|null $carrierId
-     * @throws \Exception
-     */
-    public function updateCarrierName(string $carrierName, string $carrierCode, ?int $carrierId = null): void {
-        $carrier = $this->getMagentoCarrier($carrierCode);
-        $dynamicCarrier = $this->getDynamicCarrier($carrier, $carrierId);
-
-        if ($dynamicCarrier !== null) {
-            $carrier->getPacketeryBrain()->updateDynamicCarrierName($carrierName, $dynamicCarrier);
-            return;
-        }
-
-        throw new \InvalidArgumentException('Not implemented');
-    }
-
-    /**
      * @param string $carrierCode
      * @param int|null $carrierId
      * @param string $method

@@ -129,12 +129,8 @@ class Modifier implements ModifierInterface
         $newMeta = [];
         foreach ($carriers as $carrier) {
             $carrierFieldName = $this->getCarrierFieldName($carrier);
-            $magentoCarrier = $this->carrierFacade->getMagentoCarrier($carrier->getData('carrier_code'));
-            $carrierId = $carrier->getData('carrier_id');
-            $dynamicCarrier = $magentoCarrier->getPacketeryBrain()->getDynamicCarrierById((is_numeric($carrierId) ? (int)$carrierId : null));
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($carrier->getMethod(), $carrier->getCountry(), $carrier->getCarrierCode(), $carrier->getCarrierId());
             $carrierFieldLabel = $carrier->getFieldsetTitle($resolvedPricingRule);
-            $isCarrierNameUpdatable = $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater;
             $newMeta[$carrierFieldName] = [
                 'arguments' => [
                     'data' => [
@@ -205,9 +201,9 @@ class Modifier implements ModifierInterface
                                     'dataType' => 'text',
                                     'componentType' => 'field',
                                     'label' => __('Carrier name'),
-                                    'visible' => $isCarrierNameUpdatable,
+                                    'visible' => true,
                                     'validation' => [
-                                        'required-entry' => $isCarrierNameUpdatable,
+                                        'required-entry' => true,
                                     ],
                                 ],
                             ],
@@ -560,8 +556,10 @@ class Modifier implements ModifierInterface
             $method = $carrier->getData('method');
             $carrierId = ($carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null);
 
-            $shippingMethod['carrier_name'] = $carrier->getFinalCarrierName();
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $country, $carrierCode, $carrierId);
+            $shippingMethod['carrier_name'] = ($resolvedPricingRule !== null && $resolvedPricingRule->getCarrierName() !== null)
+                ? $resolvedPricingRule->getCarrierName()
+                : $carrier->getFinalCarrierName();
 
             $shippingMethod['enabled'] = '0';
             $pricingRule['carrier_code'] = $carrierCode;
@@ -575,6 +573,7 @@ class Modifier implements ModifierInterface
                 $pricingRule['free_shipment'] = $resolvedPricingRule->getFreeShipment();
                 $pricingRule['address_validation'] = $resolvedPricingRule->getAddressValidation();
                 $pricingRule['max_cod'] = $resolvedPricingRule->getMaxCOD();
+                $pricingRule['carrier_name'] = $resolvedPricingRule->getCarrierName();
                 $pricingRule['vendor_groups'] = $resolvedPricingRule->getVendorGroups() ?? [];
 
                 $weightRules = $this->pricingService->getWeightRulesByPricingRule($resolvedPricingRule);

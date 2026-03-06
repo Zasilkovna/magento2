@@ -74,11 +74,12 @@ class Service
                 continue; // if cart weight did not match any rule
             }
 
+            $carrierTitle = $pricingRule->getCarrierName() ?? $carrierConfig->getTitle();
             $methodCode = new MethodCode($allowedMethod, $dynamicCarrierId);
             $method = $this->createRateMethod(
                 $methodCode->toString(),
                 $carrierCode,
-                $carrierConfig->getTitle(),
+                $carrierTitle,
                 $methodLabel,
                 $price
             );
