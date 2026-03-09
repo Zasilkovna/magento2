@@ -63,16 +63,13 @@ class MultiSave extends Action implements HttpPostActionInterface
             $carrierId = ($carrierId === null ? null : (int)$carrierId);
             $pricingRule['carrier_id'] = $carrierId;
             $carrierName = ($carrierPriceRule['carrier_name'] ?? null);
+            $pricingRule['carrier_name'] = ($carrierName !== null && $carrierName !== '' ? $carrierName : null);
 
             if (!$carrierEnabled) {
                 if (isset($pricingRule['id'])) {
                     $this->pricingruleRepository->setPricingRuleEnabled((int)$pricingRule['id'], $carrierEnabled);
                 }
                 continue;
-            }
-
-            if ($carrierName && $this->carrierFacade->isDynamicCarrier($carrierCode, $carrierId)) {
-                $this->carrierFacade->updateCarrierName($carrierName, $carrierCode, $carrierId);
             }
 
             $weightRules = ($pricingRule['weight_rules']['weight_rules'] ?? []);
@@ -82,7 +79,7 @@ class MultiSave extends Action implements HttpPostActionInterface
                 $pricingRule['free_shipment'] = null; // empty string is casted to 0
             }
 
-            if (empty($pricingRule['max_cod']) && !is_numeric($pricingRule['max_cod'])) {
+            if (!isset($pricingRule['max_cod']) || $pricingRule['max_cod'] === '' || !is_numeric($pricingRule['max_cod'])) {
                 $pricingRule['max_cod'] = null;
             }
 

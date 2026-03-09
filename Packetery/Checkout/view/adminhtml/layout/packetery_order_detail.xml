@@ -6,6 +6,7 @@
 
     <body>
         <referenceContainer name="content">
+            <block template="Packetery_Checkout::order-detail-no-changes-notice.phtml" name="packetery_order_detail_no_changes_notice"/>
             <block template="Packetery_Checkout::order-address-detail.phtml" name="packetery_order_address_detail"/>
             <uiComponent name="packetery_order_detail_form"/>
         </referenceContainer>

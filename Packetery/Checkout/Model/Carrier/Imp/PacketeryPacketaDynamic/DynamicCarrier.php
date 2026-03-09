@@ -60,7 +60,7 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
      * @return string
      */
     public function getFinalCarrierName(): string {
-        return $this->model->getFinalCarrierName();
+        return $this->model->getName();
     }
 
     /**
@@ -68,5 +68,9 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
      */
     public function getMethods(): array {
         return [$this->model->getMethod()];
+    }
+
+    public function disallowsCod(): bool {
+        return $this->model->disallowsCod();
     }
 }

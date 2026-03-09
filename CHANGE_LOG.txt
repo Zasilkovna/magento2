@@ -1,3 +1,9 @@
+2.4.0 - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
+      - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible
+      - Updated: pickup point selection in checkout and in order detail now shows only the relevant carriers for the chosen delivery type
+      - Updated: carriers that disallow COD in the Packeta feed are now shown in pricing rules instead of being hidden
+      - Updated: for carriers that disallow COD, the "Max COD" field is hidden in administration and COD limit is not applied when selecting payment methods or placing orders
+
 2.3.2 - Updated: Add new fields to CSV export and update version number to 8
 
 2.3.1 - Fixed: installation issues

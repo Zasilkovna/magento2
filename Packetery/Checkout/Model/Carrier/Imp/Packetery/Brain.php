@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
-use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Carrier\VendorGroups;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
@@ -13,20 +12,11 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect */
     private $methodSelect;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
-    private $carrierCollectionFactory;
-
-    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
-    private $featureFlagManager;
-
     /**
-     * Brain constructor.
-     *
      * @param \Magento\Framework\App\Request\Http $httpRequest
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect
-     * @param \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
      * @param \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory
      * @param \Magento\Framework\App\State $appState
@@ -36,16 +26,12 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect $methodSelect,
-        \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory $carrierCollectionFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
         \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
-        \Magento\Framework\App\State $appState,
-        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
+        \Magento\Framework\App\State $appState
     ) {
         parent::__construct($httpRequest, $pricingService, $scopeConfig, $weightCalculator, $rateResultFactory, $appState);
         $this->methodSelect = $methodSelect;
-        $this->carrierCollectionFactory = $carrierCollectionFactory;
-        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -75,51 +61,11 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
     }
 
     /**
-     * @inheridoc
-     */
-    protected static function getResolvableDestinationData(): array {
-        return [
-            Methods::ADDRESS_DELIVERY => [
-                'countryBranchIds' => [
-                    'CZ' => 106,
-                    'SK' => 131,
-                    'HU' => 4159,
-                    'RO' => 4161,
-                    'PL' => 4162,
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public static function getImplementedBranchIds(): array {
-        return array_values(self::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds']);
-    }
-
-    /**
      * @param array $methods
      * @return array
      */
     public function getAvailableCountries(array $methods): array {
-        $result = [];
-
-        if (in_array(Methods::ADDRESS_DELIVERY, $methods)) {
-            $result = array_merge($result, array_keys($this::getResolvableDestinationData()[Methods::ADDRESS_DELIVERY]['countryBranchIds'] ?? []));
-        }
-
-        if (in_array(Methods::PICKUP_POINT_DELIVERY, $methods)) {
-            $fixedCountries = $this->getBaseCountries();
-
-            $collection = $this->carrierCollectionFactory->create();
-            $collection->forDeliveryMethod(Methods::PICKUP_POINT_DELIVERY);
-            $countries = $collection->getColumnValues('country');
-
-            $result = array_merge($result, array_unique(array_merge($fixedCountries, $countries)));
-        }
-
-        return $result;
+        return $this->getBaseCountries();
     }
 
     /**
@@ -159,12 +105,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
      */
     public function findResolvableDynamicCarriers(): array {
-        $zpointTitle = 'Packeta internal pickup points';
-        $zboxTitle = 'Packeta - Z-BOX';
-
-        if (!$this->featureFlagManager->isSplitActive()) {
-            return [];
-        }
+        $zpointTitle = 'Packeta Pick-up Point';
+        $zboxTitle = 'Packeta Z-BOX';
 
         return [
             new VendorCarrier(
@@ -177,12 +119,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
                 2,
                 VendorGroups::ZBOX,
                 $zboxTitle,
-                'CZ',
-            ),
-            new VendorCarrier(
-                3,
-                VendorGroups::ALZABOX,
-                'Packeta - AlzaBox',
                 'CZ',
             ),
             new VendorCarrier(

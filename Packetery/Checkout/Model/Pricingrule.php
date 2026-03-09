@@ -123,4 +123,13 @@ class Pricingrule extends \Magento\Framework\Model\AbstractModel implements \Mag
     {
         return (bool)$this->getData('enabled');
     }
+
+    /**
+     * @return string|null
+     */
+    public function getCarrierName(): ?string
+    {
+        $value = $this->getData('carrier_name');
+        return ($value !== null && $value !== '' ? (string)$value : null);
+    }
 }

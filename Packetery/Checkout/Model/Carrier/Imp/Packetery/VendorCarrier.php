@@ -70,4 +70,8 @@ class VendorCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCar
     public function getMethods(): array {
         return [Methods::PICKUP_POINT_DELIVERY];
     }
+
+    public function disallowsCod(): bool {
+        return false;
+    }
 }

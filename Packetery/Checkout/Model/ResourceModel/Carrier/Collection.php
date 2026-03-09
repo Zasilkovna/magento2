@@ -8,6 +8,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
 {
     protected $_idFieldName = 'id';
 
+    private const EVENING_DELIVERY_CARRIER_IDS = [132, 134, 136, 257, 18928, 26637];
+
     protected $_eventPrefix = 'packetery_checkout_carrier_collection';
 
     protected $_eventObject = 'carrier_collection';
@@ -31,6 +33,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function resolvableOnly(): void {
         $this->whereDeleted(false);
+        $this->whereAvailable(true);
         $this->supportedOnly();
     }
 
@@ -39,6 +42,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     public function configurableOnly(): void {
         $this->whereDeleted(false);
+        $this->whereAvailable(true);
         $this->supportedOnly();
     }
 
@@ -50,19 +54,17 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     }
 
     /**
-     * @param int[] $excludeCarrierIds
+     * @param bool $value
      */
-    public function whereCarrierIdNotIn(array $excludeCarrierIds): void {
-        $this->addFieldToFilter('main_table.carrier_id', ['nin' => $excludeCarrierIds]);
+    public function whereAvailable(bool $value): void {
+        $this->addFilter('main_table.available', $value);
     }
 
     /**
      * dynamic carriers with attributes not supported by Packetery extension are omitted
      */
     private function supportedOnly(): void {
-        $this->addFieldToFilter('main_table.carrier_id', ['nin' => [257, 136, 134, 132]]); // večerní doručení todo implement ZIP code logic
-        $this->addFilter('main_table.disallows_cod', 0); // todo implement payment method filter
-        $this->addFilter('main_table.customs_declarations', 0); // todo what does it require? New order edit form fields?
+        $this->addFieldToFilter('main_table.carrier_id', ['nin' => self::EVENING_DELIVERY_CARRIER_IDS]);
     }
 
     /**

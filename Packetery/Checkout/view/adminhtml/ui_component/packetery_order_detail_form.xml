@@ -95,7 +95,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Pickup point address</item>
+                    <item name="label" xsi:type="string" translate="true">Pick up point or carrier</item>
                     <item name="visible" xsi:type="boolean">true</item>
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
@@ -315,19 +315,37 @@
                                     </action>
                                 </actions>
                             </rule>
+                            <rule name="1">
+                                <value>0</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>packetery_order_detail_form.areas.general.general.point_name</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>packetery_order_detail_form.areas.general.general.carrier_pickup_point</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>packetery_order_detail_form.areas.general.general.point_picker_field</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
                         </rules>
                         <enabled>true</enabled>
                     </switcherConfig>
                 </settings>
             </field>
-            <field name="isAnyAddressDelivery">
+            <field name="isAddressValidationEligible">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="dataType" xsi:type="string">text</item>
-                        <item name="label" xsi:type="string" translate="true">Is any address delivery?</item>
+                        <item name="label" xsi:type="string" translate="true">Is address validation eligible?</item>
                         <item name="visible" xsi:type="boolean">true</item>
                         <item name="formElement" xsi:type="string">input</item>
-                        <item name="dataScope" xsi:type="string">isAnyAddressDelivery</item>
+                        <item name="dataScope" xsi:type="string">isAddressValidationEligible</item>
+                        <item name="additionalClasses" xsi:type="string">hidden</item>
                     </item>
                 </argument>
                 <settings>
@@ -337,6 +355,15 @@
                     <switcherConfig>
                         <rules>
                             <rule name="0">
+                                <value>0</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>packetery_order_detail_form.areas.general.general.address_picker_field</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="1">
                                 <value>1</value>
                                 <actions>
                                     <action name="0">

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
-use Packetery\Checkout\Model\Carrier\IDynamicCarrierNameUpdater;
 
-class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements IDynamicCarrierNameUpdater
+class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
     /** @var \Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect */
     private $methodSelect;
@@ -59,13 +58,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     }
 
     /**
-     * @inheridoc
-     */
-    protected static function getResolvableDestinationData(): array {
-        return [];
-    }
-
-    /**
      * @return bool
      */
     public function isAssignableToPricingRule(): bool {
@@ -96,7 +88,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
         $collection->resolvableOnly();
-        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
         $items = $collection->getItems();
 
         return array_map(
@@ -118,7 +109,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
         $collection->configurableOnly();
         $collection->whereCountry($country);
         $collection->forDeliveryMethods($methods);
-        $collection->whereCarrierIdNotIn(\Packetery\Checkout\Model\Carrier\Facade::getAllImplementedBranchIds());
         $items = $collection->getItems();
 
         return array_map(
@@ -160,21 +150,6 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     }
 
     /**
-     * @param string $carrierName
-     * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier|null $dynamicCarrier
-     */
-    public function updateDynamicCarrierName(string $carrierName, ?AbstractDynamicCarrier $dynamicCarrier = null): void {
-        $collection = $this->carrierCollectionFactory->create();
-        $collection->addFilter('carrier_id', $dynamicCarrier->getDynamicCarrierId());
-        $collection->setDataToAll(
-            [
-                'carrier_name' => $carrierName,
-            ]
-        );
-        $collection->save();
-    }
-
-    /**
      * @param string $method
      * @param string $countryId
      * @param \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier $dynamicCarrier
@@ -203,6 +178,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain implements I
     public function getAvailableCountries(array $methods): array {
         /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
         $collection = $this->carrierCollectionFactory->create();
+        $collection->whereDeleted(false);
+        $collection->whereAvailable(true);
         $collection->forDeliveryMethods($methods);
         return $collection->getColumnValues('country');
     }

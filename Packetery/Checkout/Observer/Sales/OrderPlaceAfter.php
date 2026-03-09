@@ -7,9 +7,11 @@ use Magento\Framework\Exception\InputException;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Packetery\Checkout\Model\Address;
 use Packetery\Checkout\Model\AddressValidationSelect;
+use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Carrier\ShippingRateCode;
 use Packetery\Checkout\Model\Payment\MethodList;
+use Packetery\Checkout\Model\MaxCodResolver;
 
 class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 {
@@ -37,11 +39,17 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
     /** @var \Packetery\Checkout\Model\Pricing\Service */
     private $pricingService;
 
+    /** @var AddressValidationResolver */
+    private $addressValidationResolver;
+
     /** @var \Magento\Sales\Model\Order\AddressRepository */
     private $orderAddressRepository;
 
     /** @var PriceCurrencyInterface */
     private $priceCurrency;
+
+    /** @var MaxCodResolver */
+    private $maxCodResolver;
 
     /**
      * OrderPlaceAfter constructor.
@@ -53,9 +61,11 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
      * @param \Magento\Shipping\Model\CarrierFactory $carrierFactory
      * @param \Packetery\Checkout\Model\Weight\Calculator $weightCalculator
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
+     * @param AddressValidationResolver $addressValidationResolver
      * @param \Magento\Sales\Model\Order\AddressRepository $orderAddressRepository
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $magentoOrderCollectionFactory
+     * @param MaxCodResolver $maxCodResolver
      */
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -65,9 +75,11 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         \Magento\Shipping\Model\CarrierFactory $carrierFactory,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
+        AddressValidationResolver $addressValidationResolver,
         \Magento\Sales\Model\Order\AddressRepository $orderAddressRepository,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
-        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $magentoOrderCollectionFactory
+        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $magentoOrderCollectionFactory,
+        MaxCodResolver $maxCodResolver
     ) {
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
@@ -76,9 +88,11 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $this->carrierFactory = $carrierFactory;
         $this->weightCalculator = $weightCalculator;
         $this->pricingService = $pricingService;
+        $this->addressValidationResolver = $addressValidationResolver;
         $this->orderAddressRepository = $orderAddressRepository;
         $this->priceCurrency = $priceCurrency;
         $this->magentoOrderCollectionFactory = $magentoOrderCollectionFactory;
+        $this->maxCodResolver = $maxCodResolver;
     }
 
     /**
@@ -125,7 +139,8 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             throw new InputException(__('Pricing rule was not found. Please choose delivery method.'));
         }
 
-        if ($isCOD && MethodList::exceedsValueMaxLimit($order->getGrandTotal(), $relatedPricingRule->getMaxCOD())) {
+        $maxCod = $this->maxCodResolver->resolve($relatedPricingRule);
+        if ($isCOD && MethodList::exceedsValueMaxLimit($order->getGrandTotal(), $maxCod)) {
             throw new InputException(__('Selected payment method is not allowed because the grand total exceeds the max COD (%1) set up for this carrier.', $this->priceCurrency->format($relatedPricingRule->getMaxCOD(), false)));
         }
 
@@ -142,7 +157,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
                 $carrierPickupPoint = ($point->carrierPickupPointId ?: null);
             } else {
                 $validatedAddress = $postData->packetery->validatedAddress;
-                if (!$validatedAddress && $relatedPricingRule->getAddressValidation() === AddressValidationSelect::REQUIRED) {
+                if (!$validatedAddress && $this->addressValidationResolver->resolve($relatedPricingRule) === AddressValidationSelect::REQUIRED) {
                     throw new InputException(__('Please select address via Packeta widget'));
                 }
 

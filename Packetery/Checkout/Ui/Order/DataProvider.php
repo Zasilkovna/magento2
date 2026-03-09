@@ -6,6 +6,7 @@ namespace Packetery\Checkout\Ui\Order;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Packetery\Checkout\Controller\Config\ShippingRatesConfig;
+use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Carrier\ShippingRateCode;
 
@@ -20,12 +21,7 @@ class DataProvider extends AbstractDataProvider
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
 
-    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager */
-    private $featureFlagManager;
-
     /**
-     * DataProvider constructor.
-     *
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -42,7 +38,6 @@ class DataProvider extends AbstractDataProvider
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
-        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager,
         array $meta = [],
         array $data = []
     ) {
@@ -50,7 +45,6 @@ class DataProvider extends AbstractDataProvider
         $this->collection = $collectionFactory->create();
         $this->orderFactory = $orderFactory;
         $this->carrierFacade = $carrierFacade;
-        $this->featureFlagManager = $featureFlagManager;
     }
 
     /**
@@ -70,10 +64,10 @@ class DataProvider extends AbstractDataProvider
                 $shippingRateCode = ShippingRateCode::fromString($shippingMethod);
                 $methodCode = $shippingRateCode->getMethodCode();
                 $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = (Methods::isPickupPointDelivery($methodCode->getMethod()) ? '1' : '0');
-                $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = (Methods::isAnyAddressDelivery($methodCode->getMethod()) ? '1' : '0');
+                $countryId = $order->getShippingAddress()->getCountryId();
+                $result[$item->getId()]['general']['misc']['isAddressValidationEligible'] = (AddressValidationResolver::isEligibleForAddressValidation($methodCode->getMethod(), $countryId) ? '1' : '0');
                 $widgetVendors = [];
-
-                if ($this->featureFlagManager->isSplitActive()) {
+                if (Methods::isPickupPointDelivery($methodCode->getMethod())) {
                     $carrier = $this->carrierFacade->getMagentoCarrier($shippingRateCode->getCarrierCode());
                     $dynamicCarrier = $carrier->getPacketeryBrain()->getDynamicCarrierById($methodCode->getDynamicCarrierId());
 
@@ -94,10 +88,9 @@ class DataProvider extends AbstractDataProvider
                 }
 
                 $result[$item->getId()]['general']['misc']['widgetVendors'] = json_encode($widgetVendors, JSON_THROW_ON_ERROR);
-
             } else {
                 $result[$item->getId()]['general']['misc']['isPickupPointDelivery'] = '0';
-                $result[$item->getId()]['general']['misc']['isAnyAddressDelivery'] = '0';
+                $result[$item->getId()]['general']['misc']['isAddressValidationEligible'] = '0';
                 $result[$item->getId()]['general']['misc']['widgetVendors'] = '[]';
             }
         }

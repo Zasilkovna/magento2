@@ -11,8 +11,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function GuzzleHttp\json_decode;
-
 class ImportFeedCarriers extends Command
 {
     /** @var \GuzzleHttp\Client */
@@ -77,12 +75,17 @@ class ImportFeedCarriers extends Command
     protected function execute(InputInterface $input, OutputInterface $output) {
         $output->writeln('Carrier feed import started');
 
-        $apiKey = $this->scopeConfig->getValue('carriers/packetery/api_key'); // default scope
-        $response = $this->client->get("https://www.zasilkovna.cz/api/v4/{$apiKey}/branch.json?address-delivery");
-        $content = $response->getBody()->getContents();
-        $data = json_decode($content);
+        $apiKey = $this->scopeConfig->getValue('carriers/packetery/api_key');
+        if (empty($apiKey)) {
+            $output->writeln('API key is not configured');
+            return Cli::RETURN_FAILURE;
+        }
 
-        if (empty($data) || !isset($data->carriers)) {
+        $feedUrl = "https://pickup-point.api.packeta.com/v5/{$apiKey}/carrier.json?lang=en";
+        $response = $this->client->get($feedUrl);
+        $carriers = \json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($carriers) || $carriers === []) {
             $output->writeln('An error has occurred');
             return Cli::RETURN_FAILURE;
         }
@@ -96,9 +99,10 @@ class ImportFeedCarriers extends Command
         );
         $collection->save();
 
-        foreach ($data->carriers as $carrier) {
-            $data = [
-                'carrier_id' => (int)$carrier->id,
+        foreach ($carriers as $carrier) {
+            $carrierId = (int)$carrier->id;
+            $rowData = [
+                'carrier_id' => $carrierId,
                 'name' => $carrier->name,
                 'is_pickup_points' => $this->parseBool($carrier->pickupPoints), // false === addressDelivery
                 'has_carrier_direct_label' => $this->parseBool($carrier->apiAllowed),
@@ -111,24 +115,25 @@ class ImportFeedCarriers extends Command
                 'country' => strtoupper($carrier->country),
                 'currency' => $carrier->currency,
                 'max_weight' => (float)$carrier->maxWeight,
+                'available' => $this->parseBool($carrier->available ?? true),
                 'deleted' => false,
             ];
 
             /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
             $collection = $this->collectionFactory->create();
-            $collection->addFieldToFilter('carrier_id', $carrier->id);
+            $collection->addFieldToFilter('carrier_id', $carrierId);
             $record = $collection->fetchItem();
 
             if (!$record) {
                 $record = $collection->getNewEmptyItem();
-                $record->setData($data);
+                $record->setData($rowData);
                 $collection->addItem($record);
                 $collection->save();
             } else {
                 /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\Collection $collection */
                 $collection = $this->collectionFactory->create();
                 $collection->addFieldToFilter('id', $record->getId());
-                $collection->setDataToAll($data);
+                $collection->setDataToAll($rowData);
                 $collection->save();
             }
         }

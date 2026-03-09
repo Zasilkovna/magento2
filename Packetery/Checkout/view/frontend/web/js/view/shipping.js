@@ -166,21 +166,20 @@ define(
                 }
 
                 var packetaApiKey = config.apiKey;
-                var countryCode = (quote.shippingAddress().countryId).toLocaleLowerCase();
+                var rateConfig = getSelectedRateConfig();
+                if (!rateConfig) {
+                    console.warn('Packeta: no selected rate config for pickup point widget');
+                    return;
+                }
 
                 var options = {
                     webUrl: config.packetaOptions.webUrl,
                     appIdentity: config.packetaOptions.appIdentity,
-                    country: countryCode,
                     language: config.packetaOptions.language,
                     defaultPrice: parseFloat(quote.shippingMethod().amount),
-                    defaultCurrency: config.currentStoreCurrencyCode
+                    defaultCurrency: config.currentStoreCurrencyCode,
+                    vendors: rateConfig.widgetVendors
                 };
-
-                var rateConfig = getSelectedRateConfig();
-                if (rateConfig.widgetVendors.length > 0) {
-                    options.vendors = rateConfig.widgetVendors;
-                }
 
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
             },

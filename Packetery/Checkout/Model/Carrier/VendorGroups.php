@@ -9,8 +9,13 @@ use Magento\Framework\Phrase;
 class VendorGroups
 {
     public const ZPOINT = 'zpoint';
-    public const ALZABOX = 'alzabox';
     public const ZBOX = 'zbox';
+
+    public static function getAll(): array {
+        $reflection = new \ReflectionClass(self::class);
+
+        return array_values($reflection->getConstants());
+    }
 
     /**
      * @param string $group
@@ -19,7 +24,6 @@ class VendorGroups
     public static function getLabel(string $group): Phrase {
         $mapping = [
             self::ZPOINT => __('Internal pickup points'),
-            self::ALZABOX => __('AlzaBox'),
             self::ZBOX => __('Z-BOX'),
         ];
 

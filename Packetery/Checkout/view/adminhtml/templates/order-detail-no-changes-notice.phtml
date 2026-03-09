@@ -1,0 +1,8 @@
+<?php $showNotice = (bool) $block->getData('showNotice'); ?>
+<?php if ($showNotice) : ?>
+<section class="admin__page-section">
+    <div class="message message-notice">
+        <span><?= $block->escapeHtml(__('No changes can be made for this order.')); ?></span>
+    </div>
+</section>
+<?php endif; ?>

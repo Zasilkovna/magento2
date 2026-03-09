@@ -56,20 +56,6 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
     /**
      * @return string
      */
-    public function getCarrierName(): string {
-        return (string)$this->getData('carrier_name');
-    }
-
-    /**
-     * @return string
-     */
-    public function getFinalCarrierName(): string {
-        return ($this->getCarrierName() ?: $this->getName());
-    }
-
-    /**
-     * @return string
-     */
     public function getCountry(): string {
         return (string)$this->getData('country');
     }
@@ -86,5 +72,9 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
      */
     public function getDeleted(): bool {
         return (bool)$this->getData('deleted');
+    }
+
+    public function disallowsCod(): bool {
+        return (bool)$this->getData('disallows_cod');
     }
 }

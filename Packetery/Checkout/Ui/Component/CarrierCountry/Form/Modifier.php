@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Ui\Component\CarrierCountry\Form;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Ui\Component\Form;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\Carrier;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\HybridCarrier;
@@ -28,29 +31,28 @@ class Modifier implements ModifierInterface
     /** @var \Packetery\Checkout\Model\AddressValidationSelect */
     private $addressValidationSelect;
 
-    /** @var \Packetery\Checkout\Model\FeatureFlag\Manager  */
-    private $featureFlagManager;
+    /** @var ScopeConfigInterface */
+    private $scopeConfig;
 
     /**
-     * Modifier constructor.
-     *
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
      * @param \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         \Magento\Framework\App\RequestInterface $request,
         \Packetery\Checkout\Model\Pricing\Service $pricingService,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
         \Packetery\Checkout\Model\AddressValidationSelect $addressValidationSelect,
-        \Packetery\Checkout\Model\FeatureFlag\Manager $featureFlagManager
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->request = $request;
         $this->pricingService = $pricingService;
         $this->carrierFacade = $carrierFacade;
         $this->addressValidationSelect = $addressValidationSelect;
-        $this->featureFlagManager = $featureFlagManager;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -127,12 +129,8 @@ class Modifier implements ModifierInterface
         $newMeta = [];
         foreach ($carriers as $carrier) {
             $carrierFieldName = $this->getCarrierFieldName($carrier);
-            $magentoCarrier = $this->carrierFacade->getMagentoCarrier($carrier->getData('carrier_code'));
-            $carrierId = $carrier->getData('carrier_id');
-            $dynamicCarrier = $magentoCarrier->getPacketeryBrain()->getDynamicCarrierById((is_numeric($carrierId) ? (int)$carrierId : null));
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($carrier->getMethod(), $carrier->getCountry(), $carrier->getCarrierCode(), $carrier->getCarrierId());
             $carrierFieldLabel = $carrier->getFieldsetTitle($resolvedPricingRule);
-            $isCarrierNameUpdatable = $dynamicCarrier !== null && $magentoCarrier->getPacketeryBrain() instanceof Carrier\IDynamicCarrierNameUpdater;
             $newMeta[$carrierFieldName] = [
                 'arguments' => [
                     'data' => [
@@ -203,9 +201,9 @@ class Modifier implements ModifierInterface
                                     'dataType' => 'text',
                                     'componentType' => 'field',
                                     'label' => __('Carrier name'),
-                                    'visible' => $isCarrierNameUpdatable,
+                                    'visible' => true,
                                     'validation' => [
-                                        'required-entry' => $isCarrierNameUpdatable,
+                                        'required-entry' => true,
                                     ],
                                 ],
                             ],
@@ -332,8 +330,7 @@ class Modifier implements ModifierInterface
                             'dataType' => 'text',
                             'componentType' => 'field',
                             'additionalClasses' => 'packetery-checkboxset',
-                            'visible' => $carrier->hasVendorGroupsOptions() && $this->featureFlagManager->isSplitActive(),
-                            'disabled' => $carrier->hasNonInteractableVendorGroupsOptions(),
+                            'visible' => $carrier->hasVendorGroupsOptions() && !$carrier->hasNonInteractableVendorGroupsOptions(),
                             'required' => false,
                             'multiple' => true,
                             'options' => $carrier->getVendorGroupsOptions()
@@ -366,7 +363,7 @@ class Modifier implements ModifierInterface
                             'formElement' => 'select',
                             'dataType' => 'text',
                             'componentType' => 'field',
-                            'visible' => Methods::isAnyAddressDelivery($carrier->getMethod()),
+                            'visible' => AddressValidationResolver::isEligibleForAddressValidation($carrier->getMethod(), $countryId),
                             'required' => false,
                             'validation' => [
                                 'required-entry' => false,
@@ -385,7 +382,7 @@ class Modifier implements ModifierInterface
                             'formElement' => 'input',
                             'dataType' => 'text',
                             'componentType' => 'field',
-                            'visible' => true,
+                            'visible' => !$carrier->getData('disallows_cod'),
                             'required' => false,
                             'validation' => [
                                 'required-entry' => false,
@@ -398,6 +395,10 @@ class Modifier implements ModifierInterface
             ],
             'weight_rules' => $this->getWeightRules($carrier),
         ];
+    }
+
+    private function getWeightUnitLabel(): string {
+        return (string)$this->scopeConfig->getValue('general/locale/weight_unit', ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -454,7 +455,7 @@ class Modifier implements ModifierInterface
                                         'label' => new ComboPhrase(
                                             [
                                                 __('Max. weight'),
-                                                $weightUpperlimit === null ? '' : new ComboPhrase(['(max ', $weightUpperlimit, ')']),
+                                                $weightUpperlimit === null ? '' : new ComboPhrase(['(max ', $weightUpperlimit, ' ', $this->getWeightUnitLabel(), ')']),
                                             ],
                                             ' '
                                         ),
@@ -555,8 +556,10 @@ class Modifier implements ModifierInterface
             $method = $carrier->getData('method');
             $carrierId = ($carrier->getData('carrier_id') ? (int)$carrier->getData('carrier_id') : null);
 
-            $shippingMethod['carrier_name'] = $carrier->getFinalCarrierName();
             $resolvedPricingRule = $this->pricingService->resolvePricingRule($method, $country, $carrierCode, $carrierId);
+            $shippingMethod['carrier_name'] = ($resolvedPricingRule !== null && $resolvedPricingRule->getCarrierName() !== null)
+                ? $resolvedPricingRule->getCarrierName()
+                : $carrier->getFinalCarrierName();
 
             $shippingMethod['enabled'] = '0';
             $pricingRule['carrier_code'] = $carrierCode;
@@ -570,6 +573,7 @@ class Modifier implements ModifierInterface
                 $pricingRule['free_shipment'] = $resolvedPricingRule->getFreeShipment();
                 $pricingRule['address_validation'] = $resolvedPricingRule->getAddressValidation();
                 $pricingRule['max_cod'] = $resolvedPricingRule->getMaxCOD();
+                $pricingRule['carrier_name'] = $resolvedPricingRule->getCarrierName();
                 $pricingRule['vendor_groups'] = $resolvedPricingRule->getVendorGroups() ?? [];
 
                 $weightRules = $this->pricingService->getWeightRulesByPricingRule($resolvedPricingRule);
@@ -580,6 +584,10 @@ class Modifier implements ModifierInterface
             }
 
             if ($resolvedPricingRule === null && $carrier->hasNonInteractableVendorGroupsOptions()) {
+                $pricingRule['vendor_groups'] = $carrier->getVendorCodesOptionsValues();
+            }
+
+            if (($pricingRule['vendor_groups'] ?? []) === [] && $carrier->hasVendorGroupsOptions()) {
                 $pricingRule['vendor_groups'] = $carrier->getVendorCodesOptionsValues();
             }
 

@@ -53,8 +53,8 @@ define([
             return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
         },
 
-        isAnyAddressDelivery: function() {
-            return uiRegistry.get('inputName = general[misc][isAnyAddressDelivery]').value() === '1';
+        isAddressValidationEligible: function() {
+            return uiRegistry.get('inputName = general[misc][isAddressValidationEligible]').value() === '1';
         },
 
         getPacketaSymbolUrl: function() {
@@ -77,7 +77,7 @@ define([
                 fieldset.label = $t('Pickup point selection');
             }
 
-            if (mixin.isAnyAddressDelivery()) {
+            if (mixin.isAddressValidationEligible()) {
                 fieldset.label = $t('Shipping address validation');
             }
 
@@ -86,19 +86,14 @@ define([
 
         packetaButtonClick: function() {
             var packetaApiKey = config.apiKey;
-            var countryId = uiRegistry.get('inputName = general[recipient_country_id]').value();
             var widgetVendors = JSON.parse(uiRegistry.get('inputName = general[misc][widgetVendors]').value());
 
             var options = {
                 webUrl: config.packetaOptions.webUrl,
                 appIdentity: config.packetaOptions.appIdentity,
-                country: countryId.toLocaleLowerCase(),
                 language: config.packetaOptions.language,
+                vendors: widgetVendors
             };
-
-            if (widgetVendors.length > 0) {
-                options.vendors = widgetVendors;
-            }
 
             var pickupPointSelected = function(point) {
                 if(!point) {

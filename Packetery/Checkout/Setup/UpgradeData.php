@@ -41,7 +41,7 @@ class UpgradeData implements UpgradeDataInterface
             $configModel->save();
         }
 
-        if (version_compare($context->getVersion(), '2.3.0', '<')) {
+        if (version_compare($context->getVersion(), '2.4.0', '<')) {
             $packeteryOrderTable = $setup->getTable('packetery_order');
             $salesOrderTable = $setup->getTable('sales_order');
             $salesOrderAddressTable = $setup->getTable('sales_order_address');
@@ -55,7 +55,7 @@ class UpgradeData implements UpgradeDataInterface
 
             // Static Vendor groups snapshot for given module version 2.3.0
             $vendorGroupsMapping = [
-                'CZ' => '["zpoint","alzabox","zbox"]',
+                'CZ' => '["zpoint","zbox"]',
                 'SK' => '["zpoint","zbox"]',
                 'HU' => '["zpoint","zbox"]',
                 'RO' => '["zpoint","zbox"]',
@@ -88,6 +88,19 @@ class UpgradeData implements UpgradeDataInterface
                         new \Zend_Db_Expr('`vendor_groups` IS NULL'),
                     ],
                 );
+            }
+
+            $pricingRuleTable = $setup->getTable('packetery_pricing_rule');
+            $carrierTable = $setup->getTable('packetery_carrier');
+            $connection = $setup->getConnection();
+            if ($connection->isTableExists($carrierTable) && $connection->tableColumnExists($carrierTable, 'carrier_name')) {
+                $connection->query("
+                    UPDATE `$pricingRuleTable` pr
+                    INNER JOIN `$carrierTable` c ON c.carrier_id = pr.carrier_id AND pr.carrier_id IS NOT NULL
+                    SET pr.carrier_name = c.carrier_name
+                    WHERE c.carrier_name IS NOT NULL AND c.carrier_name != ''
+                ");
+                $connection->dropColumn($carrierTable, 'carrier_name');
             }
         }
     }
