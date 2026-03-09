@@ -19,6 +19,14 @@ class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
     /**
      * @return string|null
      */
+    public function getApiPassword(): ?string
+    {
+        return ($this->getConfigData('api_password') ?: null);
+    }
+
+    /**
+     * @return string|null
+     */
     public function getApiKey(): ?string
     {
         return ($this->getConfigData('api_key') ?: null);
