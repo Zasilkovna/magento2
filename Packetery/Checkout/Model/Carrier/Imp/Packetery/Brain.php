@@ -105,8 +105,8 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return \Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier[]
      */
     public function findResolvableDynamicCarriers(): array {
-        $zpointTitle = 'Packeta internal pickup points';
-        $zboxTitle = 'Packeta - Z-BOX';
+        $zpointTitle = 'Packeta Pick-up Point';
+        $zboxTitle = 'Packeta Z-BOX';
 
         return [
             new VendorCarrier(

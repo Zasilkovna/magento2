@@ -50,7 +50,7 @@ class HybridCarrier extends \Magento\Framework\DataObject
             $postfix = 'HD';
         }
         if (\Packetery\Checkout\Model\Carrier\Methods::PICKUP_POINT_DELIVERY === $method) {
-            $postfix = 'pickup points';
+            $postfix = ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier ? 'Pick-up Point, Z-BOX' : 'pickup points');
         }
 
         $hybridCarrier->setData('name', "$country {$carrier->getPacketeryConfig()->getTitle()} $postfix");
