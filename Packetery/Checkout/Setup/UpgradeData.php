@@ -11,21 +11,31 @@ class UpgradeData implements UpgradeDataInterface
     /** @var \Magento\Config\Model\Config\Factory */
     private $configFactory;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory  */
+    /** @var \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory */
     private $pricingRuleCollectionFactory;
 
+    /** @var \Magento\Framework\App\Config\Storage\WriterInterface */
+    private $configWriter;
+
+    /** @var \Magento\Store\Model\StoreManagerInterface */
+    private $storeManager;
+
     /**
-     * UpgradeData constructor.
-     *
      * @param \Magento\Config\Model\Config\Factory $configFactory
      * @param \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
+     * @param \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
         \Magento\Config\Model\Config\Factory $configFactory,
-        \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory
+        \Packetery\Checkout\Model\ResourceModel\Pricingrule\CollectionFactory $pricingRuleCollectionFactory,
+        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
         $this->configFactory = $configFactory;
         $this->pricingRuleCollectionFactory = $pricingRuleCollectionFactory;
+        $this->configWriter = $configWriter;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -102,6 +112,55 @@ class UpgradeData implements UpgradeDataInterface
                 ");
                 $connection->dropColumn($carrierTable, 'carrier_name');
             }
+        }
+
+        if (version_compare($context->getVersion(), '2.5.0', '<')) {
+            $this->migrateSenderConfig();
+        }
+    }
+
+    private function migrateSenderConfig(): void
+    {
+        $defaultSender = null;
+        foreach ($this->storeManager->getStores() as $store) {
+            $group = $store->getGroup();
+            if ($group !== null) {
+                $groupCode = $group->getCode();
+                if ($groupCode !== null && $groupCode !== '') {
+                    if ($defaultSender === null) {
+                        $defaultSender = $groupCode;
+                    }
+                    $this->configWriter->save(
+                        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::CONFIG_PATH_SENDER,
+                        $groupCode,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        (string) $store->getId()
+                    );
+                }
+            }
+        }
+        foreach ($this->storeManager->getWebSites() as $website) {
+            $defaultStore = $website->getDefaultStore();
+            if ($defaultStore !== null) {
+                $group = $defaultStore->getGroup();
+                $groupCode = $group !== null ? $group->getCode() : null;
+                if ($groupCode !== null && $groupCode !== '') {
+                    $this->configWriter->save(
+                        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::CONFIG_PATH_SENDER,
+                        $groupCode,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
+                        (string) $website->getId()
+                    );
+                }
+            }
+        }
+        if ($defaultSender !== null) {
+            $this->configWriter->save(
+                \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::CONFIG_PATH_SENDER,
+                $defaultSender,
+                'default',
+                '0'
+            );
         }
     }
 }

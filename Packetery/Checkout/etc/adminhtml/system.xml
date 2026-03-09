@@ -35,6 +35,11 @@
                     <validate>required-entry</validate>
                     <backend_model>Packetery\Checkout\Block\System\Config\Form\ApiKeyValidate</backend_model>
                 </field>
+                <field id="sender" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="43" translate="label" type="text">
+                    <label>Sender</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Packetery\Checkout\Block\System\Config\Form\SenderValidate</backend_model>
+                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>

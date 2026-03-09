@@ -49,6 +49,8 @@
 "API password","API password"
 "API password must be filled.","API password must be filled."
 "The API password length must have %1 characters!","The API password length must have %1 characters!"
+"Sender","Sender"
+"Sender must be filled.","Sender must be filled."
 "Price rules","Price rules"
 "Global settings","Global settings"
 "Default price","Default price"
