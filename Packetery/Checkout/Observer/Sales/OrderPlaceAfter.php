@@ -214,7 +214,7 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
             'point_name' => $pointName,
             'is_carrier' => $isCarrier,
             'carrier_pickup_point' => $carrierPickupPoint,
-            'sender_label' => $this->getLabel(),
+            'sender_label' => $this->resolveSenderLabel(),
             'address_validated' => $addressValidated,
             'recipient_street' => $destinationAddress->getStreet(),
             'recipient_house_number' => $destinationAddress->getHouseNumber(),
@@ -307,18 +307,30 @@ class OrderPlaceAfter implements \Magento\Framework\Event\ObserverInterface
 	}
 
 	/**
-	 * Create unique label/id of the store
+	 * @return string|null
 	 */
-	private function getLabel()
+	private function resolveSenderLabel(): ?string
 	{
-        $store = $this->storeManager->getGroup();
+		$sender = $this->packeteryConfig->getSender();
+		if ($sender !== null && $sender !== '') {
+			return $sender;
+		}
+		return $this->getLabel();
+	}
 
-        if($store)
-        {
-            return $store->getCode();
-        }
-        return null;
-    }
+	/**
+	 * Create unique label/id of the store (used as sender fallback before config is set)
+	 *
+	 * @return string|null
+	 */
+	private function getLabel(): ?string
+	{
+		$store = $this->storeManager->getGroup();
+		if ($store) {
+			return $store->getCode();
+		}
+		return null;
+	}
 
 	/**
 	 * Save order data to packetery module

@@ -8,12 +8,22 @@ use Packetery\Checkout\Model\Carrier\Methods;
 
 class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
 {
+    public const CONFIG_PATH_SENDER = 'carriers/packetery/sender';
+
     /**
      * @return string[]
      */
     public function getAllowedMethods(): array
     {
         return [Methods::PICKUP_POINT_DELIVERY];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getApiPassword(): ?string
+    {
+        return ($this->getConfigData('api_password') ?: null);
     }
 
     /**
@@ -31,5 +41,13 @@ class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
     {
         $value = $this->getConfigData('cod_methods');
         return (is_string($value) ? explode(',', $value) : []);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSender(): ?string
+    {
+        return ($this->getConfigData('sender') ?: null);
     }
 }
