@@ -236,7 +236,7 @@
                 </item>
             </argument>
         </column>
-        <column name="exported_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\YesNo">
+        <column name="exported_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\Exported">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\YesNoSelect</item>
                 <item name="config" xsi:type="array">
@@ -246,6 +246,7 @@
                     <item name="filter" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Exported</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
                 </item>
                 <item name="packetery" xsi:type="array">
                     <item name="byField" xsi:type="string">exported</item>

@@ -72,6 +72,14 @@ class Actions extends Column
                         'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['id' => $item['id']]),
                         'label' => __('Edit')
                     ];
+                    $item[$name]['submit'] = [
+                        'href' => $this->_urlBuilder->getUrl('packetery/packet/submit', ['order_id' => $item['id']]),
+                        'label' => __('Submit to Packeta'),
+                        'confirm' => [
+                            'title' => __('Submit to Packeta'),
+                            'message' => __('Do you really want to submit this packet to Packeta?'),
+                        ],
+                    ];
                 }
             }
         }

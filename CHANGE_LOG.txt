@@ -1,4 +1,6 @@
 2.5.0 - Updated: Add sorting for countries names and codes to Packeta Pricing list, default view is with countries including Packeta points
+      - Added: packet submission to Packeta API from order list
+
 2.4.0 - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
       - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible
       - Updated: pickup point selection in checkout and in order detail now shows only the relevant carriers for the chosen delivery type

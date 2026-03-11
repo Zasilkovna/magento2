@@ -265,6 +265,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), '2.5.0', '<')) {
+            $this->installSchema->packetTable($setup);
+        }
+
         $setup->endSetup();
     }
 }
