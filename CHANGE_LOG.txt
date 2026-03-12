@@ -1,10 +1,12 @@
-2.4.0 - Added: support for external carriers for pickup points
+2.4.0
+      - Added: support for external carriers for pickup points
       - Removed: carriers that are no longer supported
       - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
       - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible
       - Updated: the carrier list now also displays carriers that do not support COD and carriers outside the EU.
       - Updated: for carriers that disallow COD, the "Max COD" field is hidden in administration and COD limit is not applied when selecting payment methods or placing orders
       - Updated: carrier feed updated from version 4 to version 5
+      - Added: support for PHP 8.4
 
 2.3.2 - Updated: Add new fields to CSV export and update version number to 8
 
