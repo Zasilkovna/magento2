@@ -142,12 +142,18 @@ class Facade
     /**
      * @return array
      */
-    public function getAllAvailableCountries(): array {
+    public function getAllAvailableCountries(bool $sortPacketaCountriesFirst = false): array
+    {
         $countries = [];
+        $packetaCountries = [];
+        foreach ($this->getPacketeryAbstractCarriers() as $carrier) {
+            $available = $carrier->getPacketeryBrain()->getAvailableCountries(Methods::getAll());
+            $packetaCountries = array_merge($packetaCountries, $available);
+            $countries = array_merge($countries, $available);
+        }
 
-        foreach ($this->getPacketeryAbstractCarriers() as $packeteryAbstractCarrier) {
-            $carrierMethods = Methods::getAll();
-            $countries = array_merge($countries, $packeteryAbstractCarrier->getPacketeryBrain()->getAvailableCountries($carrierMethods));
+        if ($sortPacketaCountriesFirst && !empty($packetaCountries)) {
+            $countries = array_merge($packetaCountries, $countries);
         }
 
         return array_unique($countries);

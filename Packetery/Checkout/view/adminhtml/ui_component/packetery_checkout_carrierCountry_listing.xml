@@ -37,7 +37,7 @@
         <column name="countryName" class="Packetery\Checkout\Ui\Component\CarrierCountry\Listing\Column\Country">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="sortable" xsi:type="boolean">true</item>
                     <item name="label" xsi:type="string" translate="true">Country</item>
                 </item>
             </argument>
@@ -46,7 +46,6 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="sortable" xsi:type="boolean">true</item>
-                    <item name="sorting" xsi:type="string">ASC</item>
                     <item name="indexField" xsi:type="string">country</item>
                     <item name="label" xsi:type="string" translate="true">Country Code</item>
                 </item>
