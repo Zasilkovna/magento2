@@ -55,7 +55,15 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
     }
 
     protected function _initSelect() {
-        $subQuery = $this->orderCollectionFactory->create()->getSelect();
+        $orderCollection = $this->orderCollectionFactory->create();
+        $subQuery = $orderCollection->getSelect();
+        $packetTable = $orderCollection->getTable('packetery_packet');
+        $connection = $orderCollection->getConnection();
+        $packetSubSelect = $connection->select()
+            ->from(['p' => $packetTable], ['packet_number'])
+            ->where('p.order_number = main_table.order_number')
+            ->order('p.id DESC')
+            ->limit(1);
         $subQuery->reset('columns');
         $subQuery->columns(
             [
@@ -67,6 +75,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'cod_transformed' => "IF(main_table.cod > 0, 1, 0)",
                 'exported_transformed' => "main_table.exported",
                 'exported_at_transformed' => "main_table.exported_at",
+                'packet_number' => new Expression('(' . $packetSubSelect->assemble() . ')'),
                 'order_status' => "sales_order.status",
                 'shipping_rate_code' => "sales_order.shipping_method",
                 'created_at' => 'sales_order.created_at',

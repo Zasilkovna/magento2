@@ -190,6 +190,7 @@ class InstallSchema implements InstallSchemaInterface
         $this->pricingRulesTable($setup);
         $this->weightRulesTable($setup);
         $this->carrierTable($setup);
+        $this->packetTable($setup);
 
         $setup->endSetup();
     }
@@ -500,6 +501,55 @@ class InstallSchema implements InstallSchemaInterface
         ]);
 
         $table->setComment('Packetery carriers regulary updated via cron job');
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @throws \Zend_Db_Exception
+     */
+    public function packetTable(SchemaSetupInterface &$setup): void
+    {
+        $table = $setup->getConnection()->newTable(
+            $setup->getTable('packetery_packet')
+        );
+
+        $this->columns($table, [
+            'id' => [
+                'type' => Table::TYPE_INTEGER,
+                'attr' => ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+            ],
+            'order_number' => [
+                'type' => Table::TYPE_TEXT,
+                'size' => 128,
+                'attr' => ['nullable' => false],
+            ],
+            'packet_number' => [
+                'type' => Table::TYPE_TEXT,
+                'size' => 64,
+                'attr' => ['nullable' => false],
+            ],
+            'weight' => [
+                'type' => Table::TYPE_DECIMAL,
+                'attr' => ['nullable' => false, 'length' => '12,4'],
+            ],
+            'value' => [
+                'type' => Table::TYPE_DECIMAL,
+                'attr' => ['nullable' => false, 'length' => '20,4'],
+            ],
+            'cod' => [
+                'type' => Table::TYPE_DECIMAL,
+                'attr' => ['nullable' => true, 'length' => '20,4'],
+            ],
+        ]);
+
+        $table->addIndex(
+            $setup->getIdxName('packetery_packet', ['order_number']),
+            ['order_number']
+        );
+
+        $table->setComment('Successfully submitted Packeta packets');
 
         $setup->getConnection()->createTable($table);
     }
