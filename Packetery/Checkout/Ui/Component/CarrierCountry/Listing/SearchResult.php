@@ -4,71 +4,100 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Ui\Component\CarrierCountry\Listing;
 
+use Magento\Directory\Model\ResourceModel\Country\CollectionFactory;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\DB\Select;
 use Magento\Framework\DB\Sql\UnionExpression;
 use Magento\Framework\Event\ManagerInterface as EventManager;
+use Packetery\Checkout\Model\Carrier\Facade;
+use Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier;
 use Psr\Log\LoggerInterface as Logger;
 
 class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult
 {
-    /** @var \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier */
-    private $modifier;
+    private Modifier $modifier;
+    private Facade $carrierFacade;
+    private CollectionFactory $countryCollectionFactory;
 
-    /** @var \Packetery\Checkout\Model\Carrier\Facade */
-    private $carrierFacade;
-
-    /**
-     * @param \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
-     * @param \Magento\Framework\Event\ManagerInterface $eventManager
-     * @param \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier
-     * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
-     * @param string $mainTable
-     * @param null|string $resourceModel
-     * @param null|string $identifierName
-     * @param null|string $connectionName
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
     public function __construct(
         EntityFactory $entityFactory,
         Logger $logger,
         FetchStrategy $fetchStrategy,
         EventManager $eventManager,
-        \Packetery\Checkout\Ui\Component\CarrierCountry\Form\Modifier $modifier,
-        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
-        $mainTable,
-        $resourceModel = null,
-        $identifierName = null,
-        $connectionName = null
+        Modifier $modifier,
+        Facade $carrierFacade,
+        CollectionFactory $countryCollectionFactory,
+        string $mainTable,
+        ?string $resourceModel = null,
+        ?string $identifierName = null,
+        ?string $connectionName = null
     ) {
         $this->carrierFacade = $carrierFacade;
         $this->modifier = $modifier;
-        parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel, $identifierName, $connectionName);
+        $this->countryCollectionFactory = $countryCollectionFactory;
+
+        parent::__construct(
+            $entityFactory,
+            $logger,
+            $fetchStrategy,
+            $eventManager,
+            $mainTable,
+            $resourceModel,
+            $identifierName,
+            $connectionName
+        );
     }
 
-    protected function _initSelect() {
-        $neededCountries = $this->carrierFacade->getAllAvailableCountries();
-        $assembledQueries = [];
+    protected function _initSelect()
+    {
+        $countries = $this->carrierFacade->getAllAvailableCountries(true);
+        if (empty($countries)) {
+            return parent::_initSelect();
+        }
 
-        foreach ($neededCountries as $neededCountry) {
-            $options = $this->modifier->getCarriers($neededCountry);
-            if (empty($options)) {
-                continue; // do not show country if no carriers are available for user configuration
+        $countryNames = [];
+        foreach ($this->countryCollectionFactory->create()->addCountryCodeFilter($countries) as $countryCollectionRow) {
+            $countryNames[$countryCollectionRow->getCountryId()] = $countryCollectionRow->getName();
+        }
+
+        $assembledQueries = [];
+        $connection = $this->getConnection();
+        foreach ($countries as $index => $code) {
+            if (empty($this->modifier->getCarriers($code))) {
+                continue;
             }
 
-            $items = $this->modifier->getPricingRulesForCountry($neededCountry, true);
-            $assembledQueries[] = " SELECT {$this->getConnection()->quote($neededCountry)} AS {$this->getConnection()->quoteIdentifier('country')}, {$this->getConnection()->quote(empty($items) ? 0 : 1)} AS {$this->getConnection()->quoteIdentifier('available')} ";
+            $hasPricing = !empty($this->modifier->getPricingRulesForCountry($code, true));
+            $qCountry = $connection->quote($code);
+            $qName = $connection->quote($countryNames[$code] ?? $code);
+            $qAvailable = $hasPricing ? '1' : '0';
+            $qRank = (int) $index;
+
+            $qiCountry = $connection->quoteIdentifier('country');
+            $qiName = $connection->quoteIdentifier('country_name');
+            $qiAvailable = $connection->quoteIdentifier('available');
+            $qiRank = $connection->quoteIdentifier('rank');
+
+            $assembledQueries[] = " (SELECT {$qCountry} AS {$qiCountry},
+                {$qName} AS {$qiName},
+                {$qAvailable} AS {$qiAvailable},
+                {$qRank} AS {$qiRank}) ";
+        }
+
+        if (empty($assembledQueries)) {
+            return parent::_initSelect();
         }
 
         $this->getSelect()
-            ->from(['main_table' => new UnionExpression($assembledQueries, $this->getSelect()::SQL_UNION, '(%s)')])
+            ->from(['main_table' => new \Zend_Db_Expr('(' . new UnionExpression($assembledQueries, Select::SQL_UNION) . ')')])
             ->reset('columns')
             ->columns(
                 [
                     'country',
+                    'countryName' => 'country_name',
                     'available',
+                    'rank',
                 ]
             )
             ->group(
@@ -77,8 +106,17 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 ]
             );
 
+        $this->addFilterToMap('countryName', 'country_name');
         $this->addFilterToMap('availableName', 'available');
 
         return $this;
+    }
+
+    protected function _beforeLoad(): SearchResult
+    {
+        if (empty($this->_orders)) {
+            $this->setOrder('rank', 'ASC');
+        }
+        return parent::_beforeLoad();
     }
 }
