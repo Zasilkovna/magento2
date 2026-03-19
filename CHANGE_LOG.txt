@@ -1,4 +1,4 @@
-      - Fixed: Packeta order detail - fixed filtering by carrier names also, not just pick-up point name/id
+2.4.1 - Fixed: Packeta order list – improved filtering to include carrier names, not only pick-up point name/ID
 2.4.0 - Added: support for external carriers for pickup points
       - Removed: carriers that are no longer supported
       - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
