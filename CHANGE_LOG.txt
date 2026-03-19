@@ -1,5 +1,5 @@
-2.4.0
-      - Added: support for external carriers for pickup points
+      - Fixed: Packeta order detail - fixed filtering by carrier names also, not just pick-up point name/id
+2.4.0 - Added: support for external carriers for pickup points
       - Removed: carriers that are no longer supported
       - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
       - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible

@@ -62,7 +62,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'order_number_reference' => 'main_table.order_number',
                 'recipient_fullname' => "CONCAT_WS('', main_table.recipient_firstname, ' ',main_table.recipient_lastname)",
                 'recipient_address' => "CONCAT_WS('', main_table.recipient_street, ' ', main_table.recipient_house_number, ' ', main_table.recipient_city, ' ', main_table.recipient_zip)",
-                'delivery_destination' => "CONCAT_WS('', main_table.point_name, ' ', main_table.point_id)",
+                'delivery_destination' => "CONCAT_WS('', main_table.point_name, ' ', main_table.point_id, ' ', packetery_pricing_rule.carrier_name)",
                 'value_transformed' => "main_table.value",
                 'cod_transformed' => "IF(main_table.cod > 0, 1, 0)",
                 'exported_transformed' => "main_table.exported",
@@ -72,6 +72,11 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'created_at' => 'sales_order.created_at',
                 'main_table.*'
             ]
+        );
+        $subQuery->joinLeft(
+            ['packetery_pricing_rule' => $this->getTable('packetery_pricing_rule')],
+            'main_table.is_carrier = 1 AND main_table.point_id = packetery_pricing_rule.carrier_id',
+            []
         );
 
         $this->getSelect()
