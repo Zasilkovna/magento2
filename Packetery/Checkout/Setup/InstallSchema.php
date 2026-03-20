@@ -547,6 +547,15 @@ class InstallSchema implements InstallSchemaInterface
                 'type' => Table::TYPE_DECIMAL,
                 'attr' => ['nullable' => true, 'length' => '20,4'],
             ],
+            'courier_number' => [
+                'type' => Table::TYPE_TEXT,
+                'size' => 64,
+                'attr' => ['nullable' => true, 'comment' => 'Carrier tracking number from Packeta API'],
+            ],
+            'label_printed_at' => [
+                'type' => Table::TYPE_DATETIME,
+                'attr' => ['nullable' => true, 'comment' => 'UTC date and time of last successful label print'],
+            ],
         ]);
 
         $table->addIndex(
