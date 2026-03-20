@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
 use Packetery\Checkout\Model\Carrier\Methods;
+use Packetery\Checkout\Model\Label\LabelFormats;
 
 class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
 {
@@ -49,5 +50,10 @@ class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
     public function getSender(): ?string
     {
         return ($this->getConfigData('sender') ?: null);
+    }
+
+    protected function normalizeLabelFormatValue(string $value): string
+    {
+        return LabelFormats::normalizePacketaFormat($value);
     }
 }

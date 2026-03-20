@@ -6,6 +6,7 @@ namespace Packetery\Checkout\Model\Carrier\Imp\Packetery;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
 use Packetery\Checkout\Model\Carrier\Config\AbstractConfig;
+use Packetery\Checkout\Model\Label\LabelFormats;
 
 class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDynamicConfig
 {
@@ -37,5 +38,10 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
 
     public function getConfig(): AbstractConfig {
         return $this->config;
+    }
+
+    protected function normalizeLabelFormatValue(string $value): string
+    {
+        return LabelFormats::normalizePacketaFormat($value);
     }
 }

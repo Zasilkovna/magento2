@@ -1,6 +1,7 @@
 2.5.0 - Added: Box dimensions datagrid with possibility add, edit, delete name, depth, width and height of boxes
       - Updated: Add sorting for countries names and codes to Packeta Pricing list, default view is with countries including Packeta points
       - Added: packet submission to Packeta API from order list
+      - Added: print shipping label from order list
 
 2.4.0 - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
       - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible
