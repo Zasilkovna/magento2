@@ -1,21 +1,21 @@
 <?php
 
-
 namespace Packetery\Checkout\Setup;
 
+use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
-    /** @var \Packetery\Checkout\Setup\InstallSchema */
+    /** @var InstallSchema */
     private $installSchema;
 
     /**
      * UpgradeSchema constructor.
      *
-     * @param \Packetery\Checkout\Setup\InstallSchema $installSchema
+     * @param InstallSchema $installSchema
      */
     public function __construct(InstallSchema $installSchema)
     {
@@ -36,7 +36,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'is_carrier',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                    'type' => Table::TYPE_BOOLEAN,
                     'nullable' => false,
                     'default' => 0,
                     'comment' => 'Is Point_id ID of external carrier?',
@@ -48,7 +48,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'carrier_pickup_point',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'nullable' => true,
                     'length' => 40,
                     'comment' => 'External carrier pickup point ID',
@@ -63,7 +63,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'cod',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'type' => Table::TYPE_DECIMAL,
                     'length' => '20,4'
                 ]
             );
@@ -72,7 +72,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'value',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'type' => Table::TYPE_DECIMAL,
                     'length' => '20,4'
                 ]
             );
@@ -81,7 +81,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'weight',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'type' => Table::TYPE_DECIMAL,
                     'length' => '12,4'
                 ]
             );
@@ -94,7 +94,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'carrier_code',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'default' => 'packetery',
                     'nullable' => false,
                     'length' => '64',
@@ -107,7 +107,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'carrier_code',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'nullable' => false,
                     'length' => '64',
                     'comment' => 'Magento unique carrier class identifier',
@@ -119,7 +119,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'carrier_id',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                    'type' => Table::TYPE_INTEGER,
                     'nullable' => true,
                     'length' => '11',
                     'comment' => 'Dynamic carrier id from Mordor',
@@ -131,7 +131,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'enabled',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                    'type' => Table::TYPE_BOOLEAN,
                     'default' => 0,
                     'nullable' => false,
                     'comment' => 'Is rule enabled?',
@@ -145,7 +145,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'address_validation',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'default' => 'none',
                     'nullable' => false,
                     'length' => '10',
@@ -158,7 +158,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'max_cod',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'type' => Table::TYPE_DECIMAL,
                     'nullable' => true,
                     'after' => 'address_validation',
                     'length' => '20,4',
@@ -170,7 +170,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'address_validated',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                    'type' => Table::TYPE_BOOLEAN,
                     'nullable' => false,
                     'default' => 0,
                     'comment' => 'Is recipient address validated?',
@@ -182,7 +182,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'recipient_country_id',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'nullable' => true,
                     'length' => '2',
                     'comment' => 'Recipient country',
@@ -194,7 +194,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'recipient_county',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'nullable' => true,
                     'length' => '128',
                     'comment' => 'Recipient county',
@@ -206,7 +206,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'recipient_longitude',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'type' => Table::TYPE_DECIMAL,
                     'nullable' => true,
                     'length' => '11,8',
                     'comment' => 'Longitude',
@@ -218,7 +218,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_order'),
                 'recipient_latitude',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+                    'type' => Table::TYPE_DECIMAL,
                     'nullable' => true,
                     'length' => '10,8',
                     'comment' => 'Latitude',
@@ -230,7 +230,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'vendor_groups',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'nullable' => true,
                     'length' => '255',
                     'comment' => 'Vendor groups',
@@ -244,7 +244,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_carrier'),
                 'available',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                    'type' => Table::TYPE_BOOLEAN,
                     'nullable' => false,
                     'default' => 1,
                     'comment' => 'Carrier available in feed',
@@ -256,7 +256,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable('packetery_pricing_rule'),
                 'carrier_name',
                 [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'type' => Table::TYPE_TEXT,
                     'nullable' => true,
                     'length' => '64',
                     'comment' => 'Custom carrier name',
@@ -267,6 +267,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '2.5.0', '<')) {
             $this->installSchema->packetTable($setup);
+            $this->installSchema->boxTable($setup);
         }
 
         $setup->endSetup();

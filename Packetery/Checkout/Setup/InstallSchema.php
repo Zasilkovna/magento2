@@ -2,14 +2,17 @@
 
 namespace Packetery\Checkout\Setup;
 
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use Packetery\Checkout\Model\Box;
+use Zend_Db_Exception;
 
 class InstallSchema implements InstallSchemaInterface
 {
-    /** @var array[]  */
+    /** @var array[] */
     private $orderTableSchema = [
         "id" => [
             "type" => Table::TYPE_INTEGER,
@@ -173,8 +176,7 @@ class InstallSchema implements InstallSchemaInterface
         ],
         "exported_at" => [
             "type" => Table::TYPE_DATETIME
-        ]
-
+        ],
     ];
 
     /**
@@ -191,13 +193,14 @@ class InstallSchema implements InstallSchemaInterface
         $this->weightRulesTable($setup);
         $this->carrierTable($setup);
         $this->packetTable($setup);
+        $this->boxTable($setup);
 
         $setup->endSetup();
     }
 
     /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     * @throws \Zend_Db_Exception
+     * @param SchemaSetupInterface $setup
+     * @throws Zend_Db_Exception
      */
     private function ordersTable(SchemaSetupInterface &$setup): void
     {
@@ -213,8 +216,8 @@ class InstallSchema implements InstallSchemaInterface
     }
 
     /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     * @throws \Zend_Db_Exception
+     * @param SchemaSetupInterface $setup
+     * @throws Zend_Db_Exception
      */
     public function pricingRulesTable(SchemaSetupInterface &$setup): void
     {
@@ -325,8 +328,8 @@ class InstallSchema implements InstallSchemaInterface
     }
 
     /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     * @throws \Zend_Db_Exception
+     * @param SchemaSetupInterface $setup
+     * @throws Zend_Db_Exception
      */
     public function weightRulesTable(SchemaSetupInterface &$setup): void
     {
@@ -364,8 +367,10 @@ class InstallSchema implements InstallSchemaInterface
         ]);
 
         $table->addForeignKey(
-            $setup->getFkName($setup->getTable('packetery_weight_rule'),'packetery_pricing_rule_id', $setup->getTable('packetery_pricing_rule'), 'id'),
-            'packetery_pricing_rule_id', $setup->getTable('packetery_pricing_rule'), 'id'
+            $setup->getFkName($setup->getTable('packetery_weight_rule'), 'packetery_pricing_rule_id', $setup->getTable('packetery_pricing_rule'), 'id'),
+            'packetery_pricing_rule_id',
+            $setup->getTable('packetery_pricing_rule'),
+            'id'
         );
 
         $table->setComment('Packetery weight rules. Relates to packetery pricing rules.');
@@ -374,8 +379,8 @@ class InstallSchema implements InstallSchemaInterface
     }
 
     /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
-     * @throws \Zend_Db_Exception
+     * @param SchemaSetupInterface $setup
+     * @throws Zend_Db_Exception
      */
     public function carrierTable(SchemaSetupInterface &$setup): void
     {
@@ -506,7 +511,7 @@ class InstallSchema implements InstallSchemaInterface
     }
 
     /**
-     * @param \Magento\Framework\Setup\SchemaSetupInterface $setup
+     * @param SchemaSetupInterface $setup
      * @throws \Zend_Db_Exception
      */
     public function packetTable(SchemaSetupInterface &$setup): void
@@ -555,17 +560,93 @@ class InstallSchema implements InstallSchemaInterface
     }
 
     /**
-     * @param \Magento\Framework\DB\Ddl\Table $table
+     * @param SchemaSetupInterface $setup
+     * @throws Zend_Db_Exception
+     */
+    public function boxTable(SchemaSetupInterface &$setup): void
+    {
+        $table = $setup->getConnection()->newTable(
+            $setup->getTable(Box::TABLE_NAME)
+        );
+
+        $this->columns(
+            $table,
+            [
+                'id' => [
+                    'type' => Table::TYPE_INTEGER,
+                    'attr' => [
+                        'identity' => true,
+                        'unsigned' => true,
+                        'nullable' => false,
+                        'primary' => true,
+                    ],
+                ],
+                Box::NAME => [
+                    'type' => Table::TYPE_TEXT,
+                    'attr' => [
+                        'nullable' => false,
+                        'length' => '255',
+                        'after' => 'id',
+                        'comment' => 'Box dimension class name',
+                    ]
+                ],
+                Box::DEPTH => [
+                    'type' => Table::TYPE_DECIMAL,
+                    'attr' => [
+                        'nullable' => false,
+                        'length' => '12,1',
+                        'after' => Box::NAME,
+                        'comment' => 'Box depth in centimeters',
+                    ],
+                ],
+                Box::WIDTH => [
+                    'type' => Table::TYPE_DECIMAL,
+                    'attr' => [
+                        'nullable' => false,
+                        'length' => '12,1',
+                        'after' => Box::DEPTH,
+                        'comment' => 'Box width in centimeters',
+                    ],
+                ],
+                Box::HEIGHT => [
+                    'type' => Table::TYPE_DECIMAL,
+                    'attr' => [
+                        'nullable' => false,
+                        'length' => '12,1',
+                        'comment' => 'Box height in centimeters',
+                    ],
+                ],
+            ]
+        );
+
+        $table->addIndex(
+            $setup->getIdxName(
+                Box::TABLE_NAME,
+                [Box::NAME],
+                AdapterInterface::INDEX_TYPE_FULLTEXT
+            ),
+            [Box::NAME],
+            ['type' => AdapterInterface::INDEX_TYPE_FULLTEXT]
+        );
+
+        $table->setComment('Packeta predefined box dimensions');
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param Table $table
      * @param $schema
-     * @throws \Zend_Db_Exception
+     * @throws Zend_Db_Exception
      */
     private function columns(Table &$table, $schema): void
     {
         foreach ($schema as $name => $column) {
-            $column['attr'] = (isset($column['attr']) ? $column['attr'] : []);
-            $column['attr']['comment'] = (isset($column['attr']['comment']) ? $column['attr']['comment'] : null);
-            $column['attr']['length'] = (isset($column['attr']['length']) ? $column['attr']['length'] : null);
-            $column['size'] = (isset($column['size']) ? $column['size'] : null);
+            $column['attr'] = ($column['attr'] ?? []);
+            $column['attr']['comment'] = ($column['attr']['comment'] ?? null);
+            $column['attr']['length'] = ($column['attr']['length'] ?? null);
+            $column['size'] = ($column['size'] ?? null);
+
             $table->addColumn(
                 $name,
                 $column['type'],
