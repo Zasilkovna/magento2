@@ -31,41 +31,44 @@ class SoapApiClient
     }
 
     /**
-     * @throws \Packetery\Checkout\Model\Api\PacketLabelException
+     * @param \Packetery\Checkout\Model\Api\Request\PacketsLabelsPdfRequest $request
      */
     public function packetsLabelsPdf(
-        string $apiPassword,
-        array $packetIds,
-        string $format,
-        int $offset
-    ): string {
+        \Packetery\Checkout\Model\Api\Request\PacketsLabelsPdfRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\PacketsLabelsPdfResult {
+        $apiPassword = $request->getApiPassword();
+        $packetIds = $request->getPacketIds();
+        $format = $request->getFormat();
+        $offset = $request->getOffset();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\PacketsLabelsPdfResult();
         try {
             $client = $this->createSoapClient();
             $pdfContents = $client->packetsLabelsPdf($apiPassword, $packetIds, $format, $offset);
+            $response->setPdfContents(is_string($pdfContents) ? $pdfContents : null);
         } catch (\SoapFault $e) {
-            throw new PacketLabelException($e->getMessage(), $this->getLabelSoapDetailErrors($e), $e);
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString($e->getMessage());
+            if ($response->getFault() === 'PacketIdsFault') {
+                $response->setInvalidPacketIds($this->getInvalidPacketIdsSoapDetailErrors($e));
+            }
         }
 
-        if (!is_string($pdfContents)) {
-            throw new PacketLabelException('API did not return PDF data.', []);
-        }
-
-        return $pdfContents;
+        return $response;
     }
 
     /**
-     * @param array<int, array{packetId: string, courierNumber: string}> $packetIdsWithCourierNumbers
-     */
-    /**
-     * @param array<int, array{packetId: string, courierNumber: string}> $packetIdsWithCourierNumbers
-     * @throws \Packetery\Checkout\Model\Api\PacketLabelException
+     * @param \Packetery\Checkout\Model\Api\Request\PacketsCourierLabelsPdfRequest $request
      */
     public function packetsCourierLabelsPdf(
-        string $apiPassword,
-        array $packetIdsWithCourierNumbers,
-        int $offset,
-        string $format
-    ): string {
+        \Packetery\Checkout\Model\Api\Request\PacketsCourierLabelsPdfRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\PacketsCourierLabelsPdfResult {
+        $apiPassword = $request->getApiPassword();
+        $packetIdsWithCourierNumbers = $request->getPacketIdsWithCourierNumbers();
+        $offset = $request->getOffset();
+        $format = $request->getFormat();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\PacketsCourierLabelsPdfResult();
         $soapPairs = [];
         foreach ($packetIdsWithCourierNumbers as $pair) {
             $item = new \stdClass();
@@ -77,34 +80,43 @@ class SoapApiClient
         try {
             $client = $this->createSoapClient();
             $pdfContents = $client->packetsCourierLabelsPdf($apiPassword, $soapPairs, $offset, $format);
+            $response->setPdfContents(is_string($pdfContents) ? $pdfContents : null);
         } catch (\SoapFault $e) {
-            throw new PacketLabelException($e->getMessage(), $this->getLabelSoapDetailErrors($e), $e);
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString($e->getMessage());
+            if ($response->getFault() === 'InvalidCourierNumberFault' && count($packetIdsWithCourierNumbers) === 1) {
+                $response->setInvalidCourierNumbers(array_column($packetIdsWithCourierNumbers, 'courierNumber'));
+            }
+            if ($response->getFault() === 'PacketIdFault' && count($packetIdsWithCourierNumbers) === 1) {
+                $response->setInvalidPacketIds(array_column($packetIdsWithCourierNumbers, 'packetId'));
+            }
         }
 
-        if (!is_string($pdfContents)) {
-            throw new PacketLabelException('API did not return PDF data.', []);
-        }
-
-        return $pdfContents;
+        return $response;
     }
 
     /**
-     * @throws \Packetery\Checkout\Model\Api\PacketLabelException
+     * @param \Packetery\Checkout\Model\Api\Request\PacketCourierNumberRequest $request
      */
-    public function packetCourierNumber(string $apiPassword, string $packetId): string
-    {
+    public function packetCourierNumber(
+        \Packetery\Checkout\Model\Api\Request\PacketCourierNumberRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\PacketCourierNumberResult {
+        $apiPassword = $request->getApiPassword();
+        $packetId = $request->getPacketId();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\PacketCourierNumberResult();
         try {
             $client = $this->createSoapClient();
             $number = $client->packetCourierNumber($apiPassword, $packetId);
+            $response->setCourierNumber(
+                (is_string($number) || is_numeric($number)) ? (string) $number : null
+            );
         } catch (\SoapFault $e) {
-            throw new PacketLabelException($e->getMessage(), $this->getLabelSoapDetailErrors($e), $e);
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString($e->getMessage());
         }
 
-        if (!is_string($number) && !is_numeric($number)) {
-            throw new PacketLabelException('API did not return courier number.', []);
-        }
-
-        return (string) $number;
+        return $response;
     }
 
     /**
@@ -152,7 +164,7 @@ class SoapApiClient
     /**
      * @return string[]
      */
-    private function getLabelSoapDetailErrors(\SoapFault $e): array
+    private function getInvalidPacketIdsSoapDetailErrors(\SoapFault $e): array
     {
         $errors = [];
         if (isset($e->detail->PacketIdsFault->ids->packetId)) {
@@ -166,5 +178,19 @@ class SoapApiClient
         }
 
         return $errors;
+    }
+
+    private function getFaultIdentifier(\SoapFault $e): string
+    {
+        if (!isset($e->detail)) {
+            return '';
+        }
+
+        $fields = array_keys(get_object_vars($e->detail));
+        if ($fields === []) {
+            return '';
+        }
+
+        return (string) $fields[0];
     }
 }

@@ -94,7 +94,20 @@ class PacketLabelPrinter
             );
         }
 
-        $pdfContents = $this->soapApiClient->packetsLabelsPdf($apiPassword, [$packetId], $format, $offset);
+        $labelsRequest = new \Packetery\Checkout\Model\Api\Request\PacketsLabelsPdfRequest(
+            $apiPassword,
+            [$packetId],
+            $format,
+            $offset
+        );
+        $labelsResult = $this->soapApiClient->packetsLabelsPdf($labelsRequest);
+        $pdfContents = $labelsResult->getPdfContents();
+        if ($pdfContents === null) {
+            throw new \Packetery\Checkout\Model\Api\PacketLabelException(
+                $labelsResult->getFaultString(),
+                []
+            );
+        }
         $this->persistSuccessfulPrint($packet);
 
         return $pdfContents;
@@ -113,35 +126,36 @@ class PacketLabelPrinter
         $pairs = $this->resolveCourierPairs($apiPassword, $packet, $packetId);
 
         if ($pairs !== []) {
-            try {
-                $pdfContents = $this->soapApiClient->packetsCourierLabelsPdf(
-                    $apiPassword,
-                    $pairs,
-                    $offset,
-                    $labelFormat
-                );
+            $carrierLabelsRequest = new \Packetery\Checkout\Model\Api\Request\PacketsCourierLabelsPdfRequest(
+                $apiPassword,
+                $pairs,
+                $offset,
+                $labelFormat
+            );
+            $carrierLabelsResult = $this->soapApiClient->packetsCourierLabelsPdf($carrierLabelsRequest);
+            $carrierPdfContents = $carrierLabelsResult->getPdfContents();
+            if ($carrierPdfContents !== null) {
                 $this->persistSuccessfulPrint($packet);
 
-                return $pdfContents;
-            } catch (\Packetery\Checkout\Model\Api\PacketLabelException) {
-                $pdfContents = $this->soapApiClient->packetsLabelsPdf(
-                    $apiPassword,
-                    [$packetId],
-                    $labelFormat,
-                    $offset
-                );
-                $this->persistSuccessfulPrint($packet);
-
-                return $pdfContents;
+                return $carrierPdfContents;
             }
         }
 
-        $pdfContents = $this->soapApiClient->packetsLabelsPdf(
+        $packetaLabelsRequest = new \Packetery\Checkout\Model\Api\Request\PacketsLabelsPdfRequest(
             $apiPassword,
             [$packetId],
             $labelFormat,
             $offset
         );
+        $packetaLabelsResult = $this->soapApiClient->packetsLabelsPdf($packetaLabelsRequest);
+        $pdfContents = $packetaLabelsResult->getPdfContents();
+        if ($pdfContents === null) {
+            throw new \Packetery\Checkout\Model\Api\PacketLabelException(
+                $packetaLabelsResult->getFaultString(),
+                []
+            );
+        }
+
         $this->persistSuccessfulPrint($packet);
 
         return $pdfContents;
@@ -165,9 +179,13 @@ class PacketLabelPrinter
             ];
         }
 
-        try {
-            $number = $this->soapApiClient->packetCourierNumber($apiPassword, $packetId);
-        } catch (\Packetery\Checkout\Model\Api\PacketLabelException) {
+        $courierNumberRequest = new \Packetery\Checkout\Model\Api\Request\PacketCourierNumberRequest(
+            $apiPassword,
+            $packetId
+        );
+        $courierNumberResult = $this->soapApiClient->packetCourierNumber($courierNumberRequest);
+        $number = $courierNumberResult->getCourierNumber();
+        if ($number === null || $number === '') {
             return [];
         }
 
