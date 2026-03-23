@@ -5,6 +5,7 @@
                 <item name="packetery_checkout_order_listing_data_source" xsi:type="string">OrderGridCollection</item>
                 <item name="packetery_checkout_pricingrule_items_data_source" xsi:type="string">PricingruleGridCollection</item>
                 <item name="packetery_checkout_carrierCountry_listing_data_source" xsi:type="string">CarrierCountryGridCollection</item>
+                <item name="packetery_box_listing_data_source" xsi:type="string">BoxGridCollection</item>
             </argument>
         </arguments>
     </type>
@@ -27,6 +28,13 @@
         <arguments>
             <argument name="mainTable" xsi:type="string">packetery_carrier</argument>
             <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Carrier</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="BoxGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">packetery_box</argument>
+            <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Box</argument>
         </arguments>
     </virtualType>
 

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">packetery_box_listing.packetery_box_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/detail"/>
+                <class>primary</class>
+                <label translate="true">Add Box</label>
+            </button>
+        </buttons>
+        <spinner>packetery_box_columns</spinner>
+        <deps>
+            <dep>packetery_box_listing.packetery_box_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="packetery_box_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Packetery_Checkout::box</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="packetery_box_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="packetery_box_columns">
+        <column name="name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="depth">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Depth [cm]</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="width">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Width [cm]</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="height">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Height [cm]</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="\Packetery\Checkout\Ui\Component\Box\Listing\Column\Actions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">id</item>
+                </item>
+            </argument>
+            <argument name="viewUrl" xsi:type="string">packetery/box/detail</argument>
+            <argument name="delete" xsi:type="string">packetery/box/delete</argument>
+        </actionsColumn>
+    </columns>
+</listing>
