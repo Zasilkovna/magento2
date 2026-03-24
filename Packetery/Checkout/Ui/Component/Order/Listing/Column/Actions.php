@@ -124,17 +124,19 @@ class Actions extends Column
                         'packetery/packet/printlabel',
                         ['order_id' => $item['id'], 'offset' => 0]
                     );
+                    $target = '_blank';
                 } else {
                     $printHref = $this->_urlBuilder->getUrl(
                         'packetery/packet/printlabelform',
-                        ['order_id' => $item['id']]
+                        ['order_id' => $item['id'], 'modal' => 1]
                     );
+                    $target = '_self';
                 }
 
                 $item[$name]['printLabel'] = [
                     'href' => $printHref,
                     'label' => __('Print label'),
-                    'target' => '_blank',
+                    'target' => $target,
                 ];
             }
         }
