@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Packetery\Checkout\Block\Adminhtml\Packet\PrintLabel;
+
 class Form extends \Magento\Backend\Block\Template
 {
     /** @var \Magento\Framework\Data\Form\FormKey */
@@ -17,7 +18,7 @@ class Form extends \Magento\Backend\Block\Template
     /** @var \Magento\Sales\Model\OrderFactory */
     private $magentoOrderFactory;
 
-    /** @var \Magento\Shipping\Model\CarrierFactory */
+    /** @var \Packetery\Checkout\Model\Carrier\CarrierFactory */
     private $carrierFactory;
 
     public function __construct(
@@ -26,7 +27,7 @@ class Form extends \Magento\Backend\Block\Template
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $packeteryOrderCollectionFactory,
         \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
         \Magento\Sales\Model\OrderFactory $magentoOrderFactory,
-        \Magento\Shipping\Model\CarrierFactory $carrierFactory,
+        \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory,
         array $data = []
     ) {
         parent::__construct($context, $data);

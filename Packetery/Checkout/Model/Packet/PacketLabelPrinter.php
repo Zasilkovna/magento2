@@ -9,7 +9,7 @@ class PacketLabelPrinter
     /** @var \Packetery\Checkout\Model\Api\SoapApiClient */
     private $soapApiClient;
 
-    /** @var \Magento\Shipping\Model\CarrierFactory */
+    /** @var \Packetery\Checkout\Model\Carrier\CarrierFactory */
     private $carrierFactory;
 
     /** @var \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory */
@@ -20,7 +20,7 @@ class PacketLabelPrinter
 
     public function __construct(
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
-        \Magento\Shipping\Model\CarrierFactory $carrierFactory,
+        \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory,
         \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
         \Packetery\Checkout\Model\ResourceModel\Packet $packetResource
     ) {

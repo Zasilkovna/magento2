@@ -19,7 +19,7 @@ class PrintLabelForm extends \Magento\Backend\App\Action
     /** @var \Magento\Sales\Model\OrderFactory */
     private $magentoOrderFactory;
 
-    /** @var \Magento\Shipping\Model\CarrierFactory */
+    /** @var \Packetery\Checkout\Model\Carrier\CarrierFactory */
     private $carrierFactory;
 
     public function __construct(
@@ -27,7 +27,7 @@ class PrintLabelForm extends \Magento\Backend\App\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $packeteryOrderCollectionFactory,
         \Magento\Sales\Model\OrderFactory $magentoOrderFactory,
-        \Magento\Shipping\Model\CarrierFactory $carrierFactory
+        \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
