@@ -44,7 +44,7 @@ class PacketLabelPrinter
         $packeteryCarrierCode = \Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic();
         $packeteryCarrier = $this->carrierFactory->create($packeteryCarrierCode, $storeId);
         if (!$packeteryCarrier instanceof \Magento\Shipping\Model\Carrier\AbstractCarrier) {
-            throw new PacketLabelLocalizedException(__('API password is not configured.'));
+            throw new PacketLabelLocalizedException(__('Label carrier is not configured.'));
         }
 
         $apiPassword = (string) ($packeteryCarrier->getPacketeryConfig()->getApiPassword() ?? '');

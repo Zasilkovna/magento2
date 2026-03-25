@@ -44,7 +44,7 @@ class PrintLabelForm extends \Magento\Backend\App\Action
         $orderId = (int) $this->getRequest()->getParam('order_id');
         $resultRedirect = $this->resultRedirectFactory->create()->setPath('packetery/order/index');
         if ($orderId <= 0) {
-            $this->messageManager->addErrorMessage(__('Page not found'));
+            $this->messageManager->addErrorMessage(__('Order not found'));
             return $resultRedirect;
         }
 
@@ -52,7 +52,7 @@ class PrintLabelForm extends \Magento\Backend\App\Action
         $collection->addFieldToFilter('id', $orderId);
         $packeteryOrder = $collection->getFirstItem();
         if (!$packeteryOrder->getId()) {
-            $this->messageManager->addErrorMessage(__('Page not found'));
+            $this->messageManager->addErrorMessage(__('Order not found'));
             return $resultRedirect;
         }
 

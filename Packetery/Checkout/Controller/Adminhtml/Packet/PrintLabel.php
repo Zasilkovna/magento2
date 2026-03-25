@@ -53,7 +53,7 @@ class PrintLabel extends Action
         $resultRedirect = $this->resultRedirectFactory->create()->setPath('packetery/order/index');
         $orderId = (int) $this->getRequest()->getParam('order_id');
         if ($orderId <= 0) {
-            $this->messageManager->addErrorMessage(__('Page not found'));
+            $this->messageManager->addErrorMessage(__('Order not found'));
             return $resultRedirect;
         }
 
@@ -61,7 +61,7 @@ class PrintLabel extends Action
         $collection->addFieldToFilter('id', $orderId);
         $packeteryOrder = $collection->getFirstItem();
         if (!$packeteryOrder->getId()) {
-            $this->messageManager->addErrorMessage(__('Page not found'));
+            $this->messageManager->addErrorMessage(__('Order not found'));
             return $resultRedirect;
         }
 
