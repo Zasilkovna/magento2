@@ -30,6 +30,25 @@ class SoapApiClient
         return new \Packetery\Checkout\Model\Api\Result\CreatePacketResult((string) $result->id);
     }
 
+    public function cancelPacket(
+        \Packetery\Checkout\Model\Api\Request\CancelPacketRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\CancelPacketResult
+    {
+        $apiPassword = $request->getApiPassword();
+        $packetId = $request->getPacketId();
+        $response = new \Packetery\Checkout\Model\Api\Result\CancelPacketResult();
+
+        try {
+            $client = $this->createSoapClient();
+            $client->cancelPacket($apiPassword, $packetId);
+        } catch (\SoapFault $e) {
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString((string) $e->faultstring);
+        }
+
+        return $response;
+    }
+
     /**
      * @param \Packetery\Checkout\Model\Api\Request\PacketsLabelsPdfRequest $request
      */
