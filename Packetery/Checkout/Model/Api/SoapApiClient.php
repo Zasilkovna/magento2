@@ -16,20 +16,7 @@ class SoapApiClient
         \Packetery\Checkout\Model\Packet\PacketAttributes $packetAttributes
     ): \Packetery\Checkout\Model\Api\Result\CreatePacketResult {
         try {
-            $client = new \SoapClient(
-                self::WSDL_URL,
-                [
-                    'exceptions' => true,
-                    'connection_timeout' => 10,
-                    'stream_context' => stream_context_create(
-                        [
-                            'http' => [
-                                'timeout' => 10,
-                            ],
-                        ]
-                    ),
-                ]
-            );
+            $client = $this->createSoapClient();
             $result = $client->createPacket($apiPassword, $packetAttributes->toArray());
         } catch (\SoapFault $e) {
             $errors = $this->getValidationErrors($e);
@@ -43,9 +30,46 @@ class SoapApiClient
         return new \Packetery\Checkout\Model\Api\Result\CreatePacketResult((string) $result->id);
     }
 
+    public function cancelPacket(
+        \Packetery\Checkout\Model\Api\Request\CancelPacketRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\CancelPacketResult
+    {
+        $apiPassword = $request->getApiPassword();
+        $packetId = $request->getPacketId();
+        $response = new \Packetery\Checkout\Model\Api\Result\CancelPacketResult();
+
+        try {
+            $client = $this->createSoapClient();
+            $client->cancelPacket($apiPassword, $packetId);
+        } catch (\SoapFault $e) {
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString((string) $e->faultstring);
+        }
+
+        return $response;
+    }
+
     /**
-     * @return string[]
+     * @throws \SoapFault
      */
+    protected function createSoapClient(): \SoapClient
+    {
+        return new \SoapClient(
+            self::WSDL_URL,
+            [
+                'exceptions' => true,
+                'connection_timeout' => 10,
+                'stream_context' => stream_context_create(
+                    [
+                        'http' => [
+                            'timeout' => 10,
+                        ],
+                    ]
+                ),
+            ]
+        );
+    }
+
     private function getValidationErrors(\SoapFault $e): array
     {
         $errors = [];
@@ -62,5 +86,14 @@ class SoapApiClient
             }
         }
         return $errors;
+    }
+
+    private function getFaultIdentifier(\SoapFault $exception): string
+    {
+        if (isset($exception->detail)) {
+            return (string) array_keys(get_object_vars($exception->detail))[0];
+        }
+
+        return (string) $exception->faultstring;
     }
 }

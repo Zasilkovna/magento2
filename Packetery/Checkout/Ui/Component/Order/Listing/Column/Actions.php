@@ -61,6 +61,7 @@ class Actions extends Column
                 $orderNumber =  $item['order_number'];
                 $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
                 $shippingMethod = $order->getShippingMethod(true);
+                $packetNumber = isset($item['packet_number']) ? trim((string) $item['packet_number']) : '';
 
                 $item[$name]['orderDetail'] = [
                     'href'  => $this->_urlBuilder->getUrl('sales/order/view', ['order_id' => $order->getId()]),
@@ -72,14 +73,31 @@ class Actions extends Column
                         'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['id' => $item['id']]),
                         'label' => __('Edit')
                     ];
-                    $item[$name]['submit'] = [
-                        'href' => $this->_urlBuilder->getUrl('packetery/packet/submit', ['order_id' => $item['id']]),
-                        'label' => __('Submit to Packeta'),
-                        'confirm' => [
-                            'title' => __('Submit to Packeta'),
-                            'message' => __('Do you really want to submit this packet to Packeta?'),
-                        ],
-                    ];
+                    if ($packetNumber === '') {
+                        $item[$name]['submit'] = [
+                            'href' => $this->_urlBuilder->getUrl('packetery/packet/submit', ['order_id' => $item['id']]),
+                            'label' => __('Submit to Packeta'),
+                            'confirm' => [
+                                'title' => __('Submit to Packeta'),
+                                'message' => __('Do you really want to submit this packet to Packeta?'),
+                            ],
+                        ];
+                    }
+
+                    if ($packetNumber !== '') {
+                        $trackingNumber = 'Z' . $packetNumber;
+                        $item[$name]['cancel'] = [
+                            'href' => $this->_urlBuilder->getUrl('packetery/packet/cancel', [
+                                'order_id' => $item['id'],
+                                'packet_number' => $packetNumber,
+                            ]),
+                            'label' => __('Cancel packet'),
+                            'confirm' => [
+                                'title' => __('Cancel packet'),
+                                'message' => __('Do you really want to cancel the packet %1 for order %2 ?', $trackingNumber, $orderNumber),
+                            ],
+                        ];
+                    }
                 }
             }
         }
