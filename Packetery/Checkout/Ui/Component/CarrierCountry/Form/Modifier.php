@@ -34,6 +34,12 @@ class Modifier implements ModifierInterface
     /** @var ScopeConfigInterface */
     private $scopeConfig;
 
+    /** @var \Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory */
+    private $carrierCollectionFactory;
+
+    /** @var Carrier\Imp\Packetery\Carrier */
+    private $packeteryCarrier;
+
     /**
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Packetery\Checkout\Model\Pricing\Service $pricingService

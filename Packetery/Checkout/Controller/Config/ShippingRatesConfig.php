@@ -159,6 +159,9 @@ class ShippingRatesConfig implements HttpPostActionInterface
         $shippingRates = $postData['rates'];
 
         foreach ($shippingRates as $shippingRate) {
+            if (!$this->validateShippingRate($shippingRate)) {
+                continue;
+            }
             $ratesConfig[$shippingRate['rateCode']] = $this->getRateConfig($shippingRate['countryId'], $shippingRate['carrierCode'], $shippingRate['methodCode']);
         }
 
@@ -169,5 +172,12 @@ class ShippingRatesConfig implements HttpPostActionInterface
         ];
 
         return $this->resultJsonFactory->create()->setData($response);
+    }
+
+    private function validateShippingRate(array $shippingRate): bool
+    {
+        return !empty($shippingRate['countryId']) &&
+            !empty($shippingRate['carrierCode']) &&
+            !empty($shippingRate['methodCode']);
     }
 }
