@@ -4,8 +4,21 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Weight;
 
+use Magento\Quote\Model\Quote;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\RequestInterface;
+use Packetery\Checkout\Model\OrderFactory;
+use Packetery\Checkout\Model\ResourceModel\Order as OrderResource;
+
 class Calculator
 {
+    public function __construct(
+        private readonly CheckoutSession $checkoutSession,
+        private readonly RequestInterface $request,
+        private readonly OrderFactory $orderFactory,
+        private readonly OrderResource $orderResource
+    ) {}
+
     /**
      * Returns total weight of ordered items.
      *
@@ -74,7 +87,27 @@ class Calculator
         foreach ($productWeights as $itemWeight) {
             $totalWeight += (float)$itemWeight;
         }
-
         return $totalWeight;
+    }
+
+    public function resolveWeight(): ?float
+    {
+        $packeteryOrderId = (int)$this->request->getParam('id');
+        if (!$packeteryOrderId) {
+            $quote = $this->checkoutSession->getQuote();
+            if ($quote && $quote->getId()) {
+                return $this->getQuoteWeight($quote);
+            }
+        }
+
+        $packeteryOrder = $this->orderFactory->create();
+        $this->orderResource->load($packeteryOrder, $packeteryOrderId);
+
+        return (float)$packeteryOrder->getWeight();
+    }
+
+    public function getQuoteWeight(Quote $quote): float
+    {
+        return $this->getItemsWeight(Item::transformItems($quote->getAllVisibleItems()));
     }
 }

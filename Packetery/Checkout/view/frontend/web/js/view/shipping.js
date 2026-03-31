@@ -53,7 +53,7 @@ define(
             shippingRatesConfig: ko.observable(null),
             errorValidationMessage: ko.observable(''),
             stepNavigatorReady: ko.observable(false),
-
+            weight: 0.0,
             initialize: function() {
                 this._super();
 
@@ -180,6 +180,9 @@ define(
                     defaultCurrency: config.currentStoreCurrencyCode,
                     vendors: rateConfig.widgetVendors
                 };
+                if (mixin.weight > 0.0) {
+                    options.weight = mixin.weight;
+                }
 
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
             },
@@ -199,6 +202,9 @@ define(
                     carrierId: shippingRateConfig.directionId,
                 };
 
+                if (mixin.weight > 0.0) {
+                    options.weight = mixin.weight;
+                }
                 if (destinationAddress.houseNumber) {
                     options.houseNumber = destinationAddress.houseNumber;
                 }
@@ -364,6 +370,10 @@ define(
                 function(response) {
                     if(response.success) {
                         config = JSON.parse(response.value);
+                        if (config && config.packetaOptions) {
+                            mixin.weight = config?.packetaOptions?.weight || 0.0;
+                        }
+
                         onSuccess(config);
                     }
                 }
