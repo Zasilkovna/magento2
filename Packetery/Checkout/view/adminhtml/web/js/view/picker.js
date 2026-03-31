@@ -61,8 +61,14 @@ define([
             return window.packetery.packetaSymbolUrl;
         },
 
-        initialize: function() {
+        getWeight: function() {
+            var provider = uiRegistry.get('index = general');
+            var weight = provider?.source?.data?.general?.weight;
 
+            return (weight !== undefined && weight !== null && weight !== '') ? parseFloat(weight) : null;
+        },
+
+        initialize: function() {
             var fieldset = uiRegistry.get('index = general');
             uiRegistry.get('inputName = general[address_validated]', function(item) {
                 if (item.value() === '1') {
@@ -94,6 +100,11 @@ define([
                 language: config.packetaOptions.language,
                 vendors: widgetVendors
             };
+
+            var weight = this.getWeight();
+            if (weight > 0) {
+                options.weight = weight;
+            }
 
             var pickupPointSelected = function(point) {
                 if(!point) {
@@ -139,6 +150,11 @@ define([
                 postcode: destinationAddress.postcode,
                 carrierId: pointId,
             };
+
+            var weight = this.getWeight();
+            if (weight > 0) {
+                options.weight = weight;
+            }
 
             if (destinationAddress.houseNumber) {
                 options.houseNumber = destinationAddress.houseNumber;

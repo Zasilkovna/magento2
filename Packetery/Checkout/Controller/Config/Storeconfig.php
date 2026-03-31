@@ -3,6 +3,8 @@
 namespace Packetery\Checkout\Controller\Config;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Packetery\Checkout\Model\Weight\Calculator;
+use Packetery\Checkout\Model\Weight\Converter;
 
 class Storeconfig implements HttpGetActionInterface
 {
@@ -38,7 +40,9 @@ class Storeconfig implements HttpGetActionInterface
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Packetery\Checkout\Helper\Data $helperData,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery,
+        private readonly Calculator $weightCalculator,
+        private readonly Converter $weightConverter
     ) {
         $this->messageManager = $context->getMessageManager();
         $this->resultJsonFactory = $resultJsonFactory;
@@ -55,14 +59,22 @@ class Storeconfig implements HttpGetActionInterface
     public function execute()
     {
         try {
-            $config = [];
-            $config['apiKey'] = $this->packeteryConfig->getApiKey();
-            $config['packetaOptions'] = [
-                'webUrl' => $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK),
-                'appIdentity' => $this->helperData->getPacketeryAppIdentity(),
-                'language' => $this->helperData->getShortLocale(),
+            $store = $this->storeManager->getStore();
+            $weight = $this->weightCalculator->resolveWeight();
+            $weightInKg = ($weight !== null && $weight > 0.0)
+                ? $this->weightConverter->convertToKg($weight, (int)$store->getId())
+                : null;
+
+            $config = [
+                'apiKey' => $this->packeteryConfig->getApiKey(),
+                'packetaOptions' => [
+                    'webUrl' => $store->getBaseUrl(),
+                    'appIdentity' => $this->helperData->getPacketeryAppIdentity(),
+                    'language' => $this->helperData->getShortLocale(),
+                    'weight' => $weightInKg,
+                ],
+                'currentStoreCurrencyCode' => $store->getCurrentCurrencyCode(),
             ];
-            $config['currentStoreCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
 
             $response = [
                 'success' => true,
@@ -79,5 +91,4 @@ class Storeconfig implements HttpGetActionInterface
 
         return $this->resultJsonFactory->create()->setData($response);
     }
-
 }
