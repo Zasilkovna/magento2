@@ -1,4 +1,5 @@
-2.5.0 - Added: Box dimensions datagrid with possibility add, edit, delete name, depth, width and height of boxes
+2.5.0 - Added: Log Packeta widget parameters to the developers console
+      - Added: Box dimensions datagrid with possibility add, edit, delete name, depth, width and height of boxes
       - Updated: Add sorting for countries names and codes to Packeta Pricing list, default view is with countries including Packeta points
       - Added: packet submission to Packeta API from order list
 
