@@ -10,7 +10,8 @@ define(
         'mage/url',
         'Magento_Checkout/js/model/shipping-rates-validation-rules',
         '../model/shipping-rates-validation-rules',
-        'ko'
+        'ko',
+        'packeteryStringifyOptions',
     ], function(
         quote,
         shippingService,
@@ -22,7 +23,8 @@ define(
         url,
         defaultShippingRatesValidationRules,
         shippingRatesValidationRules,
-        ko
+        ko,
+        packeteryStringifyOptions
     ) {
         'use strict';
 
@@ -181,6 +183,7 @@ define(
                     vendors: rateConfig.widgetVendors
                 };
 
+                console.log('Address widget options: apiKey: ' + packetaApiKey + ', ' + packeteryStringifyOptions(options));
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
             },
 
@@ -203,6 +206,7 @@ define(
                     options.houseNumber = destinationAddress.houseNumber;
                 }
 
+                console.log('Address widget options: apiKey: ' + packetaApiKey + ', ' + packeteryStringifyOptions(options));
                 Packeta.Widget.pick(packetaApiKey, showSelectedAddress, options);
             },
 

@@ -7,6 +7,7 @@ define([
     'mage/storage',
     'mage/url',
     'jquery',
+    'packeteryStringifyOptions',
 ], function(
     _,
     uiRegistry,
@@ -15,7 +16,8 @@ define([
     $t,
     storage,
     frontUrlBuilder,
-    jQuery
+    jQuery,
+    packeteryStringifyOptions
 ) {
     'use strict';
 
@@ -111,6 +113,7 @@ define([
                 uiRegistry.get('inputName = general[carrier_pickup_point]').value(carrierPickupPointId);
             };
 
+            console.log('Address widget options: apiKey: ' + packetaApiKey + ', ' + packeteryStringifyOptions(options));
             Packeta.Widget.pick(packetaApiKey, pickupPointSelected, options);
         },
 
@@ -180,6 +183,7 @@ define([
                 );
             };
 
+            console.log('Address widget options: apiKey: ' + packetaApiKey + ', ' + packeteryStringifyOptions(options));
             Packeta.Widget.pick(packetaApiKey, addressSelected, options);
         }
     };
