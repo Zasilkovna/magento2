@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic;
 
 use Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier;
+use Packetery\Checkout\Model\Label\LabelFormats;
 
 /**
  * PacketaDynamic aggregates feed carriers. Each pricing request requires single carrier.
@@ -53,5 +54,10 @@ class DynamicConfig extends \Packetery\Checkout\Model\Carrier\Config\AbstractDyn
      */
     public function getConfig(): \Packetery\Checkout\Model\Carrier\Config\AbstractConfig {
         return $this->config;
+    }
+
+    protected function normalizeLabelFormatValue(string $value): string
+    {
+        return LabelFormats::normalizeCarrierFormat($value);
     }
 }

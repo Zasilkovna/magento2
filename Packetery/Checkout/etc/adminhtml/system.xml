@@ -40,6 +40,10 @@
                     <validate>required-entry</validate>
                     <backend_model>Packetery\Checkout\Block\System\Config\Form\SenderValidate</backend_model>
                 </field>
+                <field id="label_format" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="44" translate="label" type="select">
+                    <label>Label Format</label>
+                    <source_model>Packetery\Checkout\Model\Config\Source\LabelFormat</source_model>
+                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>
@@ -75,6 +79,10 @@
                     <label>Allowed Methods</label>
                     <source_model>Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\MethodSelect</source_model>
                     <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="label_format" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="44" translate="label" type="select">
+                    <label>Label Format</label>
+                    <source_model>Packetery\Checkout\Model\Config\Source\CarrierLabelFormat</source_model>
                 </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>

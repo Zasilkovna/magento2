@@ -1,0 +1,34 @@
+<?php
+/** @var \Packetery\Checkout\Block\Adminhtml\Packet\PrintLabel\Form $block */
+?>
+<div class="packetery-print-label-page">
+    <h1 class="page-title"><?= $block->escapeHtml($block->getPageHeading()) ?></h1>
+    <form class="admin__fieldset" method="get" action="<?= $block->escapeUrl($block->getPrintTargetUrl()) ?>">
+        <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKeyValue()) ?>"/>
+        <input name="order_id" type="hidden" value="<?= $block->escapeHtmlAttr((string) $block->getOrderId()) ?>"/>
+        <div class="admin__field field-offset">
+            <label class="admin__field-label" for="packetery_label_offset">
+                <span><?= $block->escapeHtml(__('Skip fields')) ?></span>
+            </label>
+            <div class="admin__field-control">
+                <select id="packetery_label_offset" name="offset" class="admin__control-select">
+                    <?php foreach ($block->getOffsetOptionLabels() as $value => $label) : ?>
+                        <option value="<?= $block->escapeHtmlAttr((string) $value) ?>">
+                            <?= $block->escapeHtml($label) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="admin__field">
+            <div class="admin__field-control">
+                <button type="submit" class="action-primary">
+                    <span><?= $block->escapeHtml(__('Print')) ?></span>
+                </button>
+                <a class="action-secondary packetery-print-label-cancel" href="<?= $block->escapeUrl($block->getBackUrl()) ?>">
+                    <?= $block->escapeHtml(__('Cancel')) ?>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

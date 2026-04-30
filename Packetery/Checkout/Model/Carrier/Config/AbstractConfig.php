@@ -93,4 +93,13 @@ abstract class AbstractConfig
         $value = $this->getConfigData('allowedMethods');
         return (is_string($value) ? explode(',', $value) : []);
     }
+
+    public function getLabelFormat(): string
+    {
+        $value = (string) ($this->getConfigData('label_format') ?? '');
+
+        return $this->normalizeLabelFormatValue($value);
+    }
+
+    abstract protected function normalizeLabelFormatValue(string $value): string;
 }

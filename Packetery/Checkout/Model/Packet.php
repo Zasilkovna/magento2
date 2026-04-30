@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model;
 
+use DateTimeImmutable;
+use DateTimeZone;
+
 class Packet extends \Magento\Framework\Model\AbstractModel
 {
     protected $_eventPrefix = 'packetery_packet';
@@ -65,6 +68,53 @@ class Packet extends \Magento\Framework\Model\AbstractModel
     public function setCod(float $cod): self
     {
         $this->setData('cod', $cod);
+        return $this;
+    }
+
+    public function getCourierNumber(): ?string
+    {
+        $value = $this->getData('courier_number');
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
+    public function setCourierNumber(?string $courierNumber): self
+    {
+        $this->setData('courier_number', $courierNumber);
+        return $this;
+    }
+
+    public function getLabelPrintedAt(): ?DateTimeImmutable
+    {
+        $value = $this->getData('label_printed_at');
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $parsed = DateTimeImmutable::createFromFormat(
+            'Y-m-d H:i:s',
+            trim((string) $value),
+            new DateTimeZone('UTC')
+        );
+        if ($parsed === false) {
+            return null;
+        }
+
+        return $parsed;
+    }
+
+    public function setLabelPrintedAt(?DateTimeImmutable $dateTime): self
+    {
+        if ($dateTime === null) {
+            $this->setData('label_printed_at', null);
+            return $this;
+        }
+
+        $utc = $dateTime->setTimezone(new DateTimeZone('UTC'));
+        $this->setData('label_printed_at', $utc->format('Y-m-d H:i:s'));
         return $this;
     }
 }
