@@ -12,22 +12,17 @@ class PacketLabelPrinter
     /** @var \Packetery\Checkout\Model\Carrier\CarrierFactory */
     private $carrierFactory;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory */
-    private $packetCollectionFactory;
-
-    /** @var \Packetery\Checkout\Model\ResourceModel\Packet */
-    private $packetResource;
+    /** @var \Packetery\Checkout\Model\PacketRepository */
+    private $packetRepository;
 
     public function __construct(
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
         \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory,
-        \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
-        \Packetery\Checkout\Model\ResourceModel\Packet $packetResource
+        \Packetery\Checkout\Model\PacketRepository $packetRepository
     ) {
         $this->soapApiClient = $soapApiClient;
         $this->carrierFactory = $carrierFactory;
-        $this->packetCollectionFactory = $packetCollectionFactory;
-        $this->packetResource = $packetResource;
+        $this->packetRepository = $packetRepository;
     }
 
     /**
@@ -52,7 +47,7 @@ class PacketLabelPrinter
             throw new PacketLabelLocalizedException(__('API password is not configured.'));
         }
 
-        $packet = $this->loadLatestPacket($packeteryOrder->getOrderNumber());
+        $packet = $this->packetRepository->findLatestByOrderNumber($packeteryOrder->getOrderNumber());
         if ($packet === null) {
             throw new PacketLabelLocalizedException(__('No submitted packet was found for this order.'));
         }
@@ -190,7 +185,7 @@ class PacketLabelPrinter
         }
 
         $packet->setCourierNumber($number);
-        $this->packetResource->save($packet);
+        $this->packetRepository->save($packet);
 
         return [
             [
@@ -200,28 +195,9 @@ class PacketLabelPrinter
         ];
     }
 
-    private function loadLatestPacket(string $orderNumber): ?\Packetery\Checkout\Model\Packet
-    {
-        $collection = $this->packetCollectionFactory->create();
-        $collection->addFieldToFilter('order_number', $orderNumber);
-        $collection->setOrder('id', 'DESC');
-        $collection->setPageSize(1);
-        $items = $collection->getItems();
-        if ($items === []) {
-            return null;
-        }
-
-        $first = reset($items);
-        if (!$first instanceof \Packetery\Checkout\Model\Packet) {
-            return null;
-        }
-
-        return $first;
-    }
-
     private function persistSuccessfulPrint(\Packetery\Checkout\Model\Packet $packet): void
     {
         $packet->setLabelPrintedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-        $this->packetResource->save($packet);
+        $this->packetRepository->save($packet);
     }
 }
