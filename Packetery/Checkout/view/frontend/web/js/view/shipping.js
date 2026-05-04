@@ -183,6 +183,10 @@ define(
                     vendors: rateConfig.widgetVendors
                 };
 
+                if (config.packetaOptions.weight !== null) {
+                    options.weight = config.packetaOptions.weight;
+                }
+
                 console.log('Address widget options: apiKey: ' + packetaApiKey + ', ' + packeteryStringifyOptions(options));
                 Packeta.Widget.pick(packetaApiKey, showSelectedPickupPoint, options);
             },
@@ -201,6 +205,10 @@ define(
                     postcode: destinationAddress.postcode,
                     carrierId: shippingRateConfig.directionId,
                 };
+
+                if (config.packetaOptions.weight !== null) {
+                    options.weight = config.packetaOptions.weight;
+                }
 
                 if (destinationAddress.houseNumber) {
                     options.houseNumber = destinationAddress.houseNumber;
@@ -363,7 +371,7 @@ define(
 
         var loadStoreConfig = function(onSuccess) {
             fullScreenLoader.startLoader();
-            var serviceUrl = url.build('packetery/config/storeconfig');
+            var serviceUrl = url.build('packetery/config/storeconfig') + '?packetery_is_checkout=1';
             storage.get(serviceUrl).done(
                 function(response) {
                     if(response.success) {

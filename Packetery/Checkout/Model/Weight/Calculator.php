@@ -77,4 +77,9 @@ class Calculator
 
         return $totalWeight;
     }
+
+    public function getQuoteWeight(\Magento\Quote\Model\Quote $quote): float
+    {
+        return $this->getItemsWeight(Item::transformItems($quote->getAllVisibleItems()));
+    }
 }
