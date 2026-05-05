@@ -183,3 +183,7 @@
 "Loading...","Načítání..."
 "Unable to load print form.","Nepodařilo se načíst formulář pro tisk."
 "Generating...","Generování..."
+"Auto-submit parcel on order status change","Automatické odeslání zásilky při změně stavu objednávky"
+"Payment method to order status mapping","Mapování platební metody na stav objednávky"
+"Payment Method","Platební metoda"
+"Order Status","Stav objednávky"

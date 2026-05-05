@@ -183,3 +183,7 @@
 "Loading...","Loading..."
 "Unable to load print form.","Unable to load print form."
 "Generating...","Generating..."
+"Auto-submit parcel on order status change","Auto-submit parcel on order status change"
+"Payment method to order status mapping","Payment method to order status mapping"
+"Payment Method","Payment Method"
+"Order Status","Order Status"
