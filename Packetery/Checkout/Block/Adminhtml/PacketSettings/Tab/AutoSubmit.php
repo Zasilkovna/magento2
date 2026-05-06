@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Block\Adminhtml\AutoSubmit;
+namespace Packetery\Checkout\Block\Adminhtml\PacketSettings\Tab;
 
-class Form extends \Magento\Backend\Block\Template
+use Magento\Backend\Block\Widget\Tab\TabInterface;
+
+class AutoSubmit extends \Magento\Backend\Block\Template implements TabInterface
 {
-    private const CONFIG_PATH = 'carriers/packetery/auto_submit_status_map';
+    private const MAPPING_PATH = 'carriers/packetery/auto_submit_status_map';
 
     /** @var \Packetery\Checkout\Model\Config\Source\PaymentMethod */
     private $paymentMethodSource;
@@ -29,7 +31,6 @@ class Form extends \Magento\Backend\Block\Template
         array $data = []
     ) {
         parent::__construct($context, $data);
-
         $this->paymentMethodSource = $paymentMethodSource;
         $this->orderConfig = $orderConfig;
         $this->scopeConfig = $scopeConfig;
@@ -39,14 +40,10 @@ class Form extends \Magento\Backend\Block\Template
     /** @return array<int, array{value: string, label: string}> */
     public function getPaymentMethods(): array
     {
-        return array_values(
-            array_filter(
-                $this->paymentMethodSource->toOptionArray(),
-                function ($option) {
-                    return $option['value'] !== '';
-                }
-            )
-        );
+        return array_values(array_filter(
+            $this->paymentMethodSource->toOptionArray(),
+            static fn($o) => $o['value'] !== ''
+        ));
     }
 
     /** @return array<string, string> */
@@ -58,18 +55,16 @@ class Form extends \Magento\Backend\Block\Template
     /** @return array<string, string> payment_method => order_status */
     public function getCurrentMapping(): array
     {
-        $raw = $this->scopeConfig->getValue(self::CONFIG_PATH);
+        $raw = $this->scopeConfig->getValue(self::MAPPING_PATH);
         if (empty($raw)) {
             return [];
         }
-
         $mapping = [];
         foreach (json_decode($raw, true) ?? [] as $row) {
             if (isset($row['payment_method'], $row['order_status'])) {
                 $mapping[$row['payment_method']] = $row['order_status'];
             }
         }
-
         return $mapping;
     }
 
@@ -81,5 +76,25 @@ class Form extends \Magento\Backend\Block\Template
     public function getFormKeyValue(): string
     {
         return $this->formKey->getFormKey();
+    }
+
+    public function getTabLabel(): \Magento\Framework\Phrase
+    {
+        return __('Automatické podání');
+    }
+
+    public function getTabTitle(): \Magento\Framework\Phrase
+    {
+        return __('Automatické podání');
+    }
+
+    public function canShowTab(): bool
+    {
+        return true;
+    }
+
+    public function isHidden(): bool
+    {
+        return false;
     }
 }

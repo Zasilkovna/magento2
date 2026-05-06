@@ -6,6 +6,7 @@ namespace Packetery\Checkout\Controller\Adminhtml\AutoSubmit;
 
 class Save extends \Magento\Backend\App\Action
 {
+    const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
     /** @var \Magento\Framework\App\Config\Storage\WriterInterface */
     private $configWriter;
 
@@ -35,9 +36,9 @@ class Save extends \Magento\Backend\App\Action
         }
 
         $this->configWriter->save('carriers/packetery/auto_submit_status_map', json_encode($rows));
-        $this->cacheTypeList->invalidate(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
+        $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
         $this->messageManager->addSuccessMessage(__('Mapping has been saved.'));
 
-        return $this->resultRedirectFactory->create()->setPath('*/*/index');
+        return $this->resultRedirectFactory->create()->setPath('packetery/packetsettings/index');
     }
 }

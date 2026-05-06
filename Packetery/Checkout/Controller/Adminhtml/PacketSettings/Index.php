@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Packetery\Checkout\Controller\Adminhtml\AutoSubmit;
+namespace Packetery\Checkout\Controller\Adminhtml\PacketSettings;
 
 class Index extends \Magento\Backend\App\Action
 {
+    const ADMIN_RESOURCE = 'Packetery_Checkout::packetery';
+
     /** @var \Magento\Framework\View\Result\PageFactory */
     private $resultPageFactory;
 
@@ -20,8 +22,8 @@ class Index extends \Magento\Backend\App\Action
     public function execute(): \Magento\Framework\View\Result\Page
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('Packetery_Checkout::autoSubmit');
-        $resultPage->getConfig()->getTitle()->prepend(__('Payment method to order status mapping'));
+        $resultPage->setActiveMenu('Packetery_Checkout::packetSettings');
+        $resultPage->getConfig()->getTitle()->prepend(__('Nastavení zásilek'));
 
         return $resultPage;
     }
