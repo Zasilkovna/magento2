@@ -1,0 +1,52 @@
+<?php
+/** @var \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray $block */
+
+$_htmlId = $block->getHtmlId() ?: '_' . uniqid();
+
+$rows = [];
+foreach ($block->getArrayRows() as $_row) {
+    $rows[] = json_decode($_row->toJson(), true);
+}
+
+$config = [
+    'tmplId' => 'tmpl-packetery-mapping-' . $_htmlId,
+    'addRowId' => 'addRow' . $_htmlId,
+    'addBtnId' => 'addToEndBtn' . $_htmlId,
+    'columns' => array_keys($block->getColumns()),
+    'rows' => $rows,
+    'disabled' => (bool) $block->getElement()->getDisabled(),
+];
+?>
+
+<script type="text/x-magento-template" id="tmpl-packetery-mapping-<?= $block->escapeHtmlAttr($_htmlId) ?>">
+<tr id="<%- _id %>">
+    <td class="packetery-mapping-field">
+        <?php foreach ($block->getColumns() as $columnName => $column): ?>
+        <div class="admin__field-control"><?= /* @noEscape */ $block->renderCellTemplate($columnName) ?></div>
+        <?php endforeach; ?>
+    </td>
+    <td class="col-actions">
+        <button class="action-delete" type="button"><span><?= $block->escapeHtml(__('Delete')) ?></span></button>
+    </td>
+</tr>
+</script>
+
+<div class="design_theme_ua_regexp"
+     id="grid<?= $block->escapeHtmlAttr($_htmlId) ?>"
+     data-mage-init='{"Packetery_Checkout/js/view/auto-submit-mapping": <?= $block->escapeHtmlAttr(json_encode($config)) ?>}'>
+    <div class="admin__control-table-wrapper">
+        <table class="admin__control-table" id="<?= $block->escapeHtmlAttr($block->getElement()->getId()) ?>">
+            <tfoot>
+            <tr>
+                <td colspan="2" class="col-actions-add">
+                    <button id="addToEndBtn<?= $block->escapeHtmlAttr($_htmlId) ?>" class="action-add" type="button">
+                        <span><?= $block->escapeHtml($block->getAddButtonLabel()) ?></span>
+                    </button>
+                </td>
+            </tr>
+            </tfoot>
+            <tbody id="addRow<?= $block->escapeHtmlAttr($_htmlId) ?>"></tbody>
+        </table>
+    </div>
+    <input type="hidden" name="<?= $block->escapeHtmlAttr($block->getElement()->getName()) ?>[__empty]" value="" />
+</div>

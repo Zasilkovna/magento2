@@ -48,28 +48,20 @@ class AutoSubmitMapping extends \Magento\Config\Block\System\Config\Form\Field\F
         $row->setData('option_extra_attrs', $options);
     }
 
-    private function getPaymentMethodRenderer(): AutoSubmitMapping\PaymentMethodSelect|\Magento\Framework\View\Element\BlockInterface
     {
-        if ($this->paymentMethodRenderer === null) {
-            $this->paymentMethodRenderer = $this->getLayout()->createBlock(
-                \Packetery\Checkout\Block\System\Config\Form\AutoSubmitMapping\PaymentMethodSelect::class,
-                '',
-                ['data' => ['is_render_to_js_template' => true]]
-            );
-        }
+            \Packetery\Checkout\Block\System\Config\Form\AutoSubmitMapping\PaymentMethodSelect::class,
+            '',
+            ['data' => ['is_render_to_js_template' => true]]
+        );
 
         return $this->paymentMethodRenderer;
     }
 
-    private function getOrderStatusRenderer(): \Magento\Framework\View\Element\BlockInterface|AutoSubmitMapping\OrderStatusSelect
     {
-        if ($this->orderStatusRenderer === null) {
-            $this->orderStatusRenderer = $this->getLayout()->createBlock(
-                \Packetery\Checkout\Block\System\Config\Form\AutoSubmitMapping\OrderStatusSelect::class,
-                '',
-                ['data' => ['is_render_to_js_template' => true]]
-            );
-        }
+            \Packetery\Checkout\Block\System\Config\Form\AutoSubmitMapping\OrderStatusSelect::class,
+            '',
+            ['data' => ['is_render_to_js_template' => true]]
+        );
 
         return $this->orderStatusRenderer;
     }
