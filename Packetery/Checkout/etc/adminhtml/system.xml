@@ -69,14 +69,7 @@
                     <label>Auto-submit parcel on order status change</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="auto_submit_status_map" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="210" translate="label">
-                    <label>Payment method to order status mapping</label>
-                    <frontend_model>Packetery\Checkout\Block\System\Config\Form\AutoSubmitMapping</frontend_model>
-                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
-                    <depends>
-                        <field id="auto_submit_enabled">1</field>
-                    </depends>
-                </field>
+
                 <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="9000" translate="label" type="text">
                     <label>Sort Order</label>
                 </field>

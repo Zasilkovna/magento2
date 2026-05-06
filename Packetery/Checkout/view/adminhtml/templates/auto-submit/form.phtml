@@ -1,0 +1,42 @@
+<?php
+/** @var \Packetery\Checkout\Block\Adminhtml\AutoSubmit\Form $block */
+
+$mapping = $block->getCurrentMapping();
+$statuses = $block->getOrderStatuses();
+?>
+<div class="packetery-auto-submit-form">
+    <h1 class="page-title"><?= $block->escapeHtml(__('Auto-submit settings')) ?></h1>
+    <br>
+    <form method="post" action="<?= $block->escapeUrl($block->getSaveUrl()) ?>" class="admin__fieldset-wrapper">
+        <input type="hidden" name="form_key" value="<?= $block->escapeHtmlAttr($block->getFormKeyValue()) ?>"/>
+        <fieldset class="admin__fieldset">
+            <legend class="admin__legend"><span><?= $block->escapeHtml(__('Payment method to order status mapping')) ?></span></legend>
+            <br>
+            <?php foreach ($block->getPaymentMethods() as $method): ?>
+            <div class="admin__field">
+                <label class="admin__field-label">
+                    <span><?= $block->escapeHtml($method['label']) ?></span>
+                </label>
+                <div class="admin__field-control">
+                    <select name="mapping[<?= $block->escapeHtmlAttr($method['value']) ?>]" class="admin__control-select">
+                        <option value=""><?= $block->escapeHtml(__('— no auto-submit —')) ?></option>
+                        <?php foreach ($statuses as $statusCode => $statusLabel): ?>
+                        <option value="<?= $block->escapeHtmlAttr($statusCode) ?>"
+                            <?= ($mapping[$method['value']] ?? '') === $statusCode ? 'selected' : '' ?>>
+                            <?= $block->escapeHtml($statusLabel) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </fieldset>
+        <div class="admin__field">
+            <div class="admin__field-control">
+                <button type="submit" class="action-primary">
+                    <span><?= $block->escapeHtml(__('Save')) ?></span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
