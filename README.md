@@ -19,7 +19,7 @@ This utility is available in Magento installation directory as "/bin/magento".
 - clean cache: `bin/magento cache:clean`
 - set Packeta configuration in administration for default scope even if Packeta carrier is inactive
 - import carriers: `bin/magento packetery:import-feed-carriers`
-- set up command `bin/magento cron:run` in cron, in order to update carriers regularly
+- set up command `bin/magento cron:run` in cron, in order to update carriers regularly and run message queue consumers
 
 ## Upgrading
 
@@ -67,6 +67,42 @@ composer phpcs-compatibility:84  # Check PHP 8.4 compatibility
 
 These commands use PHP_CodeSniffer with the PHPCompatibility standard to detect compatibility issues.
 
+#### Message queue consumer (bulk packet submission)
+
+Bulk packet submission from the order list is processed asynchronously by Magento consumer:
+
+- `packetery.checkout.packet.submit`
+
+To run consumers via Magento cron runner, configure `app/etc/env.php`:
+
+```php
+'queue' => [
+    'consumers_wait_for_messages' => 0
+],
+'cron_consumers_runner' => [
+    'cron_run' => true,
+    'max_messages' => 200
+]
+```
+
+If you prefer to run only this consumer via cron runner, use:
+
+```php
+'cron_consumers_runner' => [
+    'cron_run' => true,
+    'max_messages' => 200,
+    'consumers' => [
+        'packetery.checkout.packet.submit'
+    ]
+]
+```
+
+If consumers are not started by `bin/magento cron:run`, start the packet submission consumer manually:
+
+```bash
+bin/magento queue:consumers:start packetery.checkout.packet.submit
+```
+
 ### Configuration and "How to" guide
 
 ### Information about the module
@@ -90,6 +126,7 @@ These commands use PHP_CodeSniffer with the PHPCompatibility standard to detect 
 - setting different prices for each carrier
 - free shipping from the specified price
 - possibility of bulk weight adjustment in the shipment list
+- possibility of bulk packet submission from the order list (asynchronous processing via message queue consumer)
 - export shipments to a CSV file that can be imported in [client section](https://client.packeta.com/)
 - possibility to change the pickup point for an existing order in the administration
 - email template variables
@@ -126,7 +163,7 @@ Tato utilita je dostupná v instalačním adresáři Magenta jako "/bin/magento"
 - smazání cache: `bin/magento cache:clean`
 - nastavte v administraci přepravce Zásilkovna pro výchozí kontext (scope), ikdyž je přepravce neaktivní
 - nahrajte přepravce: `bin/magento packetery:import-feed-carriers`
-- nastavte si v cronu volání příkazu `bin/magento cron:run` tak, aby se vám aktualizovali přepravci.
+- nastavte si v cronu volání příkazu `bin/magento cron:run` tak, aby se vám aktualizovali přepravci a spouštěli message queue consumeři.
 
 ### Aktualizace modulu
 
@@ -174,6 +211,42 @@ composer phpcs-compatibility:84  # Kontrola kompatibility s PHP 8.4
 
 Tyto příkazy používají PHP_CodeSniffer se standardem PHPCompatibility pro detekci problémů s kompatibilitou.
 
+#### Message queue consumer (hromadné podání zásilek)
+
+Hromadné podání zásilek ze seznamu objednávek je zpracováno asynchronně přes Magento consumer:
+
+- `packetery.checkout.packet.submit`
+
+Pro spouštění consumerů přes Magento cron runner nastavte `app/etc/env.php`:
+
+```php
+'queue' => [
+    'consumers_wait_for_messages' => 0
+],
+'cron_consumers_runner' => [
+    'cron_run' => true,
+    'max_messages' => 200
+]
+```
+
+Pokud chcete přes cron runner spouštět pouze tento consumer, použijte:
+
+```php
+'cron_consumers_runner' => [
+    'cron_run' => true,
+    'max_messages' => 200,
+    'consumers' => [
+        'packetery.checkout.packet.submit'
+    ]
+]
+```
+
+Pokud se consumeři nespouští přes `bin/magento cron:run`, spusťte consumer pro podání zásilek ručně:
+
+```bash
+bin/magento queue:consumers:start packetery.checkout.packet.submit
+```
+
 ### Konfigurace a návod k použití
 
 [Uživatelská dokumentace](https://github.com/Zasilkovna/magento2/wiki/U%C5%BEivatelsk%C3%A1-dokumentace)
@@ -199,6 +272,7 @@ Tyto příkazy používají PHP_CodeSniffer se standardem PHPCompatibility pro d
 - nastavení různé ceny pro jednotlivé dopravce
 - doprava zdarma od zadané ceny
 - možnost hromadné úpravy hmotnosti v seznamu zásilek
+- možnost hromadného podání zásilek ze seznamu objednávek (asynchronní zpracování přes message queue consumer)
 - export zásilek do csv souboru, který lze importovat v [klientské sekci](https://client.packeta.com/)
 - možnost změny výdejního místa u existující objednávky v administraci
 - proměnné pro emailové šablony

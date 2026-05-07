@@ -39,12 +39,36 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     }
 
     /**
-     * @param int|string|null $store
-     * @return $this
+     * @param mixed $store
+     * @return static
      */
     public function setStore($store)
     {
         $this->setData('store', $store);
+        $this->packeteryConfig = $this->packeteryBrain->createConfig($this);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $scope
+     * @return static
+     */
+    public function setScope($scope)
+    {
+        $this->setData('scope', $scope);
+        $this->packeteryConfig = $this->packeteryBrain->createConfig($this);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $scopeId
+     * @return static
+     */
+    public function setScopeId($scopeId)
+    {
+        $this->setData('scope_id', $scopeId);
         $this->packeteryConfig = $this->packeteryBrain->createConfig($this);
 
         return $this;

@@ -40,6 +40,17 @@
                 <indexField>id</indexField>
                 <selectProvider>packetery_checkout_order_listing.packetery_checkout_order_listing.spinner_columns.ids</selectProvider>
             </settings>
+            <action name="submit_packets">
+                <settings>
+                    <confirm>
+                        <message translate="true">Do you really want to submit selected packets to Packeta?</message>
+                        <title translate="true">Submit packets</title>
+                    </confirm>
+                    <url path="packetery/packet/massSubmit"/>
+                    <type>submit_packets</type>
+                    <label translate="true">Submit packets</label>
+                </settings>
+            </action>
             <action name="print_packeta_labels">
                 <settings>
                     <type>print_packeta_labels</type>
