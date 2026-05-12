@@ -1,0 +1,56 @@
+<?php
+/**
+ * @var \Packetery\Checkout\Block\Adminhtml\PacketSettings\Tab\AutoSubmit $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+
+$mapping  = $block->getCurrentMapping();
+$statuses = $block->getOrderStatuses();
+?>
+<form method="post" action="<?= $block->escapeUrl($block->getSaveUrl()) ?>" class="admin__fieldset-wrapper">
+    <input type="hidden" name="form_key" value="<?= $block->escapeHtmlAttr($block->getFormKeyValue()) ?>"/>
+    <div class="admin__field" style="margin-bottom: 20px; text-align: right;">
+        <button type="submit" class="action-primary">
+            <span><?= $block->escapeHtml(__('Save')) ?></span>
+        </button>
+    </div>
+    <?php foreach ($block->getPaymentMethods() as $method): ?>
+    <?php $sectionId = 'pms_' . preg_replace('/[^a-zA-Z0-9]/', '_', $method['value']); ?>
+    <div class="section-config">
+        <div class="entry-edit-head admin__collapsible-block">
+            <span id="<?= $block->escapeHtmlAttr($sectionId) ?>-link" class="entry-edit-head-link"></span>
+            <a id="<?= $block->escapeHtmlAttr($sectionId) ?>-head"
+               href="#<?= $block->escapeHtmlAttr($sectionId) ?>-link">
+                <?= $block->escapeHtml($method['label']) ?>
+            </a>
+            <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+                'onclick',
+                "event.preventDefault(); Fieldset.toggleCollapse('" . $block->escapeJs($sectionId) . "', ''); return false;",
+                'a#' . $block->escapeHtmlAttr($sectionId) . '-head'
+            ) ?>
+        </div>
+        <input id="<?= $block->escapeHtmlAttr($sectionId) ?>-state"
+               name="config_state[<?= $block->escapeHtmlAttr($sectionId) ?>]"
+               type="hidden" value="<?= ($mapping[$method['value']] ?? '') !== '' ? '1' : '0' ?>"/>
+        <div class="admin__collapsible-block-content" id="<?= $block->escapeHtmlAttr($sectionId) ?>">
+            <div style="padding: 8px 0;">
+                <select id="mapping_<?= $block->escapeHtmlAttr($method['value']) ?>"
+                        name="mapping[<?= $block->escapeHtmlAttr($method['value']) ?>]"
+                        class="select">
+                    <option value="" <?= ($mapping[$method['value']] ?? '') === '' ? 'selected' : '' ?>><?= $block->escapeHtml(__('— no auto-submit —')) ?></option>
+                    <?php foreach ($statuses as $statusCode => $statusLabel): ?>
+                    <option value="<?= $block->escapeHtmlAttr($statusCode) ?>"
+                        <?= ($mapping[$method['value']] ?? '') === $statusCode ? 'selected' : '' ?>>
+                        <?= $block->escapeHtml($statusLabel) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </div>
+    <?php
+    $scriptString = "require(['prototype'], function(){ Fieldset.applyCollapse('" . $block->escapeJs($sectionId) . "'); });";
+    echo /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false);
+    ?>
+    <?php endforeach; ?>
+</form>

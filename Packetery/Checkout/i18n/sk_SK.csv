@@ -183,3 +183,6 @@
 "Loading...","Načítava sa..."
 "Unable to load print form.","Nepodarilo sa načítať formulár pre tlač."
 "Generating...","Generuje sa..."
+"Auto-submit parcel on order status change","Automatické odoslanie zásielky pri zmene stavu objednávky"
+"Payment method to order status mapping","Mapovanie platobnej metódy na stav objednávky"
+"Auto-submit settings","Nastavenie automatického odosielania"

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<page layout="admin-2columns-left" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="left">
+            <block class="Packetery\Checkout\Block\Adminhtml\PacketSettings\Tabs"
+                   name="packetery_packet_settings_tabs">
+                <block class="Packetery\Checkout\Block\Adminhtml\PacketSettings\Tab\AutoSubmit"
+                       name="tab_autosubmit"
+                       template="Packetery_Checkout::packet-settings/tab/auto-submit.phtml"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">auto_submit</argument>
+                    <argument name="block" xsi:type="string">tab_autosubmit</argument>
+                </action>
+                <block class="Packetery\Checkout\Block\Adminhtml\PacketSettings\Tab\Xxxx"
+                       name="tab_xxxx"
+                       template="Packetery_Checkout::packet-settings/tab/xxxx.phtml"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">xxxx</argument>
+                    <argument name="block" xsi:type="string">tab_xxxx</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template"
+                   name="packetery_packet_settings_content"
+                   template="Packetery_Checkout::packet-settings/content.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

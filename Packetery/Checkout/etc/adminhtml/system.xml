@@ -65,6 +65,11 @@
                     <source_model>Packetery\Checkout\Model\Config\Source\PaymentMethod</source_model>
                     <comment>The payment methods selected above will be considered as cash on delivery (for Packeta).</comment>
                 </field>
+                <field id="auto_submit_enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="200" translate="label" type="select">
+                    <label>Auto-submit parcel on order status change</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
                 <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="9000" translate="label" type="text">
                     <label>Sort Order</label>
                 </field>

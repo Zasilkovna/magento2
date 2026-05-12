@@ -9,4 +9,7 @@
 	<event name="email_order_set_template_vars_before">
 		<observer instance="Packetery\Checkout\Observer\Sales\EmailOrderTemplateVarsBefore" name="packetery_checkout_email_order_set_template_vars_before"/>
 	</event>
+	<event name="sales_order_save_after">
+		<observer instance="Packetery\Checkout\Observer\Sales\OrderStatusChange" name="packetery_checkout_observer_sales_order_status_change"/>
+	</event>
 </config>
