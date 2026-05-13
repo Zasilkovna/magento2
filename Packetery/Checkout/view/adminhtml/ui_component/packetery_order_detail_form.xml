@@ -67,7 +67,9 @@
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">ID</item>
-                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="additionalClasses" xsi:type="string">hidden</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">id</item>
                 </item>

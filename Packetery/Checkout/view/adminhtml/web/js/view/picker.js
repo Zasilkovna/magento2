@@ -24,9 +24,16 @@ define([
     frontUrlBuilder.setBaseUrl(window.packetery.baseUrl);
 
     var config = {};
-    var loadConfig = function(onSuccess) {
+    var loadConfig = function(packeteryOrderId, onSuccess) {
+        if (!packeteryOrderId) {
+            console.log('Packetery order id is missing, skipping config load');
+            return;
+        }
+
         jQuery('body').trigger('processStart');
-        var configUrl = frontUrlBuilder.build('packetery/config/storeconfig');
+        var configUrl = frontUrlBuilder.build('packetery/config/storeconfig')
+            + '?packetery_is_checkout=0&packetery_order_id=' + encodeURIComponent(packeteryOrderId);
+
         storage.get(configUrl).done(
             function(response) {
                 if(response.success) {
@@ -83,6 +90,12 @@ define([
                 fieldset.label = $t('Shipping address validation');
             }
 
+            uiRegistry.get('inputName = general[id]', function(idItem) {
+                loadConfig(idItem.value(), function() {
+                    mixin.isStoreConfigLoaded(true);
+                });
+            });
+
             return this._super();
         },
 
@@ -96,6 +109,11 @@ define([
                 language: config.packetaOptions.language,
                 vendors: widgetVendors
             };
+
+            var weight = config.packetaOptions.weight;
+            if (weight !== null) {
+                options.weight = weight;
+            }
 
             var pickupPointSelected = function(point) {
                 if(!point) {
@@ -187,10 +205,6 @@ define([
             Packeta.Widget.pick(packetaApiKey, addressSelected, options);
         }
     };
-
-    loadConfig(function() {
-        mixin.isStoreConfigLoaded(true);
-    });
 
     return Component.extend(mixin);
 });

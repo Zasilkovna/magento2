@@ -24,21 +24,14 @@ class Storeconfig implements HttpGetActionInterface
     /** @var \Magento\Framework\Message\ManagerInterface */
     protected $messageManager;
 
-    /**
-     * Storeconfig constructor.
-     *
-     * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Packetery\Checkout\Helper\Data $helperData
-     * @param \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
-     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Packetery\Checkout\Helper\Data $helperData,
-        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery
+        \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier $packetery,
+        private readonly \Packetery\Checkout\Model\Weight\Converter $weightConverter,
+        private readonly \Packetery\Checkout\Model\Weight\Resolver $weightResolver,
     ) {
         $this->messageManager = $context->getMessageManager();
         $this->resultJsonFactory = $resultJsonFactory;
@@ -55,14 +48,17 @@ class Storeconfig implements HttpGetActionInterface
     public function execute()
     {
         try {
-            $config = [];
-            $config['apiKey'] = $this->packeteryConfig->getApiKey();
-            $config['packetaOptions'] = [
-                'webUrl' => $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK),
-                'appIdentity' => $this->helperData->getPacketeryAppIdentity(),
-                'language' => $this->helperData->getShortLocale(),
+            $store = $this->storeManager->getStore();
+            $config = [
+                'apiKey' => $this->packeteryConfig->getApiKey(),
+                'packetaOptions' => [
+                    'webUrl' => $store->getBaseUrl(),
+                    'appIdentity' => $this->helperData->getPacketeryAppIdentity(),
+                    'language' => $this->helperData->getShortLocale(),
+                    'weight' => $this->getFormattedWeight($store),
+                ],
+                'currentStoreCurrencyCode' => $store->getCurrentCurrencyCode(),
             ];
-            $config['currentStoreCurrencyCode'] = $this->storeManager->getStore()->getCurrentCurrencyCode();
 
             $response = [
                 'success' => true,
@@ -80,4 +76,13 @@ class Storeconfig implements HttpGetActionInterface
         return $this->resultJsonFactory->create()->setData($response);
     }
 
+    private function getFormattedWeight(\Magento\Store\Api\Data\StoreInterface $store): ?float
+    {
+        $weight = $this->weightResolver->resolve();
+        if ($weight === null || $weight < 0.0) {
+            return null;
+        }
+
+        return $this->weightConverter->convertToKg($weight, (int)$store->getId());
+    }
 }
