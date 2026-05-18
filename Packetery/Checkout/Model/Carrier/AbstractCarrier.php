@@ -39,6 +39,18 @@ abstract class AbstractCarrier extends \Magento\Shipping\Model\Carrier\AbstractC
     }
 
     /**
+     * @param int|string|null $store
+     * @return $this
+     */
+    public function setStore($store)
+    {
+        $this->setData('store', $store);
+        $this->packeteryConfig = $this->packeteryBrain->createConfig($this);
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function collectRates(RateRequest $request)

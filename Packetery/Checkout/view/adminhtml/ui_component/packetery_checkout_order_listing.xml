@@ -35,6 +35,30 @@
         </bookmark>
         <columnsControls name="columns_controls"/>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction" component="Packetery_Checkout/js/grid/massactions">
+            <settings>
+                <indexField>id</indexField>
+                <selectProvider>packetery_checkout_order_listing.packetery_checkout_order_listing.spinner_columns.ids</selectProvider>
+            </settings>
+            <action name="print_packeta_labels">
+                <settings>
+                    <type>print_packeta_labels</type>
+                    <label translate="true">Print Packeta labels</label>
+                    <url path="packetery/packet/printlabelmass">
+                        <param name="label_type">packeta</param>
+                    </url>
+                </settings>
+            </action>
+            <action name="print_carrier_labels">
+                <settings>
+                    <type>print_carrier_labels</type>
+                    <label translate="true">Print carrier labels</label>
+                    <url path="packetery/packet/printlabelmass">
+                        <param name="label_type">carrier</param>
+                    </url>
+                </settings>
+            </action>
+        </massaction>
         <exportButton name="export_button" class="Packetery\Checkout\Ui\Component\ExportButton">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
