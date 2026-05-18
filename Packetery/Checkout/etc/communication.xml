@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="packetery.checkout.packet.submit" request="string">
+        <handler name="packeteryBulkPacketSubmitConsumer" type="Packetery\Checkout\Model\Packet\BulkPacketSubmitConsumer" method="process"/>
+    </topic>
+</config>
+
