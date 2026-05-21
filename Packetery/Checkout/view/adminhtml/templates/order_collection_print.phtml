@@ -1,0 +1,97 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+
+/** @var array<int, array{store_name: string, sender: \Packetery\Checkout\Model\OrderCollection\SenderAddress, receiver: \Packetery\Checkout\Model\OrderCollection\ReceiverAddress, rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[], barcode_text: string, barcode_png_base64: string}> $sections */
+$sections = $block->getData('sections');
+$printedAt = new \DateTimeImmutable('now');
+?><!DOCTYPE html>
+<html>
+<head>
+    <title><?= $block->escapeHtml(__('Handover of packets')) ?></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="<?= $block->escapeUrl($block->getViewFileUrl('Packetery_Checkout::css/order-collection-print.css')) ?>"/>
+</head>
+<body>
+<div id="packetery-order-collection-print">
+    <?php foreach ($sections as $section): ?>
+        <?php
+        /** @var \Packetery\Checkout\Model\OrderCollection\SenderAddress $sender */
+        $sender = $section['sender'];
+        /** @var \Packetery\Checkout\Model\OrderCollection\ReceiverAddress $receiver */
+        $receiver = $section['receiver'];
+        /** @var \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[] $rows */
+        $rows = $section['rows'];
+        $barcodeText = (string) $section['barcode_text'];
+        $barcodePngBase64 = (string) $section['barcode_png_base64'];
+        $storeName = (string) $section['store_name'];
+        $packetCount = count($rows);
+        ?>
+        <div class="packetery-order-collection-section">
+            <div class="packetery-order-collection-section-header">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <strong><?= $block->escapeHtml(__('Handover of packets')) ?></strong><br/>
+                            <?= $block->escapeHtml($barcodeText) ?><br/>
+                            <?= $block->escapeHtml(__('Packet count')) ?>: <?= $block->escapeHtml((string) $packetCount) ?><br/>
+                            <?= $block->escapeHtml(__('Printed at')) ?>: <?= $block->escapeHtml($printedAt->format('d. m. Y')) ?>
+                        </td>
+                        <td class="packetery-shipment-barcode">
+                            <img src="data:image/png;base64,<?= $block->escapeHtmlAttr($barcodePngBase64) ?>" alt="<?= $block->escapeHtmlAttr($barcodeText) ?>"/>
+                        </td>
+                        <td>
+                            <strong><?= $block->escapeHtml(__('Sender')) ?></strong><br/>
+                            <?= $block->escapeHtml($storeName !== '' ? $storeName : $sender->getName()) ?><br/>
+                            <?= $block->escapeHtml($sender->getStreet()) ?><br/>
+                            <?= $block->escapeHtml(trim($sender->getZip() . ' ' . $sender->getCity())) ?>
+                        </td>
+                        <td>
+                            <strong><?= $block->escapeHtml(__('Recipient')) ?></strong><br/>
+                            <?= $block->escapeHtml($receiver->getCompany()) ?><br/>
+                            <?= $block->escapeHtml($receiver->getStreet()) ?><br/>
+                            <?= $block->escapeHtml(trim($receiver->getZip() . ' ' . $receiver->getCity())) ?>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <table class="packetery-order-collection-print-table">
+                <thead>
+                <tr>
+                    <th><?= $block->escapeHtml(__('Order number')) ?></th>
+                    <th><?= $block->escapeHtml(__('Barcode')) ?></th>
+                    <th><?= $block->escapeHtml(__('Created')) ?></th>
+                    <th><?= $block->escapeHtml(__('Name and surname')) ?></th>
+                    <th><?= $block->escapeHtml(__('Cash on delivery')) ?></th>
+                    <th><?= $block->escapeHtml(__('Pick up point or carrier')) ?></th>
+                </tr>
+                </thead>
+                <tbody class="collection-print-table-body">
+                <?php foreach ($rows as $index => $row): ?>
+                    <tr class="<?= $index % 2 === 0 ? 'odd' : 'even' ?>">
+                        <td class="packetery-no-wrap order-number-column"><?= $block->escapeHtml($row->getOrderNumber()) ?></td>
+                        <td class="packetery-no-wrap"><?= $block->escapeHtml($row->getPacketNumber()) ?></td>
+                        <td class="packetery-no-wrap"><?= $block->escapeHtml($row->getCreatedAt() !== null ? $row->getCreatedAt()->format('d. m.') : '') ?></td>
+                        <td class="packetery-no-wrap"><?= $block->escapeHtml($row->getRecipientName()) ?></td>
+                        <td class="packetery-no-wrap cod-column">
+                            <strong><?= $block->escapeHtml(number_format($row->getCod(), 2, '.', '') . ' ' . $row->getCurrency()) ?></strong>
+                        </td>
+                        <td><?= $block->escapeHtml($row->getDeliveryDestination()) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="6">
+                        <div class="packetery-end"><?= $block->escapeHtml(__('End')) ?></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    <?php endforeach; ?>
+</div>
+<script>
+    window.print();
+</script>
+</body>
+</html>

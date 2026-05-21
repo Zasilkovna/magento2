@@ -69,6 +69,13 @@
                     </url>
                 </settings>
             </action>
+            <action name="print_order_collection">
+                <settings>
+                    <type>print_order_collection</type>
+                    <label translate="true">Print packet list</label>
+                    <url path="packetery/packet/printordercollectionmass"/>
+                </settings>
+            </action>
         </massaction>
         <exportButton name="export_button" class="Packetery\Checkout\Ui\Component\ExportButton">
             <argument name="data" xsi:type="array">

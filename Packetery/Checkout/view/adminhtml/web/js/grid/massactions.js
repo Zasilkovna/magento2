@@ -7,7 +7,8 @@ define([
 
     var NEW_TAB_ACTIONS = [
         'print_packeta_labels',
-        'print_carrier_labels'
+        'print_carrier_labels',
+        'print_order_collection'
     ];
 
     return Massactions.extend({
