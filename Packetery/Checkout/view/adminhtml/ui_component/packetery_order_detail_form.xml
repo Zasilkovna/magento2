@@ -283,6 +283,18 @@
                 </item>
             </argument>
         </field>
+        <field name="consign_password">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Consign password</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">consign_password</item>
+                </item>
+            </argument>
+        </field>
         <fieldset name="misc">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -399,6 +411,33 @@
                         <item name="additionalClasses" xsi:type="string">hidden</item>
                     </item>
                 </argument>
+            </field>
+            <field name="showConsignPassword">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" xsi:type="string" translate="true">Show consign password</item>
+                        <item name="visible" xsi:type="boolean">true</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="dataScope" xsi:type="string">showConsignPassword</item>
+                    </item>
+                </argument>
+                <settings>
+                    <switcherConfig>
+                        <rules>
+                            <rule name="0">
+                                <value>0</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>packetery_order_detail_form.areas.general.general.consign_password</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                        </rules>
+                        <enabled>true</enabled>
+                    </switcherConfig>
+                </settings>
             </field>
         </fieldset>
     </fieldset>

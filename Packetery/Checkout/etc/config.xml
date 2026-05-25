@@ -14,6 +14,7 @@
 				<label_format>A6 on A4</label_format>
 				<specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
 				<sallowspecific>0</sallowspecific>
+				<show_consign_password>0</show_consign_password>
 			</packetery>
 			<packeteryPacketaDynamic>
 				<model>Packetery\Checkout\Model\Carrier\Imp\PacketeryPacketaDynamic\Carrier</model>

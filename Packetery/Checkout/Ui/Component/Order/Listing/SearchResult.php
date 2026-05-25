@@ -59,8 +59,13 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
         $subQuery = $orderCollection->getSelect();
         $packetTable = $orderCollection->getTable('packetery_packet');
         $connection = $orderCollection->getConnection();
-        $packetSubSelect = $connection->select()
+        $packetNumberSubSelect = $connection->select()
             ->from(['p' => $packetTable], ['packet_number'])
+            ->where('p.order_number = main_table.order_number')
+            ->order('p.id DESC')
+            ->limit(1);
+        $consignPasswordSubSelect = $connection->select()
+            ->from(['p' => $packetTable], ['consign_password'])
             ->where('p.order_number = main_table.order_number')
             ->order('p.id DESC')
             ->limit(1);
@@ -75,9 +80,11 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'cod_transformed' => "IF(main_table.cod > 0, 1, 0)",
                 'exported_transformed' => "main_table.exported",
                 'exported_at_transformed' => "main_table.exported_at",
-                'packet_number' => new Expression('(' . $packetSubSelect->assemble() . ')'),
+                'packet_number' => new Expression('(' . $packetNumberSubSelect->assemble() . ')'),
+                'consign_password' => new Expression('(' . $consignPasswordSubSelect->assemble() . ')'),
                 'order_status' => "sales_order.status",
                 'shipping_rate_code' => "sales_order.shipping_method",
+                'store_id' => 'sales_order.store_id',
                 'created_at' => 'sales_order.created_at',
                 'main_table.*'
             ]

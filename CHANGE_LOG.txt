@@ -8,6 +8,7 @@
       - Added: print shipping label from order list
       - Added: mass print shipping labels from order list
       - Added: ability to cancel submitted packet from order list
+      - Added: option to display Z-BOX consign password in Packeta order detail and order list
 
 2.4.0 - Updated: checking and correcting address in checkout is possible only for home delivery to Czech Republic and Slovakia
       - Updated: in Packeta order detail you can change pickup point or delivery address only when the order allows it; otherwise you see a notice that no changes are possible
