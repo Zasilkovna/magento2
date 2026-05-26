@@ -72,7 +72,7 @@ class ImportFeedCarriers extends Command
      * @return int
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output): int {
         $output->writeln('Carrier feed import started');
 
         $apiKey = $this->scopeConfig->getValue('carriers/packetery/api_key');
