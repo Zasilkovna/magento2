@@ -64,7 +64,7 @@ class MigratePriceRules extends Command
      * @throws \Packetery\Checkout\Model\Exception\PricingRuleNotFound
      * @throws \Packetery\Checkout\Model\Exception\WeightRuleMissing
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configDataCollection = $this->configValueFactory->create()->getCollection();
         $configDataCollection->addFieldToFilter('scope_id', ['gt' => 0]);
