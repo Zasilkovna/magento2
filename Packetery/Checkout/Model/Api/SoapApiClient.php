@@ -138,6 +138,27 @@ class SoapApiClient
         return $response;
     }
 
+    public function packetInfo(
+        \Packetery\Checkout\Model\Api\Request\PacketInfoRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\PacketInfoResult {
+        $apiPassword = $request->getApiPassword();
+        $packetId = $request->getPacketId();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\PacketInfoResult();
+        try {
+            $client = $this->createSoapClient();
+            $info = $client->packetInfo($apiPassword, $packetId);
+            if (isset($info->consignPassword) && $info->consignPassword !== '') {
+                $response->setConsignPassword((string) $info->consignPassword);
+            }
+        } catch (\SoapFault $e) {
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString($e->getMessage());
+        }
+
+        return $response;
+    }
+
     /**
      * @throws \SoapFault
      */

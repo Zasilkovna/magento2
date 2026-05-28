@@ -16,22 +16,15 @@ class CarrierFactory
     }
 
     public function createCached(
-        array &$cache,
+        Cache $cache,
         string $carrierCode,
         int $storeId
-    ): ?\Magento\Shipping\Model\Carrier\AbstractCarrier
-    {
-        $cache['carriers'] = $cache['carriers'] ?? [];
-        $cache['carriers'][$storeId] = $cache['carriers'][$storeId] ?? [];
-
-        if (!array_key_exists($carrierCode, $cache['carriers'][$storeId])) {
-            $carrier = $this->carrierFactory->create($carrierCode, $storeId);
-            $cache['carriers'][$storeId][$carrierCode] = ($carrier instanceof \Magento\Shipping\Model\Carrier\AbstractCarrier)
-                ? $carrier
-                : null;
+    ): ?\Magento\Shipping\Model\Carrier\AbstractCarrier {
+        if (!$cache->has($storeId, $carrierCode)) {
+            $cache->set($storeId, $carrierCode, $this->create($carrierCode, $storeId));
         }
 
-        return $cache['carriers'][$storeId][$carrierCode];
+        return $cache->get($storeId, $carrierCode);
     }
 
     public function create(string $carrierCode, int $storeId): ?\Magento\Shipping\Model\Carrier\AbstractCarrier
@@ -41,4 +34,3 @@ class CarrierFactory
         return ($carrier instanceof \Magento\Shipping\Model\Carrier\AbstractCarrier) ? $carrier : null;
     }
 }
-

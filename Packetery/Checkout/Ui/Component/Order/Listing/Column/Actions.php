@@ -64,7 +64,7 @@ class Actions extends Column
     public function prepareDataSource(array $dataSource): array
     {
         if (isset($dataSource['data']['items'])) {
-            $carrierCache = [];
+            $cache = new \Packetery\Checkout\Model\Carrier\Cache();
             foreach ($dataSource['data']['items'] as &$item) {
                 $name = $this->getData('name');
 
@@ -129,7 +129,11 @@ class Actions extends Column
                 $carrierCode = $shippingRateCode->getCarrierCode();
 
                 $storeId = (int) $order->getStoreId();
-                $carrier = $this->carrierFactory->createCached($carrierCache, $carrierCode, $storeId);
+                $carrier = $this->carrierFactory->createCached(
+                    $cache,
+                    $carrierCode,
+                    $storeId
+                );
                 if (!$carrier instanceof \Magento\Shipping\Model\Carrier\AbstractCarrier) {
                     continue;
                 }

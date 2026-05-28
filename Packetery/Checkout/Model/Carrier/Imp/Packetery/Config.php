@@ -52,6 +52,11 @@ class Config extends \Packetery\Checkout\Model\Carrier\Config\AbstractConfig
         return ($this->getConfigData('sender') ?: null);
     }
 
+    public function isShowConsignPassword(): bool
+    {
+        return $this->getConfigData('show_consign_password') === '1';
+    }
+
     protected function normalizeLabelFormatValue(string $value): string
     {
         return LabelFormats::normalizePacketaFormat($value);

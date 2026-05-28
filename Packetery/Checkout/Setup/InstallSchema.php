@@ -556,6 +556,11 @@ class InstallSchema implements InstallSchemaInterface
                 'type' => Table::TYPE_DATETIME,
                 'attr' => ['nullable' => true, 'comment' => 'UTC date and time of last successful label print'],
             ],
+            'consign_password' => [
+                'type' => Table::TYPE_TEXT,
+                'size' => 10,
+                'attr' => ['nullable' => true, 'comment' => 'Z-BOX consign password returned by Packeta API'],
+            ],
         ]);
 
         $table->addIndex(

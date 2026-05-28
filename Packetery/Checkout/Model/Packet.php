@@ -117,4 +117,20 @@ class Packet extends \Magento\Framework\Model\AbstractModel
         $this->setData('label_printed_at', $utc->format('Y-m-d H:i:s'));
         return $this;
     }
+
+    public function getConsignPassword(): ?string
+    {
+        $value = $this->getData('consign_password');
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
+    public function setConsignPassword(?string $consignPassword): self
+    {
+        $this->setData('consign_password', ($consignPassword === '' ? null : $consignPassword));
+        return $this;
+    }
 }

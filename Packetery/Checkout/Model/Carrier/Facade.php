@@ -175,6 +175,18 @@ class Facade
         return $this->carrierFactory->get($carrierCode);
     }
 
+    public function getPacketeryCarrierConfig(int $storeId): ?\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config {
+        $carrier = $this->carrierFactory->create(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Brain::getCarrierCodeStatic(), $storeId);
+        if ($carrier instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Carrier) {
+            $config = $carrier->getPacketeryConfig();
+            if ($config instanceof \Packetery\Checkout\Model\Carrier\Imp\Packetery\Config) {
+                return $config;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return array<class-string<\Packetery\Checkout\Model\Carrier\AbstractBrain>>
      */

@@ -30,6 +30,9 @@ class PacketSubmitter
     /** @var \Packetery\Checkout\Model\ResourceModel\Order */
     private $orderResource;
 
+    /** @var \Packetery\Checkout\Model\Carrier\Facade */
+    private $carrierFacade;
+
     public function __construct(
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -37,7 +40,8 @@ class PacketSubmitter
         \Packetery\Checkout\Model\PacketFactory $packetFactory,
         \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
         \Packetery\Checkout\Model\ResourceModel\Packet $packetResource,
-        \Packetery\Checkout\Model\ResourceModel\Order $orderResource
+        \Packetery\Checkout\Model\ResourceModel\Order $orderResource,
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
     ) {
         $this->soapApiClient = $soapApiClient;
         $this->scopeConfig = $scopeConfig;
@@ -46,6 +50,7 @@ class PacketSubmitter
         $this->packetCollectionFactory = $packetCollectionFactory;
         $this->packetResource = $packetResource;
         $this->orderResource = $orderResource;
+        $this->carrierFacade = $carrierFacade;
     }
 
     /**
@@ -122,7 +127,15 @@ class PacketSubmitter
         }
 
         $createResult = $this->soapApiClient->createPacket($apiPassword, $attributes);
-        $this->savePacket($packeteryOrder->getOrderNumber(), $createResult->getPacketId(), $weight, $value, $cod);
+
+        $consignPassword = null;
+        $packeteryConfig = $this->carrierFacade->getPacketeryCarrierConfig($storeId);
+        if ($packeteryConfig !== null && $packeteryConfig->isShowConsignPassword()) {
+            $request = new \Packetery\Checkout\Model\Api\Request\PacketInfoRequest($apiPassword, $createResult->getPacketId());
+            $consignPassword = $this->soapApiClient->packetInfo($request)->getConsignPassword();
+        }
+
+        $this->savePacket($packeteryOrder->getOrderNumber(), $createResult->getPacketId(), $weight, $value, $cod, $consignPassword);
         $this->markOrderExported($packeteryOrder);
     }
 
@@ -142,7 +155,7 @@ class PacketSubmitter
         return $this->weightCalculator->getOrderWeight($magentoOrder);
     }
 
-    private function savePacket(string $orderNumber, string $packetId, float $weight, float $value, float $cod): void
+    private function savePacket(string $orderNumber, string $packetId, float $weight, float $value, float $cod, ?string $consignPassword): void
     {
         $packet = $this->packetFactory->create();
         $packet->setOrderNumber($orderNumber);
@@ -150,6 +163,7 @@ class PacketSubmitter
         $packet->setWeight($weight);
         $packet->setValue($value);
         $packet->setCod($cod);
+        $packet->setConsignPassword($consignPassword);
         $this->packetResource->save($packet);
     }
 

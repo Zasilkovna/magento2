@@ -21,6 +21,9 @@ class DataProvider extends AbstractDataProvider
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
 
+    /** @var \Packetery\Checkout\Model\PacketRepository */
+    private $packetRepository;
+
     /**
      * @param string $name
      * @param string $primaryFieldName
@@ -28,6 +31,7 @@ class DataProvider extends AbstractDataProvider
      * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+     * @param \Packetery\Checkout\Model\PacketRepository $packetRepository
      * @param array $meta
      * @param array $data
      */
@@ -38,6 +42,7 @@ class DataProvider extends AbstractDataProvider
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $collectionFactory,
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
+        \Packetery\Checkout\Model\PacketRepository $packetRepository,
         array $meta = [],
         array $data = []
     ) {
@@ -45,6 +50,7 @@ class DataProvider extends AbstractDataProvider
         $this->collection = $collectionFactory->create();
         $this->orderFactory = $orderFactory;
         $this->carrierFacade = $carrierFacade;
+        $this->packetRepository = $packetRepository;
     }
 
     /**
@@ -57,7 +63,15 @@ class DataProvider extends AbstractDataProvider
         foreach ($this->collection->getItems() as $item) {
             $result[$item->getId()]['general'] = $item->getData(); // princing rules
             $orderNumber = $result[$item->getId()]['general']['order_number'];
+            $packet = $this->packetRepository->findLatestByOrderNumber($orderNumber);
+            $consignPassword = $packet === null ? null : $packet->getConsignPassword();
+            $result[$item->getId()]['general']['consign_password'] = $consignPassword;
             $order = $this->orderFactory->create()->loadByIncrementId($orderNumber);
+
+            $packeteryConfig = $this->carrierFacade->getPacketeryCarrierConfig((int) $order->getStoreId());
+            $isShowConsignPassword = $packeteryConfig !== null && $packeteryConfig->isShowConsignPassword();
+            $showConsignPassword = $isShowConsignPassword && $consignPassword !== null;
+            $result[$item->getId()]['general']['misc']['showConsignPassword'] = $showConsignPassword ? '1' : '0';
 
             $shippingMethod = $order->getShippingMethod();
             if ($shippingMethod && ShippingRateCode::isPacketery($shippingMethod) && $order->getShippingAddress()) {
