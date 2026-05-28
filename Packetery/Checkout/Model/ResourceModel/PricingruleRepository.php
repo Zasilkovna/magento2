@@ -76,7 +76,7 @@ class PricingruleRepository
         $usedWeights = [];
         foreach ($weightRules as $weightRule) {
             $weight = $weightRule['max_weight'];
-            $key = (is_numeric($weight) ? number_format((float)$weight, 4, '.', '') : null);
+            $key = (is_numeric($weight) ? number_format((float)$weight, 4, '.', '') : '');
 
             if (isset($usedWeights[$key])) {
                 return false;
