@@ -9,6 +9,7 @@ use Packetery\Checkout\Model\MaxCodResolver;
 use Packetery\Checkout\Model\Pricingrule;
 use Packetery\Checkout\Model\ResourceModel\Carrier\Collection;
 use Packetery\Checkout\Model\ResourceModel\Carrier\CollectionFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MaxCodResolverTest extends TestCase
@@ -27,9 +28,7 @@ class MaxCodResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider resolveDataProvider
-     */
+    #[DataProvider('resolveDataProvider')]
     public function testResolve(?float $maxCod, ?int $carrierId, ?bool $disallowsCod, ?float $expected): void
     {
         $pricingRule = $this->createPricingRuleMock($maxCod, $carrierId);

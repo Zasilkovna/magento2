@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Test\Unit;
 
 use Packetery\Checkout\Model\Weight\Unit;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class WeightUnitTest extends \Packetery\Checkout\Test\BaseTest
 {
-    /**
-     * @dataProvider fromRawProvider
-     */
+    #[DataProvider('fromRawProvider')]
     public function testFromRaw(?string $input, ?Unit $expected): void
     {
         $this->assertSame($expected, Unit::fromRaw($input));

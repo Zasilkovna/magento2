@@ -8,6 +8,7 @@ use Packetery\Checkout\Model\AddressValidationResolver;
 use Packetery\Checkout\Model\AddressValidationSelect;
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Pricingrule;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class AddressValidationResolverTest extends TestCase
@@ -30,9 +31,7 @@ class AddressValidationResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider isEligibleForAddressValidationDataProvider
-     */
+    #[DataProvider('isEligibleForAddressValidationDataProvider')]
     public function testIsEligibleForAddressValidation(string $method, string $countryId, bool $expected): void
     {
         $this->assertSame($expected, AddressValidationResolver::isEligibleForAddressValidation($method, $countryId));

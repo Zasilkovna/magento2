@@ -20,7 +20,6 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
     {
         $rc = new \ReflectionClass($object);
         $method = $rc->getMethod($method);
-        $method->setAccessible(true);
         return $method->invokeArgs($object, $args);
     }
 
@@ -49,43 +48,7 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
         $rc = new \ReflectionClass($className);
 
         $property = $rc->getProperty($property);
-        $property->setAccessible(true);
         $property->setValue($mock, $value);
-    }
-
-    /**
-     * @param string $className
-     * @param array $except
-     * @return array
-     * @throws \ReflectionException
-     */
-    protected function createConstructorMocks(string $className, array $except = []):array
-    {
-        $rc = new \ReflectionClass($className);
-        $constructor = $rc->getConstructor();
-        $params = ($constructor ? $constructor->getParameters() : []);
-
-        $args = [];
-        foreach ($params as $param) {
-            if (in_array($param->getName(), $except)) {
-                continue;
-            }
-
-            if ($param->isDefaultValueAvailable()) {
-                $args[$param->getName()] = $param->getDefaultValue();
-                continue;
-            }
-
-            $classType = $param->getClass();
-
-            if ($classType === null) {
-                throw new \PHPUnit\Framework\Exception('mocking primitive constructor types not supported');
-            }
-
-            $args[$param->getName()] = $this->createMock($classType->getName());
-        }
-
-        return $args;
     }
 
     /**
@@ -119,8 +82,6 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
         $mock = $this->getMockBuilder($originalClassName)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->getMock();
 
         foreach ($props as $prop => $propValue) {
@@ -150,46 +111,5 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
         }
 
         return $service;
-    }
-
-    /**
-     * @param $originalClassName
-     * @param $args
-     * @param $existingMethods
-     * @param $addMethods
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     * @throws \ReflectionException
-     */
-    protected function createProxyWithMethods($originalClassName, $args, $existingMethods, $addMethods = []): \PHPUnit\Framework\MockObject\MockObject
-    {
-        $constructorArguments = $this->createConstructorMocks($originalClassName, array_keys($args));
-
-        foreach ($args as $arg => $val) {
-            $constructorArguments[$arg] = $val;
-        }
-
-        $proxy = $this->getMockBuilder($originalClassName)
-            ->setConstructorArgs($constructorArguments)
-            ->enableProxyingToOriginalMethods();
-
-        if (!empty($existingMethods)) {
-            $proxy = $proxy->onlyMethods(array_keys($existingMethods));
-        }
-
-        if (!empty($addMethods)) {
-            $proxy = $proxy->addMethods(array_keys($addMethods));
-        }
-
-        $proxy = $proxy->getMock();
-
-        foreach ($existingMethods as $method => $methodValue) {
-            $proxy->method($method)->willReturn($methodValue);
-        }
-
-        foreach ($addMethods as $method => $methodValue) {
-            $proxy->method($method)->willReturn($methodValue);
-        }
-
-        return $proxy;
     }
 }

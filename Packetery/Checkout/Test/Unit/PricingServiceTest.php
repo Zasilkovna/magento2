@@ -181,8 +181,6 @@ class PricingServiceTest extends BaseTest
         $factory = $this->getMockBuilder(($classsName ?: \stdClass::class))
             ->disableOriginalConstructor()
             ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
             ->onlyMethods(['create'])
             ->getMock();
 
@@ -229,12 +227,11 @@ class PricingServiceTest extends BaseTest
             ['getWeightRulesByPricingRule' => $weightRules, 'resolvePricingRule' => $resolvePricingRuleResult]
         );
 
-        $request = $this->createProxyWithMethods(
-            \Magento\Quote\Model\Quote\Address\RateRequest::class,
-            [],
-            [],
-            ['getPackageWeight' => $cartWeight, 'getPackageValue' => $cartValue, 'getDestCountryId' => $country]
-        );
+        $request = new \Magento\Quote\Model\Quote\Address\RateRequest([
+            'package_weight' => $cartWeight,
+            'package_value' => $cartValue,
+            'dest_country_id' => $country,
+        ]);
 
         $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config->method('getMaxWeight')->willReturn($maxGlobalWeight);
