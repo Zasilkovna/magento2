@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<p id="packetery-order-collection-fallback" style="display:none;">
+    <?= __('Your browser blocked the popup.') ?>
+    <a id="packetery-order-collection-fallback-link" href="#" target="_blank"><?= __('Open packet list') ?></a>
+</p>
+<script>
+(function () {
+    var data = <?= $block->getData('payload_json') ?>;
+    var listingUrl = <?= $block->getData('listing_url_json') ?>;
+    var fallbackWrapper = document.getElementById('packetery-order-collection-fallback');
+    var fallbackLink = document.getElementById('packetery-order-collection-fallback-link');
+    var binaryString = atob(data.html_b64);
+    var bytes = new Uint8Array(binaryString.length);
+    var i;
+
+    for (i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    var blobUrl = URL.createObjectURL(new Blob([bytes], {type: 'text/html'}));
+    var win = window.open(blobUrl, '_blank');
+    var popupBlocked = !win || win.closed || typeof win.closed === 'undefined';
+
+    if (popupBlocked) {
+        if (fallbackLink) {
+            fallbackLink.href = blobUrl;
+            fallbackLink.addEventListener('click', function () {
+                setTimeout(function () {
+                    window.location.href = listingUrl;
+                }, 3000);
+            });
+        }
+        if (fallbackWrapper) {
+            fallbackWrapper.style.display = 'block';
+        }
+        return;
+    }
+
+    setTimeout(function () {
+        window.location.href = listingUrl;
+    }, 200);
+})();
+</script>
+</body>
+</html>

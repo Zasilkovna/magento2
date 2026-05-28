@@ -114,6 +114,45 @@ class SoapApiClient
         return $response;
     }
 
+    public function createShipment(
+        \Packetery\Checkout\Model\Api\Request\CreateShipmentRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\CreateShipmentResult {
+        $apiPassword = $request->getApiPassword();
+        $packetIds = $request->getPacketIds();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\CreateShipmentResult();
+        try {
+            $client = $this->createSoapClient();
+            $result = $client->createShipment($apiPassword, $packetIds);
+            if (isset($result->barcode)) {
+                $response->setBarcode((string) $result->barcode);
+            }
+            if (isset($result->barcodeText)) {
+                $response->setBarcodeText((string) $result->barcodeText);
+            }
+        } catch (\SoapFault) {
+        }
+
+        return $response;
+    }
+
+    public function barcodePng(
+        \Packetery\Checkout\Model\Api\Request\BarcodePngRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\BarcodePngResult {
+        $apiPassword = $request->getApiPassword();
+        $barcode = $request->getBarcode();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\BarcodePngResult();
+        try {
+            $client = $this->createSoapClient();
+            $pngContents = $client->barcodePng($apiPassword, $barcode);
+            $response->setPngContents(is_string($pngContents) ? $pngContents : null);
+        } catch (\SoapFault) {
+        }
+
+        return $response;
+    }
+
     /**
      * @param \Packetery\Checkout\Model\Api\Request\PacketCourierNumberRequest $request
      */
