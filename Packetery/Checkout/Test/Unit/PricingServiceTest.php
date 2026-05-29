@@ -10,12 +10,14 @@ use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Rate\Result;
 use Packetery\Checkout\Model\Carrier\AbstractBrain;
 use Packetery\Checkout\Model\Carrier\Methods;
-use Packetery\Checkout\Model\Pricing;
+use Packetery\Checkout\Model\Pricing\Service;
 use Packetery\Checkout\Model\Pricingrule;
 use Packetery\Checkout\Model\Weightrule;
 use Packetery\Checkout\Test\BaseTest;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[AllowMockObjectsWithoutExpectations]
 class PricingServiceTest extends BaseTest
 {
     /**
@@ -136,15 +138,12 @@ class PricingServiceTest extends BaseTest
     }
 
     /**
-     * @param $defaultPrice
-     * @param $maxWeight
-     * @param $freeShipment
-     * @return \Packetery\Checkout\Model\Pricing\Service|\PHPUnit\Framework\MockObject\MockObject
+     * @return Service
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
-    protected function createService()
+    protected function createService(): Service
     {
-        $service = $this->createMock(Pricing\Service::class);
-        return $service;
+        return $this->createStub(Service::class);
     }
 
     /**
@@ -191,11 +190,11 @@ class PricingServiceTest extends BaseTest
     /**
      * @param float|null $freeShipment
      * @param string|null $countryId
-     * @return \Packetery\Checkout\Model\Pricingrule|\PHPUnit\Framework\MockObject\MockObject
+     * @return \Packetery\Checkout\Model\Pricingrule
      */
     protected function createPricingRule(?float $freeShipment, ?string $countryId)
     {
-        $weightRule = $this->createMock(Pricingrule::class);
+        $weightRule = $this->createStub(Pricingrule::class);
         $weightRule->method('getFreeShipment')->willReturn($freeShipment);
         $weightRule->method('getCountryId')->willReturn($countryId);
         $weightRule->method('getEnabled')->willReturn(true);
@@ -205,11 +204,11 @@ class PricingServiceTest extends BaseTest
     /**
      * @param float $price
      * @param float|null $maxWeightKg
-     * @return \Packetery\Checkout\Model\Weightrule|\PHPUnit\Framework\MockObject\MockObject
+     * @return \Packetery\Checkout\Model\Weightrule
      */
     protected function createWeightRule(float $price, ?float $maxWeightKg)
     {
-        $weightRule = $this->createMock(Weightrule::class);
+        $weightRule = $this->createStub(Weightrule::class);
         $weightRule->method('getPrice')->willReturn($price);
         $weightRule->method('getMaxWeight')->willReturn($maxWeightKg);
         return $weightRule;
@@ -219,10 +218,10 @@ class PricingServiceTest extends BaseTest
         $resolvePricingRuleResult = $resolvePricingRuleReturnsNull ? null : $pricingRule;
         /** @var \Packetery\Checkout\Model\Pricing\Service|MockObject $service */
         $service = $this->createProxy(
-            Pricing\Service::class,
+            Service::class,
             [
                 'rateResultFactory' => $this->createFactoryMock($this->createProxy(Result::class), \Magento\Shipping\Model\Rate\ResultFactory::class),
-                'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createMock(PriceCurrencyInterface::class)]), MethodFactory::class),
+                'rateMethodFactory' => $this->createFactoryMock($this->createProxy(Method::class, ['priceCurrency' => $this->createStub(PriceCurrencyInterface::class)]), MethodFactory::class),
             ],
             ['getWeightRulesByPricingRule' => $weightRules, 'resolvePricingRule' => $resolvePricingRuleResult]
         );
@@ -233,7 +232,7 @@ class PricingServiceTest extends BaseTest
             'dest_country_id' => $country,
         ]);
 
-        $config = $this->createMock(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
+        $config = $this->createStub(\Packetery\Checkout\Model\Carrier\Imp\Packetery\Config::class);
         $config->method('getMaxWeight')->willReturn($maxGlobalWeight);
         $config->method('getFreeShippingThreshold')->willReturn($globalfreeShipment);
         $config->method('getTitle')->willReturn('title');
