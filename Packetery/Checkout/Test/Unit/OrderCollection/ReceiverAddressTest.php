@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Test\Unit\OrderCollection;
 
 use Packetery\Checkout\Model\OrderCollection\ReceiverAddress;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ReceiverAddressTest extends \Packetery\Checkout\Test\BaseTest
 {
-    /**
-     * @dataProvider forCountryProvider
-     */
+    #[DataProvider('forCountryProvider')]
     public function testForCountry(
         string $input,
         string $expectedCountryCode,
