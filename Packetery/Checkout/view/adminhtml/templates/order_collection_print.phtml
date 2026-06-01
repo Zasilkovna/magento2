@@ -1,7 +1,17 @@
 <?php
 /** @var \Magento\Framework\View\Element\Template $block */
 
-/** @var array<int, array{store_name: string, sender: \Packetery\Checkout\Model\OrderCollection\SenderAddress, receiver: \Packetery\Checkout\Model\OrderCollection\ReceiverAddress, rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[], barcode_text: string, barcode_png_base64: string}> $sections */
+/**
+ * @var array<int, array{
+ *     store_name: string,
+ *     sender: \Packetery\Checkout\Model\OrderCollection\SenderAddress,
+ *     receiver: \Packetery\Checkout\Model\OrderCollection\ReceiverAddress,
+ *     rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[],
+ *     barcode_text: string,
+ *     barcode_png_base64: string,
+ *     show_consign_password: bool
+ * }> $sections
+ */
 $sections = $block->getData('sections');
 $printedAt = new \DateTimeImmutable('now');
 ?><!DOCTYPE html>
@@ -25,6 +35,8 @@ $printedAt = new \DateTimeImmutable('now');
         $barcodePngBase64 = (string) $section['barcode_png_base64'];
         $storeName = (string) $section['store_name'];
         $packetCount = count($rows);
+        $showConsignPassword = (bool) $section['show_consign_password'];
+        $columnCount = $showConsignPassword ? 7 : 6;
         ?>
         <div class="packetery-order-collection-section">
             <div class="packetery-order-collection-section-header">
@@ -61,6 +73,9 @@ $printedAt = new \DateTimeImmutable('now');
                 <tr>
                     <th><?= $block->escapeHtml(__('Order number')) ?></th>
                     <th><?= $block->escapeHtml(__('Barcode')) ?></th>
+                    <?php if ($showConsignPassword): ?>
+                        <th><?= $block->escapeHtml(__('Z-BOX consign password')) ?></th>
+                    <?php endif; ?>
                     <th><?= $block->escapeHtml(__('Created')) ?></th>
                     <th><?= $block->escapeHtml(__('Name and surname')) ?></th>
                     <th><?= $block->escapeHtml(__('Cash on delivery')) ?></th>
@@ -72,6 +87,9 @@ $printedAt = new \DateTimeImmutable('now');
                     <tr class="<?= $index % 2 === 0 ? 'odd' : 'even' ?>">
                         <td class="packetery-no-wrap order-number-column"><?= $block->escapeHtml($row->getOrderNumber()) ?></td>
                         <td class="packetery-no-wrap"><?= $block->escapeHtml($row->getPacketNumber()) ?></td>
+                        <?php if ($showConsignPassword): ?>
+                            <td class="packetery-no-wrap"><?= $block->escapeHtml((string) $row->getConsignPassword()) ?></td>
+                        <?php endif; ?>
                         <td class="packetery-no-wrap"><?= $block->escapeHtml($row->getCreatedAt() !== null ? $row->getCreatedAt()->format('d. m.') : '') ?></td>
                         <td class="packetery-no-wrap"><?= $block->escapeHtml($row->getRecipientName()) ?></td>
                         <td class="packetery-no-wrap cod-column">
@@ -81,7 +99,7 @@ $printedAt = new \DateTimeImmutable('now');
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="<?= (int) $columnCount ?>">
                         <div class="packetery-end"><?= $block->escapeHtml(__('End')) ?></div>
                     </td>
                 </tr>
