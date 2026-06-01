@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="packetery_order" resource="default" engine="innodb" comment="Zásilkovna objednávky">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="order_number" length="128" nullable="false"/>
+        <column xsi:type="varchar" name="recipient_firstname" length="128" nullable="false"/>
+        <column xsi:type="varchar" name="recipient_lastname" length="128" nullable="false"/>
+        <column xsi:type="varchar" name="recipient_company" length="128" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_email" length="128" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_phone" length="32" nullable="true"/>
+        <column xsi:type="decimal" name="cod" precision="20" scale="4" nullable="true"/>
+        <column xsi:type="varchar" name="currency" length="8" nullable="true"/>
+        <column xsi:type="decimal" name="value" precision="20" scale="4" nullable="true"/>
+        <column xsi:type="decimal" name="weight" precision="12" scale="4" nullable="true"/>
+        <column xsi:type="varchar" name="point_id" length="32" nullable="false"/>
+        <column xsi:type="text" name="point_name" nullable="true"/>
+        <column xsi:type="boolean" name="is_carrier" nullable="false" default="0" comment="Is Point_id ID of external carrier?"/>
+        <column xsi:type="varchar" name="carrier_pickup_point" length="40" nullable="true" comment="External carrier pickup point ID"/>
+        <column xsi:type="varchar" name="sender_label" length="64" nullable="true"/>
+        <column xsi:type="boolean" name="adult_content" nullable="true"/>
+        <column xsi:type="date" name="delayed_delivery" nullable="true"/>
+        <column xsi:type="boolean" name="address_validated" nullable="false" default="0" comment="Is recipient address validated?"/>
+        <column xsi:type="varchar" name="recipient_street" length="128" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_house_number" length="32" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_city" length="128" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_zip" length="32" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_country_id" length="2" nullable="true"/>
+        <column xsi:type="varchar" name="recipient_county" length="128" nullable="true"/>
+        <column xsi:type="decimal" name="recipient_longitude" precision="11" scale="8" nullable="true"/>
+        <column xsi:type="decimal" name="recipient_latitude" precision="10" scale="8" nullable="true"/>
+        <column xsi:type="varchar" name="carrier_point" length="64" nullable="true"/>
+        <column xsi:type="int" name="width" padding="11" nullable="true"/>
+        <column xsi:type="int" name="height" padding="11" nullable="true"/>
+        <column xsi:type="int" name="depth" padding="11" nullable="true"/>
+        <column xsi:type="boolean" name="exported" nullable="true"/>
+        <column xsi:type="datetime" name="exported_at" nullable="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="packetery_pricing_rule" resource="default" engine="innodb" comment="Packetery pricing rules. Relates to packetery_weight_rules.">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="decimal" name="free_shipment" precision="20" scale="4" nullable="true" comment="From what order value will be shipping for free?"/>
+        <column xsi:type="varchar" name="country_id" length="2" nullable="false" comment="Country that relates to specified price"/>
+        <column xsi:type="varchar" name="method" length="64" nullable="false" comment="Related delivery method"/>
+        <column xsi:type="varchar" name="carrier_code" length="64" nullable="false" comment="Magento unique carrier class identifier"/>
+        <column xsi:type="int" name="carrier_id" padding="11" nullable="true" comment="Dynamic carrier id from Mordor"/>
+        <column xsi:type="varchar" name="vendor_groups" length="255" nullable="true" comment="Vendor groups"/>
+        <column xsi:type="boolean" name="enabled" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="address_validation" length="10" nullable="false" default="none" comment="Address validation"/>
+        <column xsi:type="decimal" name="max_cod" precision="20" scale="4" nullable="true" comment="minimal value to hide COD payment methods"/>
+        <column xsi:type="varchar" name="carrier_name" length="64" nullable="true" comment="Custom carrier name"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="packetery_weight_rule" resource="default" engine="innodb" comment="Packetery weight rules. Relates to packetery pricing rules.">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="packetery_pricing_rule_id" padding="10" unsigned="true" nullable="false"/>
+        <column xsi:type="decimal" name="price" precision="20" scale="4" nullable="false" comment="Price for given constrains"/>
+        <column xsi:type="decimal" name="max_weight" precision="12" scale="4" nullable="true" comment="Maximum weight in kilograms"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_618E992384200282F65A78FC84A3DFF2" table="packetery_weight_rule" column="packetery_pricing_rule_id" referenceTable="packetery_pricing_rule" referenceColumn="id" onDelete="NO ACTION"/>
+        <index referenceId="PACKETERY_WEIGHT_RULE_PACKETERY_PRICING_RULE_ID" indexType="btree">
+            <column name="packetery_pricing_rule_id"/>
+        </index>
+    </table>
+    <table name="packetery_carrier" resource="default" engine="innodb" comment="Packetery carriers regulary updated via cron job">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="carrier_id" padding="11" nullable="false"/>
+        <column xsi:type="varchar" name="name" length="64" nullable="false"/>
+        <column xsi:type="boolean" name="is_pickup_points" nullable="false"/>
+        <column xsi:type="boolean" name="has_carrier_direct_label" nullable="false"/>
+        <column xsi:type="boolean" name="separate_house_number" nullable="false"/>
+        <column xsi:type="boolean" name="customs_declarations" nullable="false"/>
+        <column xsi:type="boolean" name="requires_email" nullable="false"/>
+        <column xsi:type="boolean" name="requires_phone" nullable="false"/>
+        <column xsi:type="boolean" name="requires_size" nullable="false"/>
+        <column xsi:type="boolean" name="disallows_cod" nullable="false"/>
+        <column xsi:type="varchar" name="country" length="3" nullable="false"/>
+        <column xsi:type="varchar" name="currency" length="3" nullable="false"/>
+        <column xsi:type="decimal" name="max_weight" precision="12" scale="4" nullable="false"/>
+        <column xsi:type="boolean" name="available" nullable="false" default="1" comment="Carrier available in feed"/>
+        <column xsi:type="boolean" name="deleted" nullable="false"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="packetery_packet" resource="default" engine="innodb" comment="Successfully submitted Packeta packets">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="order_number" length="128" nullable="false"/>
+        <column xsi:type="varchar" name="packet_number" length="64" nullable="false"/>
+        <column xsi:type="decimal" name="weight" precision="12" scale="4" nullable="false"/>
+        <column xsi:type="decimal" name="value" precision="20" scale="4" nullable="false"/>
+        <column xsi:type="decimal" name="cod" precision="20" scale="4" nullable="true"/>
+        <column xsi:type="varchar" name="courier_number" length="64" nullable="true" comment="Carrier tracking number from Packeta API"/>
+        <column xsi:type="datetime" name="label_printed_at" nullable="true" comment="UTC date and time of last successful label print"/>
+        <column xsi:type="varchar" name="consign_password" length="10" nullable="true" comment="Z-BOX consign password returned by Packeta API"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="PACKETERY_PACKET_ORDER_NUMBER" indexType="btree">
+            <column name="order_number"/>
+        </index>
+    </table>
+    <table name="packetery_box" resource="default" engine="innodb" comment="Packeta predefined box dimensions">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="false" comment="Box dimension class name"/>
+        <column xsi:type="decimal" name="depth" precision="12" scale="1" nullable="false" comment="Box depth in centimeters"/>
+        <column xsi:type="decimal" name="width" precision="12" scale="1" nullable="false" comment="Box width in centimeters"/>
+        <column xsi:type="decimal" name="height" precision="12" scale="1" nullable="false" comment="Box height in centimeters"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="PACKETERY_BOX_NAME" indexType="fulltext">
+            <column name="name"/>
+        </index>
+    </table>
+</schema>
