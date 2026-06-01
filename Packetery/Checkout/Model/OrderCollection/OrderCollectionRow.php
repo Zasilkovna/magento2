@@ -20,6 +20,8 @@ class OrderCollectionRow
 
     private string $currency;
 
+    private ?string $consignPassword;
+
     public function __construct(
         string $orderNumber,
         string $packetNumber,
@@ -27,7 +29,8 @@ class OrderCollectionRow
         string $recipientName,
         string $deliveryDestination,
         float $cod,
-        string $currency
+        string $currency,
+        ?string $consignPassword
     ) {
         $this->orderNumber = $orderNumber;
         $this->packetNumber = $packetNumber;
@@ -36,6 +39,7 @@ class OrderCollectionRow
         $this->deliveryDestination = $deliveryDestination;
         $this->cod = $cod;
         $this->currency = $currency;
+        $this->consignPassword = $consignPassword;
     }
 
     public function getOrderNumber(): string
@@ -71,5 +75,10 @@ class OrderCollectionRow
     public function getCurrency(): string
     {
         return $this->currency;
+    }
+
+    public function getConsignPassword(): ?string
+    {
+        return $this->consignPassword;
     }
 }

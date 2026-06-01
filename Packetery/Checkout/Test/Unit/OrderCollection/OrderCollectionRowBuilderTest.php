@@ -110,6 +110,28 @@ class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
         $this->assertNull($row->getCreatedAt());
     }
 
+    public function testPresentConsignPassword(): void
+    {
+        $row = $this->createBuilder()->build(
+            $this->createPacketeryOrder(['country_id' => 'CZ']),
+            $this->createPacket('Z-PWD', '044670179'),
+            $this->createMagentoOrder('packetery_pickupPointDelivery', '2026-05-19 09:00:00')
+        );
+
+        $this->assertSame('044670179', $row->getConsignPassword());
+    }
+
+    public function testNullConsignPassword(): void
+    {
+        $row = $this->createBuilder()->build(
+            $this->createPacketeryOrder(['country_id' => 'CZ']),
+            $this->createPacket('Z-NOPWD', null),
+            $this->createMagentoOrder('packetery_pickupPointDelivery', '2026-05-19 09:00:00')
+        );
+
+        $this->assertNull($row->getConsignPassword());
+    }
+
     private function createBuilder(): OrderCollectionRowBuilder
     {
         return new OrderCollectionRowBuilder(
@@ -162,13 +184,14 @@ class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
         return $order;
     }
 
-    private function createPacket(string $packetNumber): \Packetery\Checkout\Model\Packet
+    private function createPacket(string $packetNumber, ?string $consignPassword = null): \Packetery\Checkout\Model\Packet
     {
         $packet = $this->getMockBuilder(\Packetery\Checkout\Model\Packet::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getPacketNumber'])
+            ->onlyMethods(['getPacketNumber', 'getConsignPassword'])
             ->getMock();
         $packet->method('getPacketNumber')->willReturn($packetNumber);
+        $packet->method('getConsignPassword')->willReturn($consignPassword);
 
         return $packet;
     }

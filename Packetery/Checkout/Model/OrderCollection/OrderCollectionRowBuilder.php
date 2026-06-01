@@ -36,7 +36,8 @@ class OrderCollectionRowBuilder
             $recipientName,
             $this->resolveDeliveryDestination($packeteryOrder, $magentoOrder, $recipientCountry),
             (float) ($packeteryOrder->getCod() ?? 0.0),
-            (string) ($packeteryOrder->getCurrency() ?? '')
+            (string) ($packeteryOrder->getCurrency() ?? ''),
+            $packet->getConsignPassword()
         );
     }
 

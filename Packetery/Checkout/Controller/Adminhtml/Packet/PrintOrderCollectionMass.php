@@ -115,6 +115,7 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
                 'rows' => $group['rows'],
                 'barcode_text' => $shipmentResult->getBarcodeText() ?? $barcode,
                 'barcode_png_base64' => base64_encode($pngContents),
+                'show_consign_password' => $group['show_consign_password'],
             ];
         }
 
@@ -127,7 +128,12 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
 
     /**
      * @param \Packetery\Checkout\Model\Order[] $packeteryOrders
-     * @return array<int, array{api_password: string, packet_ids: string[], rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[]}>
+     * @return array<int, array{
+     *     api_password: string,
+     *     packet_ids: string[],
+     *     rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[],
+     *     show_consign_password: bool
+     * }>
      */
     private function groupByStore(array $packeteryOrders): array
     {
@@ -166,6 +172,7 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
                     'api_password' => $apiPassword,
                     'packet_ids' => [],
                     'rows' => [],
+                    'show_consign_password' => $packeteryCarrier->getPacketeryConfig()->isShowConsignPassword(),
                 ];
             }
 
@@ -177,7 +184,15 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
     }
 
     /**
-     * @param array<int, array{store_name: string, sender: \Packetery\Checkout\Model\OrderCollection\SenderAddress, receiver: \Packetery\Checkout\Model\OrderCollection\ReceiverAddress, rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[], barcode_text: string, barcode_png_base64: string}> $sections
+     * @param array<int, array{
+     *     store_name: string,
+     *     sender: \Packetery\Checkout\Model\OrderCollection\SenderAddress,
+     *     receiver: \Packetery\Checkout\Model\OrderCollection\ReceiverAddress,
+     *     rows: \Packetery\Checkout\Model\OrderCollection\OrderCollectionRow[],
+     *     barcode_text: string,
+     *     barcode_png_base64: string,
+     *     show_consign_password: bool
+     * }> $sections
      */
     private function renderCombinedHtml(array $sections): string
     {
