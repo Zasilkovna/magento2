@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Test\Unit;
 
 use Packetery\Checkout\Model\Carrier\Methods;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class AllowedMethodsTest extends \Packetery\Checkout\Test\BaseTest
 {
     public function testGetFinalAllowedMethods() {

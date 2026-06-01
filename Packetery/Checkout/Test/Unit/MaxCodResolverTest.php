@@ -42,7 +42,7 @@ class MaxCodResolverTest extends TestCase
 
     private function createPricingRuleMock(?float $maxCod, ?int $carrierId): Pricingrule
     {
-        $pricingRule = $this->createMock(Pricingrule::class);
+        $pricingRule = $this->createStub(Pricingrule::class);
         $pricingRule->method('getMaxCOD')->willReturn($maxCod);
         $pricingRule->method('getCarrierId')->willReturn($carrierId);
         return $pricingRule;
@@ -50,7 +50,7 @@ class MaxCodResolverTest extends TestCase
 
     private function createCarrierMock(bool $disallowsCod): Carrier
     {
-        $carrier = $this->createMock(Carrier::class);
+        $carrier = $this->createStub(Carrier::class);
         $carrier->method('disallowsCod')->willReturn($disallowsCod);
         return $carrier;
     }
@@ -69,7 +69,7 @@ class MaxCodResolverTest extends TestCase
 
     private function createCollectionFactoryMock(Collection $collection): CollectionFactory
     {
-        $factory = $this->createMock(CollectionFactory::class);
+        $factory = $this->createStub(CollectionFactory::class);
         $factory->method('create')->willReturn($collection);
         return $factory;
     }

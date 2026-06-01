@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Test\Unit;
 
-use Packetery\Checkout\Model\Carrier\Imp\Packetery\Config;
 use Packetery\Checkout\Model\ResourceModel\PricingruleRepository;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class ValidationTest extends \Packetery\Checkout\Test\BaseTest
 {
     /**

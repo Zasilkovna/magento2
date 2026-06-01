@@ -8,7 +8,9 @@ use Packetery\Checkout\Model\Address;
 use Packetery\Checkout\Model\Carrier\Facade;
 use Packetery\Checkout\Model\OrderCollection\OrderCollectionRowBuilder;
 use Packetery\Checkout\Model\Pricing\Service;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
 {
     public function testPickupPointOrderReturnsPointName(): void
@@ -52,13 +54,13 @@ class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
 
     public function testExternalCarrierUsesPricingRuleName(): void
     {
-        $pricingRule = $this->createMock(\Packetery\Checkout\Model\Pricingrule::class);
+        $pricingRule = $this->createStub(\Packetery\Checkout\Model\Pricingrule::class);
         $pricingRule->method('getCarrierName')->willReturn('DPD Local');
 
-        $pricingService = $this->createMock(Service::class);
+        $pricingService = $this->createStub(Service::class);
         $pricingService->method('resolvePricingRule')->willReturn($pricingRule);
 
-        $row = (new OrderCollectionRowBuilder($this->createMock(Facade::class), $pricingService))->build(
+        $row = (new OrderCollectionRowBuilder($this->createStub(Facade::class), $pricingService))->build(
             $this->createPacketeryOrder(['country_id' => 'DE']),
             $this->createPacket('Z-789'),
             $this->createMagentoOrder('packeteryPacketaDynamic_123-addressDelivery', '2026-05-19 09:00:00')
@@ -69,13 +71,13 @@ class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
 
     public function testExternalCarrierFallsBackToHybridCarrierName(): void
     {
-        $pricingService = $this->createMock(Service::class);
+        $pricingService = $this->createStub(Service::class);
         $pricingService->method('resolvePricingRule')->willReturn(null);
 
-        $hybridCarrier = $this->createMock(\Packetery\Checkout\Model\HybridCarrier::class);
+        $hybridCarrier = $this->createStub(\Packetery\Checkout\Model\HybridCarrier::class);
         $hybridCarrier->method('getFinalCarrierName')->willReturn('GLS');
 
-        $facade = $this->createMock(Facade::class);
+        $facade = $this->createStub(Facade::class);
         $facade->method('createHybridCarrierCached')->willReturn($hybridCarrier);
 
         $row = (new OrderCollectionRowBuilder($facade, $pricingService))->build(
@@ -135,8 +137,8 @@ class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
     private function createBuilder(): OrderCollectionRowBuilder
     {
         return new OrderCollectionRowBuilder(
-            $this->createMock(Facade::class),
-            $this->createMock(Service::class)
+            $this->createStub(Facade::class),
+            $this->createStub(Service::class)
         );
     }
 
@@ -198,7 +200,7 @@ class OrderCollectionRowBuilderTest extends \Packetery\Checkout\Test\BaseTest
 
     private function createMagentoOrder(string $shippingMethod, string $createdAt): \Magento\Sales\Model\Order
     {
-        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+        $order = $this->createStub(\Magento\Sales\Model\Order::class);
         $order->method('getShippingMethod')->willReturn($shippingMethod);
         $order->method('getCreatedAt')->willReturn($createdAt);
 

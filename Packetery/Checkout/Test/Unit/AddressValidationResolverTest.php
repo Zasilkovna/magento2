@@ -87,7 +87,7 @@ class AddressValidationResolverTest extends TestCase
 
     private function createPricingRuleMock(?string $method, ?string $countryId, string $addressValidation): Pricingrule
     {
-        $pricingRule = $this->createMock(Pricingrule::class);
+        $pricingRule = $this->createStub(Pricingrule::class);
         $pricingRule->method('getMethod')->willReturn($method);
         $pricingRule->method('getCountryId')->willReturn($countryId);
         $pricingRule->method('getAddressValidation')->willReturn($addressValidation);

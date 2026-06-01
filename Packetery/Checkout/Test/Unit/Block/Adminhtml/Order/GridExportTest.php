@@ -6,7 +6,9 @@ namespace Packetery\Checkout\Test\Unit\Block\Adminhtml\Order;
 
 use Packetery\Checkout\Block\Adminhtml\Order\GridExport;
 use Packetery\Checkout\Test\BaseTest;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class GridExportTest extends BaseTest
 {
     public function testCreateCsvContentReturnsCsvWithVersionHeaderAndDataRows(): void
