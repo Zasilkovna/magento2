@@ -99,9 +99,12 @@ $printedAt = new \DateTimeImmutable('now');
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td colspan="<?= (int) $columnCount ?>">
+                    <td>
                         <div class="packetery-end"><?= $block->escapeHtml(__('End')) ?></div>
                     </td>
+                    <?php for ($column = 1; $column < $columnCount; $column++): ?>
+                        <td class="packetery-end-empty"></td>
+                    <?php endfor; ?>
                 </tr>
                 </tbody>
             </table>

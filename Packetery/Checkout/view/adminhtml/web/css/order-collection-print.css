@@ -5,6 +5,10 @@
     text-align: center;
     overflow: hidden;
 }
+#packetery-order-collection-print .packetery-end-empty {
+    border: 0 none;
+    background: none;
+}
 #packetery-order-collection-print thead {
     display: table-header-group;
 }
