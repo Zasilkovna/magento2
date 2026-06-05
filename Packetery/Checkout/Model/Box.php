@@ -16,6 +16,9 @@ class Box extends AbstractModel
     public const WIDTH = 'width';
     public const HEIGHT = 'height';
 
+    public const IS_DEFAULT = 'is_default';
+    public const DELETED = 'deleted';
+
     private const ROUND_PRECISION = 1;
 
     protected function _construct(): void
@@ -70,5 +73,25 @@ class Box extends AbstractModel
     {
         $height = round($height, self::ROUND_PRECISION);
         return $this->setData(self::HEIGHT, $height);
+    }
+
+    public function getIsDefault(): bool
+    {
+        return (bool) $this->getData(self::IS_DEFAULT);
+    }
+
+    public function setIsDefault(bool $isDefault): self
+    {
+        return $this->setData(self::IS_DEFAULT, $isDefault);
+    }
+
+    public function getDeleted(): bool
+    {
+        return (bool) $this->getData(self::DELETED);
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        return $this->setData(self::DELETED, $deleted);
     }
 }

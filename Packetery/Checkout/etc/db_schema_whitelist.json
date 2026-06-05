@@ -120,7 +120,9 @@
             "name": true,
             "depth": true,
             "width": true,
-            "height": true
+            "height": true,
+            "is_default": true,
+            "deleted": true
         },
         "index": {
             "PACKETERY_BOX_NAME": true

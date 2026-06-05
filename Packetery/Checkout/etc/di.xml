@@ -31,7 +31,7 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="BoxGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+    <virtualType name="BoxGridCollection" type="Packetery\Checkout\Ui\Component\Box\Listing\SearchResult">
         <arguments>
             <argument name="mainTable" xsi:type="string">packetery_box</argument>
             <argument name="resourceModel" xsi:type="string">Packetery\Checkout\Model\ResourceModel\Box</argument>

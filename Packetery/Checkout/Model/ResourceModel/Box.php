@@ -13,4 +13,14 @@ class Box extends AbstractDb
     {
         $this->_init(BoxModel::TABLE_NAME, BoxModel::ID);
     }
+
+    public function unsetDefaultFlag(): void
+    {
+        $connection = $this->getConnection();
+        $connection->update(
+            $this->getTable(BoxModel::TABLE_NAME),
+            [BoxModel::IS_DEFAULT => 0],
+            [BoxModel::IS_DEFAULT . ' = ?' => 1]
+        );
+    }
 }

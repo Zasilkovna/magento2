@@ -111,6 +111,8 @@
         <column xsi:type="decimal" name="depth" precision="12" scale="1" nullable="false" comment="Box depth in centimeters"/>
         <column xsi:type="decimal" name="width" precision="12" scale="1" nullable="false" comment="Box width in centimeters"/>
         <column xsi:type="decimal" name="height" precision="12" scale="1" nullable="false" comment="Box height in centimeters"/>
+        <column xsi:type="boolean" name="is_default" nullable="false" default="0" comment="Default box flag"/>
+        <column xsi:type="boolean" name="deleted" nullable="false" default="0" comment="Soft-delete flag"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>

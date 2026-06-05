@@ -10,6 +10,7 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Packetery\Checkout\Model\Box;
 use Packetery\Checkout\Model\BoxFactory;
 use Packetery\Checkout\Model\BoxRepository;
 
@@ -41,7 +42,7 @@ class Save extends Action
                     $model = $this->boxFactory->create();
                 }
 
-                unset($data['id']);
+                unset($data['id'], $data[Box::IS_DEFAULT], $data[Box::DELETED]);
                 $model->addData($data);
 
                 $this->boxRepository->save($model);

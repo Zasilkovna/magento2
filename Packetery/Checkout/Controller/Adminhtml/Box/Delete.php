@@ -38,6 +38,13 @@ class Delete extends Action
 
         try {
             $model = $this->boxRepository->getById($id);
+
+            if ($model->getIsDefault()) {
+                $this->messageManager->addErrorMessage(__('Unable to delete the box.'));
+
+                return $resultRedirect->setPath('*/*/');
+            }
+
             $this->boxRepository->deleteById($id);
             $this->messageManager->addSuccessMessage(__("Item '%1' was successfully deleted.", $model->getName()));
 
