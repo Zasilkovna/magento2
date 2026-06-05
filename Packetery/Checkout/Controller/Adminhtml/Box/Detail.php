@@ -31,6 +31,9 @@ class Detail extends Action
         if ($id) {
             try {
                 $model = $this->boxRepository->getById($id);
+                if ($model->getDeleted()) {
+                    throw new NoSuchEntityException();
+                }
             } catch (NoSuchEntityException) {
                 $this->messageManager->addErrorMessage(__('Item does not exists enymore'));
 

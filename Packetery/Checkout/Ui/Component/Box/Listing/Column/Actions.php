@@ -14,6 +14,7 @@ class Actions extends Column
 {
     public const URL_PATH_EDIT = 'packetery/box/detail';
     public const URL_PATH_DELETE = 'packetery/box/delete';
+    public const URL_PATH_SET_DEFAULT = 'packetery/box/setAsDefault';
 
     public function __construct(
         ContextInterface $context,
@@ -30,19 +31,27 @@ class Actions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 if (isset($item[Box::ID])) {
-                    $item[$this->getData('name')]['edit'] = [
+                    $name = $this->getData('name');
+                    $item[$name]['edit'] = [
                         'href' => $this->urlBuilder->getUrl(self::URL_PATH_EDIT, [Box::ID => $item[Box::ID]]),
                         'label' => __('Edit'),
                     ];
 
-                    $item[$this->getData('name')]['delete'] = [
-                        'href' => $this->urlBuilder->getUrl(self::URL_PATH_DELETE, [Box::ID => $item[Box::ID]]),
-                        'label' => __('Delete'),
-                        'confirm' => [
-                            'title' => __('Delete'),
-                            'message' => __("Are you sure you want to delete item '%1'?", $item['name'])
-                        ],
-                    ];
+                    if (empty($item[Box::IS_DEFAULT])) {
+                        $item[$name]['setDefault'] = [
+                            'href' => $this->urlBuilder->getUrl(self::URL_PATH_SET_DEFAULT, [Box::ID => $item[Box::ID]]),
+                            'label' => __('Set as default'),
+                        ];
+
+                        $item[$name]['delete'] = [
+                            'href' => $this->urlBuilder->getUrl(self::URL_PATH_DELETE, [Box::ID => $item[Box::ID]]),
+                            'label' => __('Delete'),
+                            'confirm' => [
+                                'title' => __('Delete'),
+                                'message' => __("Are you sure you want to delete item '%1'?", $item['name'])
+                            ],
+                        ];
+                    }
                 }
             }
         }

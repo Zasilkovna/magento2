@@ -1,4 +1,5 @@
-2.5.0 - Added: Z-BOX consign password in Print delivery list at Packeta orders list page
+2.5.0 - Added: Box Manager default box selection and soft-delete
+      - Added: Z-BOX consign password in Print delivery list at Packeta orders list page
       - Added: Weight param to widget, converted from g/lbs to kgs
       - Added: Log Packeta widget parameters to the developers console
       - Added: Box dimensions datagrid with possibility add, edit, delete name, depth, width and height of boxes
