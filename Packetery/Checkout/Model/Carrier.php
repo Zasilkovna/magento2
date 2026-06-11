@@ -77,4 +77,8 @@ class Carrier extends \Magento\Framework\Model\AbstractModel implements \Magento
     public function disallowsCod(): bool {
         return (bool)$this->getData('disallows_cod');
     }
+
+    public function requiresSize(): bool {
+        return (bool)$this->getData('requires_size');
+    }
 }

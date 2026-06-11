@@ -9,6 +9,13 @@ use Packetery\Checkout\Model\Carrier\VendorGroups;
 
 class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
 {
+    public const BASE_COUNTRIES = [
+        'CZ',
+        'SK',
+        'HU',
+        'RO',
+    ];
+
     /** @var \Packetery\Checkout\Model\Carrier\Imp\Packetery\MethodSelect */
     private $methodSelect;
 
@@ -72,7 +79,7 @@ class Brain extends \Packetery\Checkout\Model\Carrier\AbstractBrain
      * @return string[]
      */
     public function getBaseCountries(): array {
-        return ['CZ', 'SK', 'HU', 'RO'];
+        return self::BASE_COUNTRIES;
     }
 
     public function getDynamicCarrierById( ?int $id ): ?\Packetery\Checkout\Model\Carrier\AbstractDynamicCarrier {

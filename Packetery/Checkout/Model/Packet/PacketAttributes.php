@@ -6,7 +6,7 @@ namespace Packetery\Checkout\Model\Packet;
 
 class PacketAttributes
 {
-    /** @var array<string, string|int|float> */
+    /** @var array<string, string|int|float|bool|array{length: int, width: int, height: int}> */
     private array $data;
 
     public function __construct(array $data = [])
@@ -133,8 +133,28 @@ class PacketAttributes
         return $clone;
     }
 
+    public function withAdultContent(bool $adultContent): self
+    {
+        $clone = clone $this;
+        $clone->data['adultContent'] = $adultContent;
+
+        return $clone;
+    }
+
+    public function withSize(int $length, int $width, int $height): self
+    {
+        $clone = clone $this;
+        $clone->data['size'] = [
+            'length' => $length,
+            'width' => $width,
+            'height' => $height,
+        ];
+
+        return $clone;
+    }
+
     /**
-     * @return array<string, string|int|float>
+     * @return array<string, string|int|float|bool|array{length: int, width: int, height: int}>
      */
     public function toArray(): array
     {

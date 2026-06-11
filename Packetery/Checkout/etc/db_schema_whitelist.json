@@ -32,11 +32,13 @@
             "width": true,
             "height": true,
             "depth": true,
+            "box_id": true,
             "exported": true,
             "exported_at": true
         },
         "constraint": {
-            "PRIMARY": true
+            "PRIMARY": true,
+            "PACKETERY_ORDER_BOX_ID_PACKETERY_BOX_ID": true
         }
     },
     "packetery_pricing_rule": {
@@ -108,7 +110,11 @@
             "consign_password": true,
             "packet_status": true,
             "packet_id_fault": true,
-            "status_synced_at": true
+            "status_synced_at": true,
+            "box_name": true,
+            "box_width": true,
+            "box_height": true,
+            "box_depth": true
         },
         "index": {
             "PACKETERY_PACKET_ORDER_NUMBER": true

@@ -8,10 +8,15 @@ class TrackingUrlFactory
 {
     private const BASE_URL = 'https://tracking.packeta.com/';
 
+    private const BARCODE_PREFIX = 'Z';
+
     public function create(string $packetNumber): string
     {
-        $trackingNumber = 'Z' . $packetNumber;
+        return self::BASE_URL . rawurlencode($this->formatNumber($packetNumber));
+    }
 
-        return self::BASE_URL . rawurlencode($trackingNumber);
+    public function formatNumber(string $packetNumber): string
+    {
+        return self::BARCODE_PREFIX . $packetNumber;
     }
 }

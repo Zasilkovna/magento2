@@ -1,6 +1,4 @@
-<div class="packetery-picker" visible="element.isStoreConfigLoaded()" class="primary">
-    <img class="packetery-picker-logo" data-bind="attr: { src: element.getPacketaSymbolUrl() }" alt="packeta-logo">
-    <button class="secondary" type="button" click="element.packetaButtonClick">
-        <span data-bind="i18n: 'Choose Pickup Point'"></span>
-    </button>
+<div class="packetery-picker" visible="element.isStoreConfigLoaded()">
+    <span class="packetery-picker__value" data-bind="text: element.pickedDeliveryPlace"></span>
+    <a class="packetery-picker__change" href="#" click="element.packetaButtonClick"><span data-bind="i18n: 'Change'"></span></a>
 </div>

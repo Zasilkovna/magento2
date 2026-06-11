@@ -6,6 +6,7 @@ namespace Packetery\Checkout\Model\Packet;
 
 use Packetery\Checkout\Model\Carrier\Methods;
 use Packetery\Checkout\Model\Carrier\ShippingRateCode;
+use Packetery\Checkout\Model\Dimensions\Unit;
 
 class PacketSubmitter
 {
@@ -39,6 +40,15 @@ class PacketSubmitter
     /** @var \Packetery\Checkout\Model\Log\ApiErrorFormatter */
     private $apiErrorFormatter;
 
+    /** @var \Packetery\Checkout\Model\BoxRepository */
+    private $boxRepository;
+
+    /** @var \Packetery\Checkout\Model\Dimensions\Converter */
+    private $dimensionsConverter;
+
+    /** @var \Packetery\Checkout\Model\OrderCurrencyResolver */
+    private $orderCurrencyResolver;
+
     public function __construct(
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -49,7 +59,10 @@ class PacketSubmitter
         \Packetery\Checkout\Model\ResourceModel\Order $orderResource,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
         \Packetery\Checkout\Model\Log\LogWriter $logWriter,
-        \Packetery\Checkout\Model\Log\ApiErrorFormatter $apiErrorFormatter
+        \Packetery\Checkout\Model\Log\ApiErrorFormatter $apiErrorFormatter,
+        \Packetery\Checkout\Model\BoxRepository $boxRepository,
+        \Packetery\Checkout\Model\Dimensions\Converter $dimensionsConverter,
+        \Packetery\Checkout\Model\OrderCurrencyResolver $orderCurrencyResolver
     ) {
         $this->soapApiClient = $soapApiClient;
         $this->scopeConfig = $scopeConfig;
@@ -61,6 +74,9 @@ class PacketSubmitter
         $this->carrierFacade = $carrierFacade;
         $this->logWriter = $logWriter;
         $this->apiErrorFormatter = $apiErrorFormatter;
+        $this->boxRepository = $boxRepository;
+        $this->dimensionsConverter = $dimensionsConverter;
+        $this->orderCurrencyResolver = $orderCurrencyResolver;
     }
 
     /**
@@ -96,10 +112,7 @@ class PacketSubmitter
             $cod = 0.0;
         }
 
-        $currency = $packeteryOrder->getCurrency();
-        if ($currency === null) {
-            $currency = (string) $magentoOrder->getOrderCurrencyCode();
-        }
+        $currency = (string) $this->orderCurrencyResolver->resolve($packeteryOrder, $magentoOrder);
 
         $attributes = (new \Packetery\Checkout\Model\Packet\PacketAttributes())
             ->withNumber($packeteryOrder->getOrderNumber())
@@ -136,6 +149,16 @@ class PacketSubmitter
                 ->withZip((string) $recipientAddress->getZip());
         }
 
+        $box = $this->resolveBox($packeteryOrder->getBoxId());
+        $attributes = $this->withBoxSize($attributes, $box);
+
+        $shippingAddress = $magentoOrder->getShippingAddress();
+        $countryId = $shippingAddress !== null ? (string) $shippingAddress->getCountryId() : '';
+        if ($packeteryOrder->getAdultContent() === true
+            && \Packetery\Checkout\Model\AdultContentResolver::isEligibleForAdultContent($methodCode->getMethod(), $countryId, $packeteryOrder->isCarrier())) {
+            $attributes = $attributes->withAdultContent(true);
+        }
+
         try {
             $createResult = $this->soapApiClient->createPacket($apiPassword, $attributes);
         } catch (\Packetery\Checkout\Model\Api\PacketSubmissionException $exception) {
@@ -155,7 +178,20 @@ class PacketSubmitter
             $consignPassword = $this->soapApiClient->packetInfo($request)->getConsignPassword();
         }
 
-        $this->savePacket($packeteryOrder->getOrderNumber(), $createResult->getPacketId(), $weight, $value, $cod, $consignPassword);
+        $this->savePacket(
+            $packeteryOrder->getOrderNumber(),
+            $createResult->getPacketId(),
+            $weight,
+            $value,
+            $cod,
+            $consignPassword,
+            $box
+        );
+
+        // Persist the resolved weight so an order that fell back to product/config default
+        // no longer stays empty (the record then matches Packeta)
+        $packeteryOrder->setWeight($weight);
+
         $this->markOrderExported($packeteryOrder);
 
         $this->logWriter->logSuccess(
@@ -165,6 +201,53 @@ class PacketSubmitter
         );
     }
 
+    private function resolveBox(?int $boxId): ?\Packetery\Checkout\Model\Box
+    {
+        if ($boxId === null) {
+            return null;
+        }
+
+        try {
+            return $this->boxRepository->getById($boxId);
+        } catch (\Magento\Framework\Exception\NoSuchEntityException) {
+            return null;
+        }
+    }
+
+    /**
+     * Adds the box size in whole mm, but only when every dimension is set.
+     * A dimension is null only on a box edited directly in the database (the box form requires all dimensions),
+     * so the size is skipped instead of letting the strict conversion throw, mirroring the read-only label fallback.
+     */
+    private function withBoxSize(\Packetery\Checkout\Model\Packet\PacketAttributes $attributes, ?\Packetery\Checkout\Model\Box $box): \Packetery\Checkout\Model\Packet\PacketAttributes
+    {
+        if ($box === null) {
+            return $attributes;
+        }
+
+        $depth = $box->getDepth();
+        $width = $box->getWidth();
+        $height = $box->getHeight();
+
+        if ($depth === null || $width === null || $height === null) {
+            return $attributes;
+        }
+
+        return $attributes->withSize(
+            $this->convertToMm($depth),
+            $this->convertToMm($width),
+            $this->convertToMm($height)
+        );
+    }
+
+    /**
+     * The Packeta API wants size in whole mm, so the converted cm value is rounded here
+     */
+    private function convertToMm(float $cm): int
+    {
+        return (int) round($this->dimensionsConverter->convert($cm, Unit::CM, Unit::MM));
+    }
+
     private function isAlreadySubmitted(string $orderNumber): bool
     {
         $collection = $this->packetCollectionFactory->create();
@@ -172,17 +255,43 @@ class PacketSubmitter
         return $collection->getSize() > 0;
     }
 
+    /**
+     * Resolves the submit weight in order: manual > product > per-store configured default
+     */
     private function resolveWeight(\Packetery\Checkout\Model\Order $packeteryOrder, \Magento\Sales\Model\Order $magentoOrder): float
     {
         $manualWeight = $packeteryOrder->getWeight();
         if ($manualWeight !== null && $manualWeight > 0.0) {
             return $manualWeight;
         }
-        return $this->weightCalculator->getOrderWeight($magentoOrder);
+
+        $productWeight = $this->weightCalculator->getOrderWeight($magentoOrder);
+        if ($productWeight > 0.0) {
+            return $productWeight;
+        }
+
+        $config = $this->carrierFacade->getPacketeryCarrierConfig((int) $magentoOrder->getStoreId());
+        $defaultWeight = $config !== null ? $config->getDefaultWeight() : null;
+        if ($defaultWeight !== null && $defaultWeight > 0.0) {
+            return $defaultWeight;
+        }
+
+        return $productWeight;
     }
 
-    private function savePacket(string $orderNumber, string $packetId, float $weight, float $value, float $cod, ?string $consignPassword): void
-    {
+    /**
+     * Persists the packet; snapshots the chosen box so the read-only view stays correct even if the box later changes
+     */
+    private function savePacket(
+        string $orderNumber,
+        string $packetId,
+        float $weight,
+        float $value,
+        float $cod,
+        ?string $consignPassword,
+        ?\Packetery\Checkout\Model\Box $box
+    ): void {
+        /** @var \Packetery\Checkout\Model\Packet $packet */
         $packet = $this->packetFactory->create();
         $packet->setOrderNumber($orderNumber);
         $packet->setPacketNumber($packetId);
@@ -190,6 +299,14 @@ class PacketSubmitter
         $packet->setValue($value);
         $packet->setCod($cod);
         $packet->setConsignPassword($consignPassword);
+
+        if ($box !== null) {
+            $packet->setBoxName($box->getName());
+            $packet->setBoxWidth($box->getWidth());
+            $packet->setBoxHeight($box->getHeight());
+            $packet->setBoxDepth($box->getDepth());
+        }
+
         $this->packetResource->save($packet);
     }
 

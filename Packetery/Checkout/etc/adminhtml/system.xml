@@ -44,6 +44,10 @@
                     <label>Label Format</label>
                     <source_model>Packetery\Checkout\Model\Config\Source\LabelFormat</source_model>
                 </field>
+                <field id="default_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="61" translate="label" type="text">
+                    <label>Default weight</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
                 <field id="max_weight" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="62" translate="label" type="text">
                     <label>Max. weight</label>
                     <validate>required-entry validate-not-negative-number</validate>

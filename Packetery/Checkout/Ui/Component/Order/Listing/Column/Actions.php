@@ -11,9 +11,6 @@ class Actions extends Column
     /** @var \Magento\Framework\UrlInterface */
     private $_urlBuilder;
 
-    /** @var string */
-    private $_viewUrl;
-
     /** @var \Magento\Sales\Model\OrderFactory */
     private $orderFactory;
 
@@ -32,7 +29,6 @@ class Actions extends Column
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
      * @param \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory
      * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $packeteryOrderCollectionFactory
-     * @param string $viewUrl
      * @param array $components
      * @param array $data
      */
@@ -43,12 +39,10 @@ class Actions extends Column
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory,
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $packeteryOrderCollectionFactory,
-        $viewUrl = '',
         array $components = [],
         array $data = []
     ) {
         $this->_urlBuilder = $urlBuilder;
-        $this->_viewUrl    = $viewUrl;
         $this->orderFactory = $orderFactory;
         $this->carrierFactory = $carrierFactory;
         $this->packeteryOrderCollectionFactory = $packeteryOrderCollectionFactory;
@@ -79,10 +73,6 @@ class Actions extends Column
                 ];
 
                 if ($shippingMethod) {
-                    $item[$name]['view'] = [
-                        'href'  => $this->_urlBuilder->getUrl($this->_viewUrl, ['id' => $item['id']]),
-                        'label' => __('Edit')
-                    ];
                     if ($packetNumber === '') {
                         $item[$name]['submit'] = [
                             'href' => $this->_urlBuilder->getUrl('packetery/packet/submit', ['order_id' => $item['id']]),
