@@ -31,6 +31,9 @@ class PrintLabelMass extends \Magento\Backend\App\Action
     /** @var \Packetery\Checkout\Model\Api\SoapApiClient */
     private $soapApiClient;
 
+    /** @var \Packetery\Checkout\Model\Log\LogWriter */
+    private $logWriter;
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\RawFactory $resultRawFactory,
@@ -39,7 +42,8 @@ class PrintLabelMass extends \Magento\Backend\App\Action
         \Magento\Sales\Model\OrderFactory $magentoOrderFactory,
         \Packetery\Checkout\Model\PacketRepository $packetRepository,
         \Packetery\Checkout\Model\Carrier\CarrierFactory $carrierFactory,
-        \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient
+        \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
+        \Packetery\Checkout\Model\Log\LogWriter $logWriter
     ) {
         parent::__construct($context);
         $this->resultRawFactory = $resultRawFactory;
@@ -49,6 +53,7 @@ class PrintLabelMass extends \Magento\Backend\App\Action
         $this->packetRepository = $packetRepository;
         $this->carrierFactory = $carrierFactory;
         $this->soapApiClient = $soapApiClient;
+        $this->logWriter = $logWriter;
     }
 
     /**
@@ -189,8 +194,15 @@ class PrintLabelMass extends \Magento\Backend\App\Action
 
         $offset = 0;
         $pdfContentsList = [];
+        $printedPacketCount = 0;
+        $failedPacketCount = 0;
+        $faultMessages = [];
 
         foreach ($groups as $apiPassword => $group) {
+            $groupPacketCount = $labelType === self::LABEL_TYPE_CARRIER
+                ? count($group['carrier_pairs'])
+                : count($group['packet_ids']);
+
             if ($labelType === self::LABEL_TYPE_CARRIER) {
                 $labelsResult = $this->soapApiClient->packetsCourierLabelsPdf(
                     new \Packetery\Checkout\Model\Api\Request\PacketsCourierLabelsPdfRequest(
@@ -214,6 +226,8 @@ class PrintLabelMass extends \Magento\Backend\App\Action
             $contents = $labelsResult->getPdfContents();
             if ($contents === null) {
                 $fault = (string) $labelsResult->getFaultString();
+                $failedPacketCount += $groupPacketCount;
+                $faultMessages[] = $fault;
                 $this->messageManager->addErrorMessage(
                     new \Packetery\Checkout\Model\Misc\ComboPhrase(
                         [
@@ -226,13 +240,26 @@ class PrintLabelMass extends \Magento\Backend\App\Action
                 continue;
             }
 
+            $printedPacketCount += $groupPacketCount;
             $pdfContentsList[] = $contents;
         }
 
         if ($pdfContentsList === []) {
+            $this->logWriter->logError(
+                \Packetery\Checkout\Model\Log::ACTION_PRINT_LABEL,
+                null,
+                ['packetCount' => $failedPacketCount],
+                implode('; ', $faultMessages)
+            );
             $this->messageManager->addErrorMessage(__('No eligible shipments found for selected action.'));
             return $resultRedirect;
         }
+
+        $this->logWriter->logSuccess(
+            \Packetery\Checkout\Model\Log::ACTION_PRINT_LABEL,
+            null,
+            __('Printed %1 label(s), %2 failed.', $printedPacketCount, $failedPacketCount)
+        );
 
         $packetsToPersist = [];
         foreach ($groups as $group) {

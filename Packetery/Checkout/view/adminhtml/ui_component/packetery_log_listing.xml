@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">packetery_log_listing.packetery_log_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>packetery_log_columns</spinner>
+        <deps>
+            <dep>packetery_log_listing.packetery_log_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="packetery_log_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Packetery_Checkout::log</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="packetery_log_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="packetery_log_columns">
+        <column name="status" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Packetery\Checkout\Model\Log\StatusOptions"/>
+                <bodyTmpl>Packetery_Checkout/grid/cells/log-status</bodyTmpl>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="order_number">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Order number</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <sorting>desc</sorting>
+                <label translate="true">Date and time</label>
+            </settings>
+        </column>
+        <column name="action" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Packetery\Checkout\Model\Log\ActionOptions"/>
+                <dataType>select</dataType>
+                <label translate="true">Action</label>
+            </settings>
+        </column>
+        <column name="note">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <label translate="true">Note</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Packetery\Checkout\Ui\Component\Log\Listing\Column\Actions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Packetery_Checkout/js/grid/columns/log-actions</item>
+                    <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="indexField" xsi:type="string">id</item>
+                </item>
+            </argument>
+        </actionsColumn>
+    </columns>
+</listing>

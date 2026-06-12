@@ -21,3 +21,15 @@
     margin-left: 0;
     margin-top: 0.7rem;
 }
+
+.packetery-log-status {
+    font-weight: 600;
+}
+
+.packetery-log-status-error {
+    color: #a94442;
+}
+
+.packetery-log-status-success {
+    color: #3c763d;
+}

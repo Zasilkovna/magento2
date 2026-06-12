@@ -33,6 +33,12 @@ class PacketSubmitter
     /** @var \Packetery\Checkout\Model\Carrier\Facade */
     private $carrierFacade;
 
+    /** @var \Packetery\Checkout\Model\Log\LogWriter */
+    private $logWriter;
+
+    /** @var \Packetery\Checkout\Model\Log\ApiErrorFormatter */
+    private $apiErrorFormatter;
+
     public function __construct(
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -41,7 +47,9 @@ class PacketSubmitter
         \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
         \Packetery\Checkout\Model\ResourceModel\Packet $packetResource,
         \Packetery\Checkout\Model\ResourceModel\Order $orderResource,
-        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade
+        \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
+        \Packetery\Checkout\Model\Log\LogWriter $logWriter,
+        \Packetery\Checkout\Model\Log\ApiErrorFormatter $apiErrorFormatter
     ) {
         $this->soapApiClient = $soapApiClient;
         $this->scopeConfig = $scopeConfig;
@@ -51,6 +59,8 @@ class PacketSubmitter
         $this->packetResource = $packetResource;
         $this->orderResource = $orderResource;
         $this->carrierFacade = $carrierFacade;
+        $this->logWriter = $logWriter;
+        $this->apiErrorFormatter = $apiErrorFormatter;
     }
 
     /**
@@ -126,7 +136,17 @@ class PacketSubmitter
                 ->withZip((string) $recipientAddress->getZip());
         }
 
-        $createResult = $this->soapApiClient->createPacket($apiPassword, $attributes);
+        try {
+            $createResult = $this->soapApiClient->createPacket($apiPassword, $attributes);
+        } catch (\Packetery\Checkout\Model\Api\PacketSubmissionException $exception) {
+            $this->logWriter->logError(
+                \Packetery\Checkout\Model\Log::ACTION_SUBMIT,
+                $packeteryOrder->getOrderNumber(),
+                $attributes->toArray(),
+                $this->apiErrorFormatter->format($exception->getMessage(), $exception->getSoapDetailErrors())
+            );
+            throw $exception;
+        }
 
         $consignPassword = null;
         $packeteryConfig = $this->carrierFacade->getPacketeryCarrierConfig($storeId);
@@ -137,6 +157,12 @@ class PacketSubmitter
 
         $this->savePacket($packeteryOrder->getOrderNumber(), $createResult->getPacketId(), $weight, $value, $cod, $consignPassword);
         $this->markOrderExported($packeteryOrder);
+
+        $this->logWriter->logSuccess(
+            \Packetery\Checkout\Model\Log::ACTION_SUBMIT,
+            $packeteryOrder->getOrderNumber(),
+            __('Submitted packet %1.', $createResult->getPacketId())
+        );
     }
 
     private function isAlreadySubmitted(string $orderNumber): bool

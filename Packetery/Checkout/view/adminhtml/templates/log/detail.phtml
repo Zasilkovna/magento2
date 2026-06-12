@@ -1,0 +1,22 @@
+<?php
+/** @var \Packetery\Checkout\Block\Adminhtml\Log\Detail $block */
+?>
+<div class="packetery-log-detail-page">
+    <h1 class="page-title"><?= $block->escapeHtml(__('Error detail')) ?></h1>
+    <div class="admin__field">
+        <label class="admin__field-label">
+            <span><?= $block->escapeHtml(__('Call parameters')) ?></span>
+        </label>
+        <div class="admin__field-control">
+            <pre class="packetery-log-detail-value"><?= $block->escapeHtml($block->getCallParameters()) ?></pre>
+        </div>
+    </div>
+    <div class="admin__field">
+        <label class="admin__field-label">
+            <span><?= $block->escapeHtml(__('API response')) ?></span>
+        </label>
+        <div class="admin__field-control">
+            <pre class="packetery-log-detail-value"><?= $block->escapeHtml($block->getApiResponse()) ?></pre>
+        </div>
+    </div>
+</div>

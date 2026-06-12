@@ -31,18 +31,28 @@ class PrintLabel extends Action
     /** @var PacketLabelPrinter */
     private $packetLabelPrinter;
 
+    /** @var \Packetery\Checkout\Model\Log\LogWriter */
+    private $logWriter;
+
+    /** @var \Packetery\Checkout\Model\Log\ApiErrorFormatter */
+    private $apiErrorFormatter;
+
     public function __construct(
         Context $context,
         RawFactory $resultRawFactory,
         PacketeryOrderCollectionFactory $packeteryOrderCollectionFactory,
         OrderFactory $magentoOrderFactory,
-        PacketLabelPrinter $packetLabelPrinter
+        PacketLabelPrinter $packetLabelPrinter,
+        \Packetery\Checkout\Model\Log\LogWriter $logWriter,
+        \Packetery\Checkout\Model\Log\ApiErrorFormatter $apiErrorFormatter
     ) {
         parent::__construct($context);
         $this->resultRawFactory = $resultRawFactory;
         $this->packeteryOrderCollectionFactory = $packeteryOrderCollectionFactory;
         $this->magentoOrderFactory = $magentoOrderFactory;
         $this->packetLabelPrinter = $packetLabelPrinter;
+        $this->logWriter = $logWriter;
+        $this->apiErrorFormatter = $apiErrorFormatter;
     }
 
     /**
@@ -81,6 +91,13 @@ class PrintLabel extends Action
             $errors = $exception->getSoapDetailErrors();
             $firstMessage = $errors[0] ?? $exception->getMessage();
 
+            $this->logWriter->logError(
+                \Packetery\Checkout\Model\Log::ACTION_PRINT_LABEL,
+                $packeteryOrder->getOrderNumber(),
+                ['orderNumber' => $packeteryOrder->getOrderNumber()],
+                $this->apiErrorFormatter->format($exception->getMessage(), $errors)
+            );
+
             $this->messageManager->addErrorMessage(
                 new ComboPhrase(
                     [
@@ -96,6 +113,12 @@ class PrintLabel extends Action
             $this->messageManager->addErrorMessage($exception->getMessage());
             return $resultRedirect;
         }
+
+        $this->logWriter->logSuccess(
+            \Packetery\Checkout\Model\Log::ACTION_PRINT_LABEL,
+            $packeteryOrder->getOrderNumber(),
+            __('Printed label for order %1.', $packeteryOrder->getOrderNumber())
+        );
 
         $raw = $this->resultRawFactory->create();
         $raw->setHeader('Content-Type', 'application/pdf', true);
