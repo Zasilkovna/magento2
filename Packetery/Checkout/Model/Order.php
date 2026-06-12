@@ -41,11 +41,6 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
         return $this->getData('order_number');
     }
 
-    public function isAddressValidated(): bool
-    {
-        return $this->getData('address_validated') === '1';
-    }
-
     public function getRecipientAddress(): Address
     {
         $address = new Address();
@@ -138,6 +133,26 @@ class Order extends \Magento\Framework\Model\AbstractModel implements \Magento\F
         }
 
         return (string) $value;
+    }
+
+    public function getBoxId(): ?int
+    {
+        $value = $this->getData('box_id');
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    public function getAdultContent(): ?bool
+    {
+        $value = $this->getData('adult_content');
+        if ($value === null) {
+            return null;
+        }
+
+        return (bool) $value;
     }
 
     public function markExported(): void

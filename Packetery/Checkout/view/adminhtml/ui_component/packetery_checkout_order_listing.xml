@@ -341,7 +341,6 @@
                     <item name="indexField" xsi:type="string">id</item>
                 </item>
             </argument>
-            <argument name="viewUrl" xsi:type="string">packetery/order/detail</argument>
         </actionsColumn>
     </columns>
 </listing>

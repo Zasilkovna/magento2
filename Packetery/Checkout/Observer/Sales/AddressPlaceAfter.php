@@ -36,7 +36,6 @@ class AddressPlaceAfter implements \Magento\Framework\Event\ObserverInterface
         $packeteryAddress = \Packetery\Checkout\Model\Address::fromShippingAddress($shippingAddress);
 
         $data = [
-            'address_validated' => false,
             'recipient_street' => $packeteryAddress->getStreet(),
             'recipient_house_number' => $packeteryAddress->getHouseNumber(),
             'recipient_city' => $packeteryAddress->getCity(),

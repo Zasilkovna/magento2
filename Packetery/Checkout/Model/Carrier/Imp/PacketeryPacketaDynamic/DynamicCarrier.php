@@ -73,4 +73,8 @@ class DynamicCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCa
     public function disallowsCod(): bool {
         return $this->model->disallowsCod();
     }
+
+    public function requiresSize(): bool {
+        return $this->model->requiresSize();
+    }
 }

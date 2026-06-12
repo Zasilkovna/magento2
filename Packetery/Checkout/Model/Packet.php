@@ -144,6 +144,16 @@ class Packet extends \Magento\Framework\Model\AbstractModel
         return (string) $value;
     }
 
+    public function getBoxName(): ?string
+    {
+        $value = $this->getData('box_name');
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
     public function setPacketStatus(?string $packetStatus): self
     {
         $this->setData('packet_status', ($packetStatus === '' ? null : $packetStatus));
@@ -170,6 +180,60 @@ class Packet extends \Magento\Framework\Model\AbstractModel
 
         $utc = $dateTime->setTimezone(new \DateTimeZone('UTC'));
         $this->setData('status_synced_at', $utc->format('Y-m-d H:i:s'));
+        return $this;
+    }
+
+    public function setBoxName(?string $boxName): self
+    {
+        $this->setData('box_name', ($boxName === '' ? null : $boxName));
+        return $this;
+    }
+
+    public function getBoxWidth(): ?float
+    {
+        $value = $this->getData('box_width');
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    public function setBoxWidth(?float $width): self
+    {
+        $this->setData('box_width', $width);
+        return $this;
+    }
+
+    public function getBoxHeight(): ?float
+    {
+        $value = $this->getData('box_height');
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    public function setBoxHeight(?float $height): self
+    {
+        $this->setData('box_height', $height);
+        return $this;
+    }
+
+    public function getBoxDepth(): ?float
+    {
+        $value = $this->getData('box_depth');
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    public function setBoxDepth(?float $depth): self
+    {
+        $this->setData('box_depth', $depth);
         return $this;
     }
 }

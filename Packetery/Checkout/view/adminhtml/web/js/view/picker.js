@@ -8,6 +8,7 @@ define([
     'mage/url',
     'jquery',
     'packeteryStringifyOptions',
+    'packetaWidget',
 ], function(
     _,
     uiRegistry,
@@ -55,44 +56,38 @@ define([
     var mixin = {
         isStoreConfigLoaded: ko.observable(false),
         errorValidationMessage: ko.observable(''),
-        pickedValidatedAddress: ko.observable(''),
-        buttonLabel: ko.observable($t('Check delivery address')),
+        pickedDeliveryAddress: ko.observable(''),
+        pickedDeliveryPlace: ko.observable(''),
 
-        isPickupPointDelivery: function() {
-            return uiRegistry.get('inputName = general[misc][isPickupPointDelivery]').value() === '1';
-        },
-
-        isAddressValidationEligible: function() {
-            return uiRegistry.get('inputName = general[misc][isAddressValidationEligible]').value() === '1';
-        },
-
-        getPacketaSymbolUrl: function() {
-            return window.packetery.packetaSymbolUrl;
+        formatDeliveryAddress: function(street, houseNumber, city, zip) {
+            return [street, houseNumber, city, zip].filter(Boolean).join(', ');
         },
 
         initialize: function() {
-
-            var fieldset = uiRegistry.get('index = general');
-            uiRegistry.get('inputName = general[address_validated]', function(item) {
-                if (item.value() === '1') {
-                    mixin.buttonLabel($t('Change delivery address'));
-                }
-                if (item.value() === '0') {
-                    mixin.buttonLabel($t('Check delivery address'));
-                }
-            });
-
-            if (mixin.isPickupPointDelivery()) {
-                fieldset.label = $t('Pickup point selection');
-            }
-
-            if (mixin.isAddressValidationEligible()) {
-                fieldset.label = $t('Shipping address validation');
-            }
-
             uiRegistry.get('inputName = general[id]', function(idItem) {
                 loadConfig(idItem.value(), function() {
                     mixin.isStoreConfigLoaded(true);
+                });
+            });
+
+            // Pre-fill the delivery label from the saved order
+            uiRegistry.get('inputName = general[point_name]', function(pointItem) {
+                var sync = function() {
+                    mixin.pickedDeliveryPlace(pointItem.value() || '');
+                };
+                sync();
+                pointItem.value.subscribe(sync);
+            });
+
+            uiRegistry.get('inputName = general[recipient_street]', function(street) {
+                uiRegistry.get('inputName = general[recipient_house_number]', function(house) {
+                    uiRegistry.get('inputName = general[recipient_city]', function(city) {
+                        uiRegistry.get('inputName = general[recipient_zip]', function(zip) {
+                            mixin.pickedDeliveryAddress(
+                                mixin.formatDeliveryAddress(street.value(), house.value(), city.value(), zip.value())
+                            );
+                        });
+                    });
                 });
             });
 
@@ -184,7 +179,6 @@ define([
                     return;
                 }
 
-                uiRegistry.get('inputName = general[address_validated]').value('1');
                 uiRegistry.get('inputName = general[recipient_street]').value(address.street || null);
                 uiRegistry.get('inputName = general[recipient_house_number]').value(address.houseNumber || null);
                 uiRegistry.get('inputName = general[recipient_city]').value(address.city || null);
@@ -194,10 +188,8 @@ define([
                 uiRegistry.get('inputName = general[recipient_longitude]').value(address.longitude || null);
                 uiRegistry.get('inputName = general[recipient_latitude]').value(address.latitude || null);
 
-                mixin.pickedValidatedAddress(
-                    [ address.street, address.houseNumber, address.city ].filter(function(value) {
-                        return !!value;
-                    }).join(' ')
+                mixin.pickedDeliveryAddress(
+                    mixin.formatDeliveryAddress(address.street, address.houseNumber, address.city, address.postcode)
                 );
             };
 

@@ -45,4 +45,6 @@ abstract class AbstractDynamicCarrier
      * @return bool
      */
     abstract public function disallowsCod(): bool;
+
+    abstract public function requiresSize(): bool;
 }

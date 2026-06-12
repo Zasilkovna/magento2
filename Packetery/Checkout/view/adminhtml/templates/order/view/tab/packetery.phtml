@@ -1,0 +1,84 @@
+<?php
+/** @var \Packetery\Checkout\Block\Adminhtml\Order\View\Tab\Packetery $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<div class="packetery-order-tab">
+    <?php if ($block->isSubmitted()): ?>
+        <?php $packet = $block->getPacket(); ?>
+        <?php $currency = $block->getCurrency(); ?>
+        <table class="admin__table-secondary packetery-order-tab__readonly">
+            <tr>
+                <th><?= $escaper->escapeHtml($block->getDeliveryLabelHeading()) ?></th>
+                <td><?= $escaper->escapeHtml($block->getDeliveryLabel()) ?></td>
+            </tr>
+            <tr>
+                <th><?= $escaper->escapeHtml(__('Packet value')) ?></th>
+                <td><?= $escaper->escapeHtml(trim($packet->getValue() . ' ' . $currency)) ?></td>
+            </tr>
+            <?php if ((float) $packet->getCod() > 0): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Cash on delivery')) ?></th>
+                    <td><?= $escaper->escapeHtml(trim($packet->getCod() . ' ' . $currency)) ?></td>
+                </tr>
+            <?php endif; ?>
+            <tr>
+                <th><?= $escaper->escapeHtml(__('Weight')) ?></th>
+                <td><?= $escaper->escapeHtml(trim($packet->getWeight() . ' kg')) ?></td>
+            </tr>
+            <?php if ($block->getDimensionsLabel() !== null): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Dimensions')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->getDimensionsLabel()) ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->isAdultContentEligible()): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Age verification')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->getPacketeryOrder()->getAdultContent() ? (string) __('Yes') : (string) __('No')) ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($packet->getConsignPassword() !== null): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Consign password')) ?></th>
+                    <td><?= $escaper->escapeHtml($packet->getConsignPassword()) ?></td>
+                </tr>
+            <?php endif; ?>
+            <tr>
+                <th><?= $escaper->escapeHtml(__('Packet number')) ?></th>
+                <td>
+                    <a href="<?= $escaper->escapeUrl((string) $block->getTrackingUrl()) ?>" target="_blank" rel="noopener">
+                        <?= $escaper->escapeHtml((string) $block->getTrackingNumber()) ?>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    <?php else: ?>
+        <?php
+        $saveConfig = [
+            'Magento_Ui/js/form/button-adapter' => [
+                'actions' => [
+                    [
+                        'targetName' => 'packetery_order_detail_form.areas',
+                        'actionName' => 'save',
+                        'params' => [true],
+                    ],
+                ],
+            ],
+        ];
+        ?>
+        <div class="admin__page-section-title">
+            <span class="title"><?= $escaper->escapeHtml(__('Packeta – packet')) ?></span>
+        </div>
+        <?= /* @noEscape */ $block->getChildHtml('packetery_order_detail_form') ?>
+        <div class="admin__fieldset packetery-order-tab__actions">
+            <div class="admin__field">
+                <div class="admin__field-label"></div>
+                <div class="admin__field-control">
+                    <button type="button" class="action-default scalable action-save action-secondary" data-mage-init='<?= /* @noEscape */ json_encode($saveConfig) ?>'>
+                        <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>

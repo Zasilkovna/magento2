@@ -32,11 +32,13 @@
         <column xsi:type="int" name="width" padding="11" nullable="true"/>
         <column xsi:type="int" name="height" padding="11" nullable="true"/>
         <column xsi:type="int" name="depth" padding="11" nullable="true"/>
+        <column xsi:type="int" name="box_id" padding="10" unsigned="true" nullable="true" comment="Selected predefined box (packetery_box.id)"/>
         <column xsi:type="boolean" name="exported" nullable="true"/>
         <column xsi:type="datetime" name="exported_at" nullable="true"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
+        <constraint xsi:type="foreign" referenceId="PACKETERY_ORDER_BOX_ID_PACKETERY_BOX_ID" table="packetery_order" column="box_id" referenceTable="packetery_box" referenceColumn="id" onDelete="NO ACTION"/>
     </table>
     <table name="packetery_pricing_rule" resource="default" engine="innodb" comment="Packetery pricing rules. Relates to packetery_weight_rules.">
         <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
@@ -101,6 +103,10 @@
         <column xsi:type="boolean" name="packet_id_fault" nullable="false" default="0" comment="Set when Packeta API reports the packet number does not exist (PacketIdFault)"/>
         <column xsi:type="varchar" name="packet_status" length="64" nullable="true" comment="Last known packet status codeText from Packeta API"/>
         <column xsi:type="datetime" name="status_synced_at" nullable="true" comment="UTC date and time of last packet status synchronization with Packeta API"/>
+        <column xsi:type="varchar" name="box_name" length="255" nullable="true" comment="Snapshot of chosen box name at submission"/>
+        <column xsi:type="decimal" name="box_width" precision="12" scale="1" nullable="true" comment="Snapshot of box width in cm"/>
+        <column xsi:type="decimal" name="box_height" precision="12" scale="1" nullable="true" comment="Snapshot of box height in cm"/>
+        <column xsi:type="decimal" name="box_depth" precision="12" scale="1" nullable="true" comment="Snapshot of box depth in cm"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>

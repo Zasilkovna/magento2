@@ -61,17 +61,34 @@ class BoxRepository
         return $box;
     }
 
+    /**
+     * @throws NoSuchEntityException
+     */
+    public function getDefaultBox(): ?Box
+    {
+        $id = $this->findDefaultBoxId();
+
+        return $id !== null ? $this->getById($id) : null;
+    }
+
     private function hasDefaultBox(): bool
+    {
+        return $this->findDefaultBoxId() !== null;
+    }
+
+    private function findDefaultBoxId(): ?int
     {
         $connection = $this->boxResource->getConnection();
 
-        return (bool) $connection->fetchOne(
+        $id = $connection->fetchOne(
             $connection->select()
                 ->from($this->boxResource->getTable(Box::TABLE_NAME), Box::ID)
                 ->where(Box::IS_DEFAULT . ' = ?', 1)
                 ->where(Box::DELETED . ' = ?', 0)
                 ->limit(1)
         );
+
+        return $id ? (int) $id : null;
     }
 
     public function deleteById(int $id): bool

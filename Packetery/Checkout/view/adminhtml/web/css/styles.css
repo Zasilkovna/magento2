@@ -1,11 +1,33 @@
 .packetery-picker {
-    display: inline-flex;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2rem;
+    min-height: 3.2rem;
 }
 
-.packetery-picker-logo {
-    width: 40px;
-    display: inline-flex;
-    margin-right: 2px;
+.packetery-picker__value {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.packetery-picker__change {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.packetery-order-tab .fieldset-wrapper-title {
+    border-bottom: 0;
+    padding-bottom: 0.8rem;
+}
+
+.packetery-order-tab fieldset.admin__fieldset {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.packetery-order-tab .admin__field + .admin__field {
+    margin-top: 0;
 }
 
 .packetery-checkboxset .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2), .packetery-checkboxset .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {

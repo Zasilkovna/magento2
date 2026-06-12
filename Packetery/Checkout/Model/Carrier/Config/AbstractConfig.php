@@ -60,6 +60,17 @@ abstract class AbstractConfig
     public function getMaxWeight(): ?float
     {
         $value = $this->getConfigData('max_weight');
+
+        return (is_numeric($value) ? (float)$value : null);
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getDefaultWeight(): ?float
+    {
+        $value = $this->getConfigData('default_weight');
+
         return (is_numeric($value) ? (float)$value : null);
     }
 

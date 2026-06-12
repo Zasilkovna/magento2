@@ -1,4 +1,5 @@
-2.5.0 - Added: Box Manager default box selection and soft-delete
+2.5.0 - Updated: Editing a Packeta order moves from the separate detail page into a new "Packeta" tab in the native order view; after submission the tab shows a read-only packet overview with a tracking link.
+      - Added: Box Manager default box selection and soft-delete
       - Added: Z-BOX consign password in Print delivery list at Packeta orders list page
       - Added: Weight param to widget, converted from g/lbs to kgs
       - Added: Log Packeta widget parameters to the developers console

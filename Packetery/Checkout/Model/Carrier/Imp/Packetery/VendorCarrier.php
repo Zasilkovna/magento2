@@ -74,4 +74,8 @@ class VendorCarrier extends \Packetery\Checkout\Model\Carrier\AbstractDynamicCar
     public function disallowsCod(): bool {
         return false;
     }
+
+    public function requiresSize(): bool {
+        return false;
+    }
 }
