@@ -103,6 +103,50 @@ If consumers are not started by `bin/magento cron:run`, start the packet submiss
 bin/magento queue:consumers:start packetery.checkout.packet.submit
 ```
 
+#### Packet status tracking
+
+Submitted packets have their current Packeta status fetched periodically and shown in the order grid (column `Packet status`). A cron job selects the packets that still need updating (the longest-unsynchronized first) and hands them to a consumer that performs the actual API call:
+
+- consumer: `packetery.checkout.packet.status.sync`
+- cron job: `syncPacketStatus` (group `packetery`), no committed schedule — runs only once devops sets a `cron_expr`
+
+The consumer is started the same way as the bulk submission consumer (via `cron_consumers_runner` in `app/etc/env.php`, or manually):
+
+```bash
+bin/magento queue:consumers:start packetery.checkout.packet.status.sync
+```
+
+The following are deployment (devops) concerns, not merchant admin options — they affect server and message-queue load, so none of them is exposed in the admin UI. The `status_polling/batch_size` key lives in the `packetery/status_polling` array in `app/etc/env.php`:
+
+```php
+'packetery' => [
+    'status_polling' => [
+        'batch_size' => 200   // omit or 0 = no limit
+    ]
+]
+```
+
+- **Batch size per run** — `status_polling/batch_size`. Maximum packets the cron queues per run; absent or `0` means no limit (all open packets are queued).
+- **Enable / disable + frequency** — the cron config path `crontab/packetery/jobs/syncPacketStatus/schedule/cron_expr` (`packetery` = the job's cron group). The job has no committed default schedule, so this value is the single switch: setting it enables the feature and defines how often it runs, clearing/unsetting it disables it (the feature is off right after install). It has no admin field, so set it in `app/etc/config.php` under the `system/default` tree (not via `bin/magento config:set`, which only accepts `system.xml` paths):
+
+```php
+'system' => [
+    'default' => [             // config scope
+        'crontab' => [
+            'packetery' => [   // cron group
+                'jobs' => [
+                    'syncPacketStatus' => [
+                        'schedule' => ['cron_expr' => '17 */3 * * *']
+                    ]
+                ]
+            ]
+        ]
+    ]
+]
+```
+
+  Then `bin/magento cache:flush config`.
+
 ### Configuration and "How to" guide
 
 ### Information about the module
@@ -246,6 +290,50 @@ Pokud se consumeři nespouští přes `bin/magento cron:run`, spusťte consumer 
 ```bash
 bin/magento queue:consumers:start packetery.checkout.packet.submit
 ```
+
+#### Sledování stavu zásilky
+
+U podaných zásilek se průběžně dotahuje aktuální stav z Packeta API a zobrazuje se v přehledu objednávek (sloupec `Packet status`). Cron vybere zásilky, které je potřeba aktualizovat (nejdéle nedotažené první), a předá je consumeru, který provede vlastní volání API:
+
+- consumer: `packetery.checkout.packet.status.sync`
+- cron job: `syncPacketStatus` (skupina `packetery`), bez commitnutého rozvrhu — spustí se až poté, co devops nastaví `cron_expr`
+
+Consumer se spouští stejně jako consumer pro hromadné podání (přes `cron_consumers_runner` v `app/etc/env.php`, nebo ručně):
+
+```bash
+bin/magento queue:consumers:start packetery.checkout.packet.status.sync
+```
+
+Následující věci patří devops, nejde o volby pro eshopistu v administraci — ovlivňují zátěž serveru a fronty, proto žádná z nich není v admin UI. Klíč `status_polling/batch_size` je v poli `packetery/status_polling` v `app/etc/env.php`:
+
+```php
+'packetery' => [
+    'status_polling' => [
+        'batch_size' => 200   // vynechat nebo 0 = bez limitu
+    ]
+]
+```
+
+- **Strop počtu zásilek na běh** — `status_polling/batch_size`. Maximální počet zásilek, které cron zařadí za jeden běh; chybějící hodnota nebo `0` znamená bez limitu (zařadí všechny otevřené zásilky).
+- **Zapnutí / vypnutí + frekvence** — cron config path `crontab/packetery/jobs/syncPacketStatus/schedule/cron_expr` (`packetery` = cron skupina jobu). Job nemá commitnutý výchozí rozvrh, takže tato hodnota je jediný vypínač: nastavením se funkce zapne a určí se, jak často běží, smazáním/nenastavením se vypne (hned po instalaci je funkce vypnutá). Nemá admin field, takže ho nastavte v `app/etc/config.php` ve stromu `system/default` (ne přes `bin/magento config:set`, který bere jen `system.xml` cesty):
+
+```php
+'system' => [
+    'default' => [             // config scope
+        'crontab' => [
+            'packetery' => [   // cron skupina
+                'jobs' => [
+                    'syncPacketStatus' => [
+                        'schedule' => ['cron_expr' => '17 */3 * * *']
+                    ]
+                ]
+            ]
+        ]
+    ]
+]
+```
+
+  Poté `bin/magento cache:flush config`.
 
 ### Konfigurace a návod k použití
 

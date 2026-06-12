@@ -295,6 +295,22 @@
                 </item>
             </argument>
         </column>
+        <column name="packet_status_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\PacketStatus">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Packetery\Checkout\Ui\Component\Order\Listing\Column\PacketStatusOptions</item>
+                <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="indexField" xsi:type="string">packet_status_transformed</item>
+                    <item name="index" xsi:type="string">packet_status_transformed</item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Packet status</item>
+                </item>
+                <item name="packetery" xsi:type="array">
+                    <item name="byField" xsi:type="string">packet_status_transformed</item>
+                </item>
+            </argument>
+        </column>
         <column name="exported_at_transformed" class="Packetery\Checkout\Ui\Component\Order\Listing\Column\DateTime">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

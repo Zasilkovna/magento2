@@ -105,7 +105,10 @@
             "cod": true,
             "courier_number": true,
             "label_printed_at": true,
-            "consign_password": true
+            "consign_password": true,
+            "packet_status": true,
+            "packet_id_fault": true,
+            "status_synced_at": true
         },
         "index": {
             "PACKETERY_PACKET_ORDER_NUMBER": true

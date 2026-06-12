@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/publisher.xsd">
     <publisher topic="packetery.checkout.packet.submit" queue="packetery.checkout.packet.submit.queue"/>
+    <publisher topic="packetery.checkout.packet.status.sync" queue="packetery.checkout.packet.status.sync.queue"/>
 </config>
 

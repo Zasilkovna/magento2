@@ -3,5 +3,8 @@
     <topic name="packetery.checkout.packet.submit" request="string">
         <handler name="packeteryBulkPacketSubmitConsumer" type="Packetery\Checkout\Model\Packet\BulkPacketSubmitConsumer" method="process"/>
     </topic>
+    <topic name="packetery.checkout.packet.status.sync" request="string">
+        <handler name="packeteryPacketStatusSyncConsumer" type="Packetery\Checkout\Model\Packet\PacketStatusSyncConsumer" method="process"/>
+    </topic>
 </config>
 

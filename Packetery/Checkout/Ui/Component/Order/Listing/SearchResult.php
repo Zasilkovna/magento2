@@ -69,6 +69,19 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
             ->where('p.order_number = main_table.order_number')
             ->order('p.id DESC')
             ->limit(1);
+        $packetStatusSubSelect = $connection->select()
+            ->from(['p' => $packetTable], ['packet_status'])
+            ->where('p.order_number = main_table.order_number')
+            ->order('p.id DESC')
+            ->limit(1);
+        $packetIdFaultSubSelect = $connection->select()
+            ->from(['p' => $packetTable], ['packet_id_fault'])
+            ->where('p.order_number = main_table.order_number')
+            ->order('p.id DESC')
+            ->limit(1);
+        $packetStatusExpression = 'IF((' . $packetIdFaultSubSelect->assemble() . ') = 1, '
+            . $connection->quote(\Packetery\Checkout\Model\Packet\PacketStatus::DOES_NOT_EXIST)
+            . ', (' . $packetStatusSubSelect->assemble() . '))';
         $subQuery->reset('columns');
         $subQuery->columns(
             [
@@ -82,6 +95,7 @@ class SearchResult extends \Magento\Framework\View\Element\UiComponent\DataProvi
                 'exported_at_transformed' => "main_table.exported_at",
                 'packet_number' => new Expression('(' . $packetNumberSubSelect->assemble() . ')'),
                 'consign_password' => new Expression('(' . $consignPasswordSubSelect->assemble() . ')'),
+                'packet_status_transformed' => new Expression($packetStatusExpression),
                 'order_status' => "sales_order.status",
                 'shipping_rate_code' => "sales_order.shipping_method",
                 'store_id' => 'sales_order.store_id',

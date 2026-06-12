@@ -98,6 +98,9 @@
         <column xsi:type="varchar" name="courier_number" length="64" nullable="true" comment="Carrier tracking number from Packeta API"/>
         <column xsi:type="datetime" name="label_printed_at" nullable="true" comment="UTC date and time of last successful label print"/>
         <column xsi:type="varchar" name="consign_password" length="10" nullable="true" comment="Z-BOX consign password returned by Packeta API"/>
+        <column xsi:type="boolean" name="packet_id_fault" nullable="false" default="0" comment="Set when Packeta API reports the packet number does not exist (PacketIdFault)"/>
+        <column xsi:type="varchar" name="packet_status" length="64" nullable="true" comment="Last known packet status codeText from Packeta API"/>
+        <column xsi:type="datetime" name="status_synced_at" nullable="true" comment="UTC date and time of last packet status synchronization with Packeta API"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
