@@ -4,5 +4,8 @@
         <job name="importFeedCarriers" instance="Packetery\Checkout\Console\Command\ImportFeedCarriers" method="runForCron">
             <schedule>0 13 * * *</schedule><!-- every first minute of hour 13 -->
         </job>
+        <job name="syncPacketStatus" instance="Packetery\Checkout\Console\Command\SyncPacketStatus" method="runForCron">
+            <config_path>crontab/packetery/jobs/syncPacketStatus/schedule/cron_expr</config_path><!-- no committed default schedule: devops enables the feature by setting cron_expr (e.g. 17 */3 * * *), disables it by clearing the value -->
+        </job>
     </group>
 </config>

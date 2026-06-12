@@ -44,6 +44,7 @@
                 <item name="packetery_importFeedCarriers" xsi:type="object">Packetery\Checkout\Console\Command\ImportFeedCarriers</item>
                 <item name="packetery_migrateDefaultPrice" xsi:type="object">Packetery\Checkout\Console\Command\MigrateDefaultPrice</item>
                 <item name="packetery_migratePriceRules" xsi:type="object">Packetery\Checkout\Console\Command\MigratePriceRules</item>
+                <item name="packetery_syncPacketStatus" xsi:type="object">Packetery\Checkout\Console\Command\SyncPacketStatus</item>
             </argument>
         </arguments>
     </type>
@@ -58,6 +59,23 @@
             <argument name="handlers" xsi:type="array">
                 <item name="bulkPacketSubmit" xsi:type="object">Packetery\Checkout\Logger\Handler\BulkPacketSubmit</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="Packetery\Checkout\Logger\PacketStatusSyncLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">packetery_packet_status_sync</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="packetStatusSync" xsi:type="object">Packetery\Checkout\Logger\Handler\PacketStatusSync</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Packetery\Checkout\Model\Misc\Clock" type="Packetery\Checkout\Model\Misc\SystemClock"/>
+
+    <type name="Packetery\Checkout\Model\Misc\SystemClock">
+        <arguments>
+            <argument name="timezone" xsi:type="object">Packetery\Checkout\Model\Misc\UtcDateTimeZone</argument>
         </arguments>
     </type>
 </config>

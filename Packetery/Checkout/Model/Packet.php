@@ -133,4 +133,43 @@ class Packet extends \Magento\Framework\Model\AbstractModel
         $this->setData('consign_password', ($consignPassword === '' ? null : $consignPassword));
         return $this;
     }
+
+    public function getPacketStatus(): ?string
+    {
+        $value = $this->getData('packet_status');
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) $value;
+    }
+
+    public function setPacketStatus(?string $packetStatus): self
+    {
+        $this->setData('packet_status', ($packetStatus === '' ? null : $packetStatus));
+        return $this;
+    }
+
+    public function hasPacketIdFault(): bool
+    {
+        return (bool) $this->getData('packet_id_fault');
+    }
+
+    public function setPacketIdFault(bool $packetIdFault): self
+    {
+        $this->setData('packet_id_fault', ($packetIdFault ? 1 : 0));
+        return $this;
+    }
+
+    public function setStatusSyncedAt(?\DateTimeImmutable $dateTime): self
+    {
+        if ($dateTime === null) {
+            $this->setData('status_synced_at', null);
+            return $this;
+        }
+
+        $utc = $dateTime->setTimezone(new \DateTimeZone('UTC'));
+        $this->setData('status_synced_at', $utc->format('Y-m-d H:i:s'));
+        return $this;
+    }
 }

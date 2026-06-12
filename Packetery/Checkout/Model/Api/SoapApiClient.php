@@ -198,6 +198,27 @@ class SoapApiClient
         return $response;
     }
 
+    public function packetStatus(
+        \Packetery\Checkout\Model\Api\Request\PacketStatusRequest $request
+    ): \Packetery\Checkout\Model\Api\Result\PacketStatusResult {
+        $apiPassword = $request->getApiPassword();
+        $packetId = $request->getPacketId();
+
+        $response = new \Packetery\Checkout\Model\Api\Result\PacketStatusResult();
+        try {
+            $client = $this->createSoapClient();
+            $status = $client->packetStatus($apiPassword, $packetId);
+            if (isset($status->codeText) && $status->codeText !== '') {
+                $response->setCodeText((string) $status->codeText);
+            }
+        } catch (\SoapFault $e) {
+            $response->setFault($this->getFaultIdentifier($e));
+            $response->setFaultString($e->getMessage());
+        }
+
+        return $response;
+    }
+
     /**
      * @throws \SoapFault
      */
