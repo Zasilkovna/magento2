@@ -23,16 +23,21 @@ class BulkPacketSubmitConsumer
     /** @var BulkPacketSubmitLogger */
     private $logger;
 
+    /** @var \Packetery\Checkout\Model\Log\LogWriter */
+    private $logWriter;
+
     public function __construct(
         PacketeryOrderCollectionFactory $packeteryOrderCollectionFactory,
         OrderFactory $magentoOrderFactory,
         PacketSubmitter $packetSubmitter,
-        BulkPacketSubmitLogger $logger
+        BulkPacketSubmitLogger $logger,
+        \Packetery\Checkout\Model\Log\LogWriter $logWriter
     ) {
         $this->packeteryOrderCollectionFactory = $packeteryOrderCollectionFactory;
         $this->magentoOrderFactory = $magentoOrderFactory;
         $this->packetSubmitter = $packetSubmitter;
         $this->logger = $logger;
+        $this->logWriter = $logWriter;
     }
 
     public function process(string $packeteryOrderId): void
@@ -55,6 +60,15 @@ class BulkPacketSubmitConsumer
         try {
             $this->packetSubmitter->submitPacket($packeteryOrder, $magentoOrder);
         } catch (\Throwable $exception) {
+            if (!$exception instanceof \Packetery\Checkout\Model\Api\PacketSubmissionException) {
+                $this->logWriter->logError(
+                    \Packetery\Checkout\Model\Log::ACTION_SUBMIT,
+                    $packeteryOrder->getOrderNumber(),
+                    ['orderNumber' => $packeteryOrder->getOrderNumber()],
+                    $exception->getMessage()
+                );
+            }
+
             $this->logger->error(
                 'Bulk shipment submission failed.',
                 [

@@ -147,6 +147,26 @@ The following are deployment (devops) concerns, not merchant admin options — t
 
   Then `bin/magento cache:flush config`.
 
+#### API action log retention
+
+Packeta API actions (submit, cancel, label print, packet list print) performed in the admin are recorded
+in the **Packeta → Log** grid. A daily cron job (`packetery_log_retention`, `Packetery\Checkout\Cron\LogPurger`)
+deletes records older than a configured number of days.
+
+The retention period is a devops operational lever, not an admin setting, so it lives in the deploy
+configuration (`app/etc/env.php` or `app/etc/config.php`):
+
+```php
+'packetery' => [
+    'log' => [
+        'retention_days' => 30
+    ]
+]
+```
+
+Behaviour: unset defaults to `30`; a positive integer `N` deletes records older than `N` days daily;
+`0` or a negative value disables purging. The cron runs in the `packetery` group at `0 2 * * *`.
+
 ### Configuration and "How to" guide
 
 ### Information about the module
@@ -334,6 +354,26 @@ Následující věci patří devops, nejde o volby pro eshopistu v administraci 
 ```
 
   Poté `bin/magento cache:flush config`.
+
+#### Promazávání logu API akcí
+
+API akce Zásilkovny (podání, storno, tisk štítku, tisk seznamu zásilek) provedené v administraci se
+zaznamenávají do gridu **Packeta → Log**. Denní cron (`packetery_log_retention`, `Packetery\Checkout\Cron\LogPurger`)
+maže záznamy starší než nastavený počet dní.
+
+Doba uchování je provozní páka pro devops, ne nastavení v administraci, proto se nastavuje v deploy
+konfiguraci (`app/etc/env.php` nebo `app/etc/config.php`):
+
+```php
+'packetery' => [
+    'log' => [
+        'retention_days' => 30
+    ]
+]
+```
+
+Chování: nenastaveno → výchozí `30`; kladné číslo `N` → denně se mažou záznamy starší než `N` dní;
+`0` nebo záporná hodnota mazání vypne. Cron běží ve skupině `packetery` v `0 2 * * *`.
 
 ### Konfigurace a návod k použití
 

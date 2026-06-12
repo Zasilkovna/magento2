@@ -28,6 +28,8 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
 
     private \Magento\Store\Model\StoreManagerInterface $storeManager;
 
+    private \Packetery\Checkout\Model\Log\LogWriter $logWriter;
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Controller\Result\RawFactory $resultRawFactory,
@@ -39,7 +41,8 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
         \Packetery\Checkout\Model\OrderCollection\SenderAddressProvider $senderAddressProvider,
         \Packetery\Checkout\Model\OrderCollection\OrderCollectionRowBuilder $rowBuilder,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Packetery\Checkout\Model\Log\LogWriter $logWriter
     ) {
         parent::__construct($context);
         $this->resultRawFactory = $resultRawFactory;
@@ -52,6 +55,7 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
         $this->senderAddressProvider = $senderAddressProvider;
         $this->rowBuilder = $rowBuilder;
         $this->storeManager = $storeManager;
+        $this->logWriter = $logWriter;
     }
 
     /**
@@ -81,6 +85,11 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
             return $resultRedirect;
         }
 
+        $packetCount = 0;
+        foreach ($groups as $group) {
+            $packetCount += count($group['packet_ids']);
+        }
+
         $sections = [];
         foreach ($groups as $storeId => $group) {
             $shipmentResult = $this->soapApiClient->createShipment(
@@ -91,6 +100,12 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
             );
             $barcode = $shipmentResult->getBarcode();
             if ($barcode === null || $barcode === '') {
+                $this->logWriter->logError(
+                    \Packetery\Checkout\Model\Log::ACTION_PRINT_LIST,
+                    null,
+                    ['packetCount' => $packetCount],
+                    __('The packet list could not be generated.')
+                );
                 $this->messageManager->addErrorMessage(__('The packet list could not be generated.'));
                 return $resultRedirect;
             }
@@ -103,6 +118,12 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
             );
             $pngContents = $barcodeResult->getPngContents();
             if ($pngContents === null || $pngContents === '') {
+                $this->logWriter->logError(
+                    \Packetery\Checkout\Model\Log::ACTION_PRINT_LIST,
+                    null,
+                    ['packetCount' => $packetCount],
+                    __('The packet list could not be generated.')
+                );
                 $this->messageManager->addErrorMessage(__('The packet list could not be generated.'));
                 return $resultRedirect;
             }
@@ -118,6 +139,12 @@ class PrintOrderCollectionMass extends \Magento\Backend\App\Action
                 'show_consign_password' => $group['show_consign_password'],
             ];
         }
+
+        $this->logWriter->logSuccess(
+            \Packetery\Checkout\Model\Log::ACTION_PRINT_LIST,
+            null,
+            __('Printed packet list for %1 packet(s).', $packetCount)
+        );
 
         $raw = $this->resultRawFactory->create();
         $raw->setHeader('Content-Type', 'text/html; charset=UTF-8', true);

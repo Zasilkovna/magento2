@@ -133,5 +133,24 @@
         "constraint": {
             "PRIMARY": true
         }
+    },
+    "packetery_log": {
+        "column": {
+            "id": true,
+            "action": true,
+            "status": true,
+            "order_number": true,
+            "note": true,
+            "params": true,
+            "response": true,
+            "created_at": true
+        },
+        "index": {
+            "PACKETERY_LOG_CREATED_AT": true,
+            "PACKETERY_LOG_ORDER_NUMBER": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
     }
 }

@@ -15,7 +15,8 @@ class PacketCanceler
         private readonly \Magento\Shipping\Model\CarrierFactory $carrierFactory,
         private readonly \Packetery\Checkout\Model\ResourceModel\Order $orderResource,
         private readonly \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
-        private readonly \Packetery\Checkout\Model\ResourceModel\Packet $packetResource
+        private readonly \Packetery\Checkout\Model\ResourceModel\Packet $packetResource,
+        private readonly \Packetery\Checkout\Model\Log\LogWriter $logWriter
     ) {
     }
 
@@ -53,8 +54,20 @@ class PacketCanceler
         $request = new CancelPacketRequest($apiPassword, $packetNumber);
         $result = $this->soapApiClient->cancelPacket($request);
         if ($result->hasFault() && !$result->hasCancelNotAllowedFault()) {
+            $this->logWriter->logError(
+                \Packetery\Checkout\Model\Log::ACTION_CANCEL,
+                $packeteryOrder->getOrderNumber(),
+                ['packetId' => $packetNumber],
+                $result->getFaultString() ?? ''
+            );
             throw new PacketCancelLocalizedException(__('The packet %1 could not be canceled.', $trackingNumber));
         }
+
+        $this->logWriter->logSuccess(
+            \Packetery\Checkout\Model\Log::ACTION_CANCEL,
+            $packeteryOrder->getOrderNumber(),
+            __('Canceled packet %1.', $trackingNumber)
+        );
 
         $this->deletePacketRows($packeteryOrder->getOrderNumber(), $packetNumber);
         $packeteryOrder->setData('exported', 0);

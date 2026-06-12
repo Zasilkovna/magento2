@@ -123,4 +123,23 @@
             <column name="name"/>
         </index>
     </table>
+    <table name="packetery_log" resource="default" engine="innodb" comment="History of Packeta API actions performed in admin">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="varchar" name="action" length="32" nullable="false" comment="Stable action code (submit, cancel, print_label, print_list)"/>
+        <column xsi:type="varchar" name="status" length="16" nullable="false" comment="Stable status code (success, error)"/>
+        <column xsi:type="varchar" name="order_number" length="128" nullable="true" comment="Related order number, empty for batch actions covering multiple shipments"/>
+        <column xsi:type="text" name="note" nullable="true" comment="Structured human readable result"/>
+        <column xsi:type="text" name="params" nullable="true" comment="API call parameters without credentials, stored for errors"/>
+        <column xsi:type="text" name="response" nullable="true" comment="API response or error message, stored for errors"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="UTC date and time the record was created"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="PACKETERY_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+        <index referenceId="PACKETERY_LOG_ORDER_NUMBER" indexType="btree">
+            <column name="order_number"/>
+        </index>
+    </table>
 </schema>
