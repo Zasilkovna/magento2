@@ -6,8 +6,10 @@ namespace Packetery\Checkout\Controller\Adminhtml\Packet;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\Result\RawFactory;
-use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Phrase;
 use Magento\Sales\Model\OrderFactory;
 use Packetery\Checkout\Model\Api\PacketLabelException;
 use Packetery\Checkout\Model\Misc\ComboPhrase;
@@ -21,6 +23,9 @@ class PrintLabel extends Action
 
     /** @var RawFactory */
     private $resultRawFactory;
+
+    /** @var JsonFactory */
+    private $resultJsonFactory;
 
     /** @var PacketeryOrderCollectionFactory */
     private $packeteryOrderCollectionFactory;
@@ -40,6 +45,7 @@ class PrintLabel extends Action
     public function __construct(
         Context $context,
         RawFactory $resultRawFactory,
+        JsonFactory $resultJsonFactory,
         PacketeryOrderCollectionFactory $packeteryOrderCollectionFactory,
         OrderFactory $magentoOrderFactory,
         PacketLabelPrinter $packetLabelPrinter,
@@ -48,6 +54,7 @@ class PrintLabel extends Action
     ) {
         parent::__construct($context);
         $this->resultRawFactory = $resultRawFactory;
+        $this->resultJsonFactory = $resultJsonFactory;
         $this->packeteryOrderCollectionFactory = $packeteryOrderCollectionFactory;
         $this->magentoOrderFactory = $magentoOrderFactory;
         $this->packetLabelPrinter = $packetLabelPrinter;
@@ -56,31 +63,27 @@ class PrintLabel extends Action
     }
 
     /**
-     * @return \Magento\Framework\Controller\Result\Raw|Redirect
+     * @return \Magento\Framework\Controller\Result\Raw|ResultInterface
      */
     public function execute()
     {
-        $resultRedirect = $this->resultRedirectFactory->create()->setPath('packetery/order/index');
         $orderId = (int) $this->getRequest()->getParam('order_id');
         if ($orderId <= 0) {
-            $this->messageManager->addErrorMessage(__('Order not found'));
-            return $resultRedirect;
+            return $this->createErrorResult(__('Order not found'));
         }
 
         $collection = $this->packeteryOrderCollectionFactory->create();
         $collection->addFieldToFilter('id', $orderId);
         $packeteryOrder = $collection->getFirstItem();
         if (!$packeteryOrder->getId()) {
-            $this->messageManager->addErrorMessage(__('Order not found'));
-            return $resultRedirect;
+            return $this->createErrorResult(__('Order not found'));
         }
 
         $magentoOrder = $this->magentoOrderFactory->create()->loadByIncrementId($packeteryOrder->getOrderNumber());
         if (!$magentoOrder->getId()) {
-            $this->messageManager->addErrorMessage(
+            return $this->createErrorResult(
                 __('Order %1 not found.', $packeteryOrder->getOrderNumber())
             );
-            return $resultRedirect;
         }
 
         $offset = (int) $this->getRequest()->getParam('offset');
@@ -98,7 +101,7 @@ class PrintLabel extends Action
                 $this->apiErrorFormatter->format($exception->getMessage(), $errors)
             );
 
-            $this->messageManager->addErrorMessage(
+            return $this->createErrorResult(
                 new ComboPhrase(
                     [
                         __('The label could not be generated.'),
@@ -107,11 +110,8 @@ class PrintLabel extends Action
                     ]
                 )
             );
-
-            return $resultRedirect;
         } catch (PacketLabelLocalizedException $exception) {
-            $this->messageManager->addErrorMessage($exception->getMessage());
-            return $resultRedirect;
+            return $this->createErrorResult($exception->getMessage());
         }
 
         $this->logWriter->logSuccess(
@@ -132,5 +132,27 @@ class PrintLabel extends Action
         $raw->setContents($contents);
 
         return $raw;
+    }
+
+    /**
+     * For the modal (AJAX) flow the message must stay out of the session,
+     * otherwise it would pop up on an unrelated page load later.
+     *
+     * @param Phrase|string $message
+     */
+    private function createErrorResult($message): ResultInterface
+    {
+        $request = $this->getRequest();
+        if ($request instanceof \Magento\Framework\App\Request\Http && $request->isXmlHttpRequest()) {
+            return $this->resultJsonFactory->create()->setData(
+                [
+                    'message' => (string) $message,
+                ]
+            );
+        }
+
+        $this->messageManager->addErrorMessage($message);
+
+        return $this->resultRedirectFactory->create()->setPath('packetery/order/index');
     }
 }

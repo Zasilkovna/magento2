@@ -104,44 +104,97 @@ define([
             var form = $(formElement),
                 action = form.attr('action'),
                 query = form.serialize(),
-                requestUrl = action + (action.indexOf('?') === -1 ? '?' : '&') + query;
+                requestUrl = action + (action.indexOf('?') === -1 ? '?' : '&') + query,
+                backUrl = form.find('.packetery-print-label-cancel').attr('href') || window.location.href;
 
             this.packeteryPrintInProgress = true;
+            this.removePrintLabelFormError();
             this.setPrintLoadingState(true);
             this.setModalInteractionLock(true);
-            $.ajax({
-                url: requestUrl,
-                method: 'GET',
-                xhrFields: {
-                    responseType: 'blob'
+            // 'manual' keeps unexpected redirects (expired session) unfollowed,
+            // errors arrive as JSON thanks to the AJAX header.
+            window.fetch(requestUrl, {
+                redirect: 'manual',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-            }).done(function (responseBlob, textStatus, jqXhr) {
-                var contentType = jqXhr.getResponseHeader('Content-Type') || '',
-                    blobUrl = null;
+            }).then(function (response) {
+                var contentType = response.headers.get('Content-Type') || '';
 
-                if (contentType.indexOf('application/pdf') === -1) {
-                    this.setPrintLoadingState(false);
-                    this.packeteryPrintInProgress = false;
-                    this.setModalInteractionLock(false);
+                if (response.type === 'opaqueredirect') {
+                    this.resetPrintRequestState();
                     this.closePacketeryPrintLabelModal();
-                    window.location.href = requestUrl;
+                    window.location.href = backUrl;
 
+                    return null;
+                }
+
+                if (contentType.indexOf('application/json') !== -1) {
+                    return response.json().then(function (data) {
+                        if (data.ajaxExpired && data.ajaxRedirect) {
+                            this.resetPrintRequestState();
+                            this.closePacketeryPrintLabelModal();
+                            window.location.href = data.ajaxRedirect;
+
+                            return null;
+                        }
+
+                        this.resetPrintRequestState();
+                        this.renderPrintLabelFormError(data.message || $.mage.__('The label could not be generated.'));
+
+                        return null;
+                    }.bind(this));
+                }
+
+                if (!response.ok || contentType.indexOf('application/pdf') === -1) {
+                    this.resetPrintRequestState();
+                    this.renderPrintLabelFormError($.mage.__('The label could not be generated.'));
+
+                    return null;
+                }
+
+                return response.blob();
+            }.bind(this)).then(function (responseBlob) {
+                var blobUrl = null;
+
+                if (responseBlob === null) {
                     return;
                 }
 
                 blobUrl = URL.createObjectURL(responseBlob);
                 window.open(blobUrl, '_blank');
-                this.setPrintLoadingState(false);
-                this.packeteryPrintInProgress = false;
-                this.setModalInteractionLock(false);
+                this.resetPrintRequestState();
                 this.closePacketeryPrintLabelModal();
-            }.bind(this)).fail(function () {
-                this.setPrintLoadingState(false);
-                this.packeteryPrintInProgress = false;
-                this.setModalInteractionLock(false);
-                this.closePacketeryPrintLabelModal();
-                window.location.href = requestUrl;
+            }.bind(this)).catch(function () {
+                this.resetPrintRequestState();
+                this.renderPrintLabelFormError($.mage.__('The label could not be generated.'));
             }.bind(this));
+        },
+
+        renderPrintLabelFormError: function (message) {
+            var page = this.getPacketeryPrintLabelModalContent().find('.packetery-print-label-page'),
+                messageElement = null;
+
+            if (page.length === 0) {
+                this.renderModalError(message);
+
+                return;
+            }
+
+            messageElement = $(this.buildMessageHtml('error', ''));
+            messageElement.children('div').text(message);
+            this.removePrintLabelFormError();
+            page.find('form').before(messageElement);
+        },
+
+        removePrintLabelFormError: function () {
+            this.getPacketeryPrintLabelModalContent().find('.packetery-print-label-page > .message').remove();
+        },
+
+        resetPrintRequestState: function () {
+            this.setPrintLoadingState(false);
+            this.packeteryPrintInProgress = false;
+            this.setModalInteractionLock(false);
         },
 
         setPrintLoadingState: function (isLoading) {
