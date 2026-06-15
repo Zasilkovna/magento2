@@ -55,3 +55,7 @@
 .packetery-log-status-success {
     color: #3c763d;
 }
+
+.packetery-print-label-page > .message {
+    margin: 1.5rem 0 2.5rem;
+}
