@@ -8,6 +8,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 abstract class BaseTest extends \PHPUnit\Framework\TestCase
 {
+    protected const SHIPPING_PICKUP_POINT = 'packetery_pickupPointDelivery';
+    protected const SHIPPING_ADDRESS_DELIVERY = 'packeteryPacketaDynamic_106-directAddressDelivery';
+    protected const SHIPPING_NON_PACKETERY = 'dummy_dummy';
 
     /**
      * @param $object
@@ -111,5 +114,56 @@ abstract class BaseTest extends \PHPUnit\Framework\TestCase
         }
 
         return $service;
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    protected function prepareOrderMock(
+        ?string $shippingMethod = null,
+        ?string $shippingCountryId = null,
+        int $storeId = 1
+    ): \Magento\Sales\Model\Order&MockObject {
+        $order = $this->createMock(\Magento\Sales\Model\Order::class);
+
+        $order->method('getShippingMethod')
+            ->willReturn($shippingMethod);
+        $order->method('getStoreId')
+            ->willReturn($storeId);
+
+        $shippingAddress = null;
+        if ($shippingCountryId !== null) {
+            $shippingAddress = $this->createStub(\Magento\Sales\Api\Data\OrderAddressInterface::class);
+            $shippingAddress->method('getCountryId')
+                ->willReturn($shippingCountryId);
+        }
+
+        $order->method('getShippingAddress')
+            ->willReturn($shippingAddress);
+
+        return $order;
+    }
+
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    protected function prepareBoxStub(
+        int $id = 1,
+        string $name = 'M',
+        ?float $depth = null,
+        ?float $width = null,
+        ?float $height = null,
+        bool $deleted = false
+    ): \Packetery\Checkout\Model\Box {
+        $box = $this->createStub(\Packetery\Checkout\Model\Box::class);
+
+        $box->method('getId')->willReturn($id);
+        $box->method('getName')->willReturn($name);
+        $box->method('getDepth')->willReturn($depth);
+        $box->method('getWidth')->willReturn($width);
+        $box->method('getHeight')->willReturn($height);
+        $box->method('getDeleted')->willReturn($deleted);
+
+        return $box;
     }
 }
