@@ -20,17 +20,22 @@ use Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory as PacketCol
 use Packetery\Checkout\Model\Weight\Calculator;
 use Packetery\Checkout\Test\BaseTest;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
 class PacketSubmitterTest extends BaseTest
 {
+    private const DEFAULT_WEIGHT = 3.5;
+    private const PACKET_NUMBER = 'PKT-1';
+    private const CONSIGN_PASSWORD = 'A1B2C3';
+
     /**
      * @throws \ReflectionException
      */
     public function testResolveWeightPrefersManualWeight(): void
     {
-        $this->assertSame(3.5, $this->invokeResolveWeight(3.5, 1.2, 2.0));
+        $this->assertSame(self::DEFAULT_WEIGHT, $this->invokeResolveWeight(self::DEFAULT_WEIGHT, 1.2, 2.0));
     }
 
     /**
@@ -74,14 +79,14 @@ class PacketSubmitterTest extends BaseTest
         $packeteryOrder->expects($this->once())->method('markExported');
 
         $soapApiClient = $this->createMock(SoapApiClient::class);
-        $soapApiClient->method('createPacket')->willReturn(new CreatePacketResult('PKT-1'));
+        $soapApiClient->method('createPacket')->willReturn(new CreatePacketResult(self::PACKET_NUMBER));
 
         $submitter = $this->makeSubmitter($soapApiClient, $orderResource);
 
-        $submitter->submitPacket($packeteryOrder, $this->makeMagentoOrder());
+        $submitter->submitPacket($packeteryOrder, $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT));
 
         // setWeight is a DataObject magic setter, so the write-back is read back off the raw data
-        $this->assertSame(3.5, $packeteryOrder->getData('weight'));
+        $this->assertSame(self::DEFAULT_WEIGHT, $packeteryOrder->getData('weight'));
     }
 
     /**
@@ -95,7 +100,7 @@ class PacketSubmitterTest extends BaseTest
         $orderResource->expects($this->never())
             ->method('save');
 
-        $packeteryOrder = $this->makePacketeryOrder(3.5);
+        $packeteryOrder = $this->makePacketeryOrder(self::DEFAULT_WEIGHT);
         $packeteryOrder->expects($this->never())
             ->method('markExported');
 
@@ -108,7 +113,7 @@ class PacketSubmitterTest extends BaseTest
         $this->assertException(
             PacketSubmissionException::class,
             function () use ($submitter, $packeteryOrder): void {
-                $submitter->submitPacket($packeteryOrder, $this->makeMagentoOrder());
+                $submitter->submitPacket($packeteryOrder, $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT));
             }
         );
 
@@ -117,10 +122,8 @@ class PacketSubmitterTest extends BaseTest
     }
 
     /**
-     * No manual weight, no product weight and no configured default:
-     * the resolver does not crash, it stays at 0.0
-     * (see testResolveWeightStaysZeroWhenNothingResolves) and that zero is what reaches the API,
-     * which rejects the packet, so nothing is persisted.
+     * No manual, product, or configured weight: the resolver stays at 0.0; that zero reaches the API,
+     * which rejects the packet, so nothing is persisted
      *
      * @throws \ReflectionException
      */
@@ -151,7 +154,7 @@ class PacketSubmitterTest extends BaseTest
         $this->assertException(
             PacketSubmissionException::class,
             function () use ($submitter, $packeteryOrder): void {
-                $submitter->submitPacket($packeteryOrder, $this->makeMagentoOrder());
+                $submitter->submitPacket($packeteryOrder, $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT));
             }
         );
 
@@ -160,69 +163,276 @@ class PacketSubmitterTest extends BaseTest
     }
 
     /**
-     * A box with all dimensions set sends the size to the API in whole mm (cm × 10),
-     * mapping depth to the API length axis.
-     *
-     * @throws \ReflectionException
+     * @return array<string, array{?float, ?float, ?float, ?array<string, int>}>
      */
-    public function testSubmitPacketSendsBoxSizeInMillimetres(): void
+    public static function boxSizeProvider(): array
     {
-        $box = $this->makeBox(30.0, 20.0, 10.0);
-
-        $sentSize = null;
-        $soapApiClient = $this->createMock(SoapApiClient::class);
-        $soapApiClient->method('createPacket')
-            ->willReturnCallback(
-                function (string $apiPassword, PacketAttributes $attributes) use (&$sentSize): CreatePacketResult {
-                    $sentSize = $attributes->toArray()['size'] ?? null;
-
-                    return new CreatePacketResult('PKT-1');
-                }
-            );
-
-        $submitter = $this->makeSubmitter($soapApiClient, $this->createMock(OrderResource::class), $box);
-
-        $submitter->submitPacket($this->makePacketeryOrder(3.5, 7), $this->makeMagentoOrder());
-
-        $this->assertSame(['length' => 300, 'width' => 200, 'height' => 100], $sentSize);
+        return [
+            'all dimensions → mm (depth maps to API length)' => [
+                30.0,
+                20.0,
+                10.0,
+                ['length' => 300, 'width' => 200, 'height' => 100],
+            ],
+            'null dimension (DB-edited row) → size skipped' => [
+                null,
+                20.0,
+                10.0,
+                null,
+            ],
+        ];
     }
 
     /**
-     * A box dimension is null only on a row edited directly in the database, so the size is skipped
-     * instead of crashing the strict conversion: the packet still submits, just without size.
-     *
+     * @param ?array<string, int> $expectedSize
      * @throws \ReflectionException
      */
-    public function testSubmitPacketSkipsSizeWhenBoxDimensionMissing(): void
-    {
-        $box = $this->makeBox(null, 20.0, 10.0);
+    #[DataProvider('boxSizeProvider')]
+    public function testSubmitBoxSize(
+        ?float $depth,
+        ?float $width,
+        ?float $height,
+        ?array $expectedSize
+    ): void {
+        $box = $this->prepareBoxStub(
+            1,
+            'M',
+            $depth,
+            $width,
+            $height
+        );
 
-        $sizeKeyExists = true;
+        $captured = [];
         $soapApiClient = $this->createMock(SoapApiClient::class);
         $soapApiClient->method('createPacket')
             ->willReturnCallback(
-                function (string $apiPassword, PacketAttributes $attributes) use (&$sizeKeyExists): CreatePacketResult {
-                    $sizeKeyExists = array_key_exists('size', $attributes->toArray());
+                function (string $apiPassword, PacketAttributes $attributes) use (&$captured): CreatePacketResult {
+                    $captured = $attributes->toArray();
 
-                    return new CreatePacketResult('PKT-1');
+                    return new CreatePacketResult(self::PACKET_NUMBER);
                 }
             );
-
         $submitter = $this->makeSubmitter($soapApiClient, $this->createMock(OrderResource::class), $box);
 
-        $submitter->submitPacket($this->makePacketeryOrder(3.5, 7), $this->makeMagentoOrder());
+        $submitter->submitPacket(
+            $this->makePacketeryOrder(self::DEFAULT_WEIGHT, 7),
+            $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT)
+        );
 
-        $this->assertFalse($sizeKeyExists);
+        if ($expectedSize === null) {
+            $this->assertArrayNotHasKey('size', $captured);
+
+            return;
+        }
+
+        $this->assertSame($expectedSize, $captured['size']);
+    }
+
+    /** @return array<string, array{float, ?float}> */
+    public static function codProvider(): array
+    {
+        return [
+            'zero COD omits attribute' => [0.0, null],
+            'positive COD is sent' => [150.0, 150.0],
+        ];
     }
 
     /**
-     * Order with a manual weight so `resolveWeight` short-circuits, on a pickup-point method with no
-     * carrier pickup point, no box, no COD and no adult content, so `submitPacket` takes its shortest path.
-     * Partial mock: the declared getters are stubbed, but the magic setWeight()/getData() stay real
-     * so the test can observe the write-back.
+     * @throws \ReflectionException
      */
-    private function makePacketeryOrder(?float $manualWeight, ?int $boxId = null): MockObject
+    #[DataProvider('codProvider')]
+    public function testSubmitCodAttribute(float $cod, ?float $expectedCod): void
     {
+        $captured = [];
+        $soapApiClient = $this->createMock(SoapApiClient::class);
+        $soapApiClient->method('createPacket')
+            ->willReturnCallback(
+                function (string $apiPassword, PacketAttributes $attributes) use (&$captured): CreatePacketResult {
+                    $captured = $attributes->toArray();
+
+                    return new CreatePacketResult(self::PACKET_NUMBER);
+                }
+            );
+        $submitter = $this->makeSubmitter($soapApiClient, $this->createMock(OrderResource::class));
+
+        $submitter->submitPacket(
+            $this->makePacketeryOrder(
+                self::DEFAULT_WEIGHT,
+                null,
+                100.0,
+                $cod
+            ),
+            $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT)
+        );
+
+        $this->assertSame($expectedCod, $captured['cod'] ?? null);
+    }
+
+    /** @return array<string, array{bool, bool, ?bool}> */
+    public static function adultContentProvider(): array
+    {
+        return [
+            'flag on + own pickup + base country → sent' => [true, false, true],
+            'flag on + carrier pickup → omitted' => [true, true, null],
+            'flag off → omitted' => [false, false, null],
+        ];
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    #[DataProvider('adultContentProvider')]
+    public function testSubmitAdultContentAttribute(
+        bool $adultContent,
+        bool $isCarrier,
+        ?bool $expectedAdultContent
+    ): void {
+        $captured = [];
+        $soapApiClient = $this->createMock(SoapApiClient::class);
+        $soapApiClient->method('createPacket')
+            ->willReturnCallback(
+                function (string $apiPassword, PacketAttributes $attributes) use (&$captured): CreatePacketResult {
+                    $captured = $attributes->toArray();
+
+                    return new CreatePacketResult(self::PACKET_NUMBER);
+                }
+            );
+
+        $submitter = $this->makeSubmitter($soapApiClient, $this->createMock(OrderResource::class));
+        $submitter->submitPacket(
+            $this->makePacketeryOrder(
+                self::DEFAULT_WEIGHT,
+                null,
+                100.0,
+                0.0,
+                $adultContent,
+                $isCarrier
+            ),
+            $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT, 'CZ')
+        );
+
+        $this->assertSame($expectedAdultContent, $captured['adultContent'] ?? null);
+    }
+
+    /**
+     * Box is snapshotted onto the packet so the detail stays correct if the box is later changed
+     *
+     * @throws \ReflectionException
+     */
+    public function testSubmitSnapshotsBoxDimensionsOnSuccess(): void
+    {
+        $box = $this->prepareBoxStub(
+            1,
+            'M',
+            30.0,
+            20.0,
+            10.0
+        );
+
+        $packet = $this->createMock(\Packetery\Checkout\Model\Packet::class);
+        $packet->expects($this->once())
+            ->method('setBoxName')
+            ->with('M');
+        $packet->expects($this->once())
+            ->method('setBoxDepth')
+            ->with(30.0);
+        $packet->expects($this->once())
+            ->method('setBoxWidth')
+            ->with(20.0);
+        $packet->expects($this->once())
+            ->method('setBoxHeight')
+            ->with(10.0);
+
+        $soapApiClient = $this->createMock(SoapApiClient::class);
+        $soapApiClient->method('createPacket')
+            ->willReturn(new CreatePacketResult(self::PACKET_NUMBER));
+
+        $submitter = $this->makeSubmitter($soapApiClient, $this->createMock(OrderResource::class), $box, $packet);
+
+        $submitter->submitPacket(
+            $this->makePacketeryOrder(self::DEFAULT_WEIGHT, 7),
+            $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT)
+        );
+    }
+
+    /**
+     * With the consignment code enabled the submit fetches it through packetInfo and stores it on the packet
+     *
+     * @throws \ReflectionException
+     */
+    public function testSubmitFetchesConsignPasswordWhenEnabled(): void
+    {
+        $packetInfo = $this->createStub(\Packetery\Checkout\Model\Api\Result\PacketInfoResult::class);
+        $packetInfo->method('getConsignPassword')
+            ->willReturn(self::CONSIGN_PASSWORD);
+
+        $soapApiClient = $this->createMock(SoapApiClient::class);
+        $soapApiClient->method('createPacket')
+            ->willReturn(new CreatePacketResult(self::PACKET_NUMBER));
+        $soapApiClient->expects($this->once())
+            ->method('packetInfo')
+            ->willReturn($packetInfo);
+
+        $packet = $this->createMock(\Packetery\Checkout\Model\Packet::class);
+        $packet->expects($this->once())
+            ->method('setConsignPassword')
+            ->with(self::CONSIGN_PASSWORD);
+
+        $submitter = $this->makeSubmitter(
+            $soapApiClient,
+            $this->createMock(OrderResource::class),
+            null,
+            $packet,
+            true
+        );
+
+        $submitter->submitPacket(
+            $this->makePacketeryOrder(self::DEFAULT_WEIGHT),
+            $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT)
+        );
+    }
+
+    /**
+     * With the consignment code disabled the submit never calls packetInfo and stores null
+     *
+     * @throws \ReflectionException
+     */
+    public function testSubmitSkipsConsignPasswordWhenDisabled(): void
+    {
+        $soapApiClient = $this->createMock(SoapApiClient::class);
+        $soapApiClient->method('createPacket')
+            ->willReturn(new CreatePacketResult(self::PACKET_NUMBER));
+        $soapApiClient->expects($this->never())
+            ->method('packetInfo');
+
+        $packet = $this->createMock(\Packetery\Checkout\Model\Packet::class);
+        $packet->expects($this->once())
+            ->method('setConsignPassword')
+            ->with(null);
+
+        $submitter = $this->makeSubmitter(
+            $soapApiClient,
+            $this->createMock(OrderResource::class),
+            packet: $packet
+        );
+
+        $submitter->submitPacket(
+            $this->makePacketeryOrder(self::DEFAULT_WEIGHT),
+            $this->prepareOrderMock(self::SHIPPING_PICKUP_POINT)
+        );
+    }
+
+    /**
+     * Partial mock: declared getters are stubbed, magic setWeight()/getData() stay real so tests see the write-back
+     */
+    private function makePacketeryOrder(
+        ?float $manualWeight,
+        ?int $boxId = null,
+        ?float $value = 100.0,
+        ?float $cod = 0.0,
+        bool $adultContent = false,
+        bool $isCarrier = false
+    ): \Packetery\Checkout\Model\Order&MockObject {
         $packeteryOrder = $this->createPartialMock(
             \Packetery\Checkout\Model\Order::class,
             [
@@ -239,13 +449,14 @@ class PacketSubmitterTest extends BaseTest
                 'getCarrierPickupPoint',
                 'getBoxId',
                 'getAdultContent',
+                'isCarrier',
                 'markExported',
             ]
         );
         $packeteryOrder->method('getOrderNumber')->willReturn('000000004');
         $packeteryOrder->method('getWeight')->willReturn($manualWeight);
-        $packeteryOrder->method('getValue')->willReturn(100.0);
-        $packeteryOrder->method('getCod')->willReturn(0.0);
+        $packeteryOrder->method('getValue')->willReturn($value);
+        $packeteryOrder->method('getCod')->willReturn($cod);
         $packeteryOrder->method('getRecipientFirstname')->willReturn('John');
         $packeteryOrder->method('getRecipientLastname')->willReturn('Smith');
         $packeteryOrder->method('getRecipientCompany')->willReturn('');
@@ -254,23 +465,19 @@ class PacketSubmitterTest extends BaseTest
         $packeteryOrder->method('getPointId')->willReturn(123);
         $packeteryOrder->method('getCarrierPickupPoint')->willReturn(null);
         $packeteryOrder->method('getBoxId')->willReturn($boxId);
-        $packeteryOrder->method('getAdultContent')->willReturn(false);
+        $packeteryOrder->method('getAdultContent')->willReturn($adultContent);
+        $packeteryOrder->method('isCarrier')->willReturn($isCarrier);
 
         return $packeteryOrder;
     }
 
-    private function makeMagentoOrder(): MockObject
-    {
-        $magentoOrder = $this->createMock(\Magento\Sales\Model\Order::class);
-        $magentoOrder->method('getStoreId')->willReturn(1);
-        $magentoOrder->method('getShippingMethod')->willReturn('packetery_pickupPointDelivery');
-        $magentoOrder->method('getShippingAddress')->willReturn(null);
-
-        return $magentoOrder;
-    }
-
-    private function makeSubmitter(MockObject $soapApiClient, MockObject $orderResource, ?\Packetery\Checkout\Model\Box $box = null): PacketSubmitter
-    {
+    private function makeSubmitter(
+        MockObject $soapApiClient,
+        MockObject $orderResource,
+        ?\Packetery\Checkout\Model\Box $box = null,
+        ?object $packet = null,
+        bool $showConsignPassword = false
+    ): PacketSubmitter {
         $scopeConfig = $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class);
         $scopeConfig->method('getValue')->willReturn('configured');
 
@@ -280,10 +487,10 @@ class PacketSubmitterTest extends BaseTest
         $packetCollectionFactory->method('create')->willReturn($packetCollection);
 
         $packetFactory = $this->createStub(PacketFactory::class);
-        $packetFactory->method('create')->willReturn($this->createStub(\Packetery\Checkout\Model\Packet::class));
+        $packetFactory->method('create')->willReturn($packet ?? $this->createStub(\Packetery\Checkout\Model\Packet::class));
 
         $config = $this->createStub(Config::class);
-        $config->method('isShowConsignPassword')->willReturn(false);
+        $config->method('isShowConsignPassword')->willReturn($showConsignPassword);
         $facade = $this->createStub(Facade::class);
         $facade->method('getPacketeryCarrierConfig')->willReturn($config);
 
@@ -315,21 +522,6 @@ class PacketSubmitterTest extends BaseTest
                 'orderCurrencyResolver' => $currencyResolver,
             ]
         );
-    }
-
-    /**
-     * A pickup-point order (see makeMagentoOrder) carrying a box, so submitPacket resolves the box and
-     * builds the size from its dimensions; a null dimension models a row edited directly in the database.
-     */
-    private function makeBox(?float $depth, ?float $width, ?float $height): \Packetery\Checkout\Model\Box
-    {
-        $box = $this->createStub(\Packetery\Checkout\Model\Box::class);
-        $box->method('getName')->willReturn('M');
-        $box->method('getDepth')->willReturn($depth);
-        $box->method('getWidth')->willReturn($width);
-        $box->method('getHeight')->willReturn($height);
-
-        return $box;
     }
 
     /**
