@@ -55,7 +55,7 @@ Price rules are created as unavailable, without set maximum weight.
 
 #### PHP Compatibility Checks
 
-The module includes PHPCompatibility checks to ensure compatibility with PHP 8.1 and PHP 8.4.
+The module includes PHPCompatibility checks to ensure compatibility with PHP 8.1 through PHP 8.5.
 
 Requirements to run the checks: PHP 8.4 and Composer 2.8.6. From the module directory (where `composer.json` lives), run:
 
@@ -63,6 +63,7 @@ Requirements to run the checks: PHP 8.4 and Composer 2.8.6. From the module dire
 composer install
 composer phpcs-compatibility:81  # Check PHP 8.1 compatibility
 composer phpcs-compatibility:84  # Check PHP 8.4 compatibility
+composer phpcs-compatibility:85  # Check PHP 8.5 compatibility
 ```
 
 These commands use PHP_CodeSniffer with the PHPCompatibility standard to detect compatibility issues.
@@ -178,8 +179,8 @@ Behaviour: unset defaults to `30`; a positive integer `N` deletes records older 
 
 #### Supported versions:
 
-- Magento 2.4.4+
-- php 8.1 - 8.4
+- Magento 2.4.4+ (including 2.4.9)
+- php 8.1 - 8.5
 - If you have a problem using the module, please contact us by email: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com)
 
 #### Supported features:
@@ -263,7 +264,7 @@ Cenová pravidla jsou vytvořena jako nedostupná, bez nastavené maximální hm
 
 #### Kontrola kompatibility PHP
 
-Modul obsahuje kontroly PHPCompatibility pro zajištění kompatibility s PHP 8.1 a PHP 8.4.
+Modul obsahuje kontroly PHPCompatibility pro zajištění kompatibility s PHP 8.1 až PHP 8.5.
 
 Pro spuštění kontrol je potřeba PHP 8.4 a Composer 2.8.6. V adresáři modulu (kde je `composer.json`) spusťte:
 
@@ -271,6 +272,7 @@ Pro spuštění kontrol je potřeba PHP 8.4 a Composer 2.8.6. V adresáři modul
 composer install
 composer phpcs-compatibility:81  # Kontrola kompatibility s PHP 8.1
 composer phpcs-compatibility:84  # Kontrola kompatibility s PHP 8.4
+composer phpcs-compatibility:85  # Kontrola kompatibility s PHP 8.5
 ```
 
 Tyto příkazy používají PHP_CodeSniffer se standardem PHPCompatibility pro detekci problémů s kompatibilitou.
@@ -388,8 +390,8 @@ Chování: nenastaveno → výchozí `30`; kladné číslo `N` → denně se ma�
 
 #### Podporované verze:
 
-- Magento 2.4.4+
-- php 8.1 - 8.4
+- Magento 2.4.4+ (včetně 2.4.9)
+- php 8.1 - 8.5
 - Při problému s použitím modulu nás kontaktujte na emailu: [e-commerce.support@packeta.com](mailto:e-commerce.support@packeta.com)
 
 #### Poskytované funkce:

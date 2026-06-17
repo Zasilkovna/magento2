@@ -14,7 +14,8 @@
     },
     "scripts": {
         "phpcs-compatibility:81": "bash bin/phpcs-compatibility 8.1",
-        "phpcs-compatibility:84": "bash bin/phpcs-compatibility 8.4"
+        "phpcs-compatibility:84": "bash bin/phpcs-compatibility 8.4",
+        "phpcs-compatibility:85": "bash bin/phpcs-compatibility 8.5"
     },
     "config": {
         "allow-plugins": {
