@@ -46,6 +46,9 @@ class ConverterTest extends TestCase
             'whole number drops decimals' => [30.0, '30'],
             'keeps one decimal' => [30.5, '30.5'],
             'trims trailing zero' => [20.0, '20'],
+            'negative whole trims decimals' => [-5.0, '-5'],
+            'negative keeps one decimal' => [-12.5, '-12.5'],
+            'rounds to one decimal' => [30.25, '30.3'],
         ];
     }
 
