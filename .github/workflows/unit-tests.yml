@@ -1,0 +1,52 @@
+name: Unit tests
+
+on:
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    unit-tests:
+        runs-on: ubuntu-24.04
+        strategy:
+            fail-fast: false
+            matrix: >-
+                ${{ github.base_ref == 'v2.5.0' && fromJSON('{"include":[{"php-version":"8.5","magento-version":"2.4.9"}]}')
+                || fromJSON('{"include":[
+                  {"php-version":"8.1","magento-version":"2.4.4-p13"},
+                  {"php-version":"8.2","magento-version":"2.4.7-p10"},
+                  {"php-version":"8.3","magento-version":"2.4.8-p5"},
+                  {"php-version":"8.4","magento-version":"2.4.8-p5"}
+                ]}')
+                }}
+
+        steps:
+            -   uses: actions/checkout@v4.3.1
+
+            -   uses: shivammathur/setup-php@2.37.2
+                with:
+                    php-version: ${{ matrix.php-version }}
+                    extensions: bcmath, gd, intl, mbstring, pdo_mysql, soap, sockets, xsl, zip
+                    coverage: none
+
+            -   name: Install Magento ${{ matrix.magento-version }}
+                env:
+                    COMPOSER_AUTH: '{"http-basic":{"repo.magento.com":{"username":"${{ secrets.MAGENTO_PUBLIC_KEY }}","password":"${{ secrets.MAGENTO_PRIVATE_KEY }}"}}}'
+                run: |
+                    composer config --global policy.advisories.block false
+                    composer create-project --repository-url=https://repo.magento.com/ \
+                        "magento/project-community-edition=${{ matrix.magento-version }}" ../magento --no-interaction --no-progress
+
+            -   name: Copy module and Allure config
+                run: |
+                    mkdir -p ../magento/app/code/Packetery ../magento/allure
+                    cp -r Packetery/Checkout ../magento/app/code/Packetery/
+                    cat > ../magento/allure/allure.config.php <<'PHP'
+                    <?php
+                    return ["outputDirectory" => "build/allure-results"];
+                    PHP
+
+            -   name: Run unit tests
+                working-directory: ../magento
+                run: vendor/bin/phpunit -c dev/tests/unit/phpunit.xml.dist app/code/Packetery/Checkout/Test/Unit
