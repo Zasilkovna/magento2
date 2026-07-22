@@ -4,15 +4,17 @@
     <meta charset="utf-8"/>
 </head>
 <body>
-<p id="packetery-mass-print-fallback" style="display:none;">
-    <?= __('If you are not redirected automatically,') ?>
-    <a id="packetery-mass-print-fallback-link" href="#"><?= __('click here') ?></a>.
+<p id="packetery-mass-print-fallback" style="display:none;"
+   data-payload="<?= $block->escapeHtmlAttr($block->getData('payload_json')) ?>"
+   data-listing-url="<?= $block->escapeHtmlAttr($block->getData('listing_url_json')) ?>">
+    <?= $block->escapeHtml(__('If you are not redirected automatically,')) ?>
+    <a id="packetery-mass-print-fallback-link" href="#"><?= $block->escapeHtml(__('click here')) ?></a>.
 </p>
 <script>
 (function () {
-    var data = <?= $block->getData('payload_json') ?>;
-    var listingUrl = <?= $block->getData('listing_url_json') ?>;
     var fallbackWrapper = document.getElementById('packetery-mass-print-fallback');
+    var data = JSON.parse(fallbackWrapper.getAttribute('data-payload'));
+    var listingUrl = JSON.parse(fallbackWrapper.getAttribute('data-listing-url'));
     var fallbackLink = document.getElementById('packetery-mass-print-fallback-link');
 
     (data.pdfs || []).forEach(function (b64) {
