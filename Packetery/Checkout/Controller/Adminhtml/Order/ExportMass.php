@@ -20,6 +20,9 @@ class ExportMass extends \Magento\Backend\App\Action
     /** @var ConvertToCsvCustom */
     private $converter;
 
+    /** @var \Magento\Framework\App\Response\Http\FileFactory */
+    private $fileFactory;
+
     /**
      * ExportMass constructor.
      *
@@ -34,7 +37,8 @@ class ExportMass extends \Magento\Backend\App\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Packetery\Checkout\Helper\Data $data,
         \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-        ConvertToCsvCustom $converter
+        ConvertToCsvCustom $converter,
+        \Magento\Framework\App\Response\Http\FileFactory $fileFactory
     ) {
         parent::__construct($context);
 
@@ -42,6 +46,7 @@ class ExportMass extends \Magento\Backend\App\Action
         $this->data = $data;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->converter = $converter;
+        $this->fileFactory = $fileFactory;
     }
 
     /**
@@ -85,24 +90,10 @@ class ExportMass extends \Magento\Backend\App\Action
         );
         $collection->save();
 
-        $this->_sendUploadResponse($this->data->getExportFileName(), $content);
-    }
-
-    /**
-     * @param string $fileName
-     * @param string|null $content
-     * @param string $contentType
-     */
-    protected function _sendUploadResponse(string $fileName, ?string $content, string $contentType = 'application/octet-stream') {
-        $this->_response->setHttpResponseCode(200)
-            ->setHeader('Pragma', 'public', true)
-            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
-            ->setHeader('Content-type', $contentType, true)
-            ->setHeader('Content-Length', strlen($content), true)
-            ->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true)
-            ->setHeader('Last-Modified', date('r'), true)
-            ->setBody($content)
-            ->sendResponse();
-        die;
+        return $this->fileFactory->create(
+            $this->data->getExportFileName(),
+            $content,
+            \Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR
+        );
     }
 }

@@ -1,16 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Packetery\Checkout\Controller\Adminhtml\Order;
 
 class ExportPacketeryCsvAll extends \Magento\Backend\App\Action
 {
+    /** @var \Magento\Framework\App\Response\Http\FileFactory */
+    private $fileFactory;
 
-    protected $_fileFactory;
-    protected $_response;
-    protected $_view;
-    protected $directory;
-    protected $converter;
-    protected $resultPageFactory;
-    protected $directory_list;
+    /** @var \Magento\Framework\View\Result\PageFactory */
+    private $resultPageFactory;
 
     /** @var \Packetery\Checkout\Helper\Data */
     private $data;
@@ -18,19 +18,34 @@ class ExportPacketeryCsvAll extends \Magento\Backend\App\Action
     /** @var \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory */
     private $orderCollectionFactory;
 
+    /**
+     * ExportPacketeryCsvAll constructor.
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Packetery\Checkout\Helper\Data $data
+     * @param \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+     * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context  $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Packetery\Checkout\Helper\Data $data,
-        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+        \Magento\Framework\App\Response\Http\FileFactory $fileFactory
     ) {
         parent::__construct($context);
 
         $this->resultPageFactory  = $resultPageFactory;
         $this->data = $data;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->fileFactory = $fileFactory;
     }
 
+    /**
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function execute()
     {
         $resultPage = $this->resultPageFactory->create();
@@ -56,21 +71,10 @@ class ExportPacketeryCsvAll extends \Magento\Backend\App\Action
         );
         $collection->save();
 
-        $this->_sendUploadResponse($this->data->getExportFileName(), $content);
-
-    }
-
-    protected function _sendUploadResponse($fileName, $content, $contentType='application/octet-stream')
-    {
-        $this->_response->setHttpResponseCode(200)
-            ->setHeader('Pragma', 'public', true)
-            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
-            ->setHeader('Content-type', $contentType, true)
-            ->setHeader('Content-Length', strlen($content), true)
-            ->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true)
-            ->setHeader('Last-Modified', date('r'), true)
-            ->setBody($content)
-            ->sendResponse();
-        die;
+        return $this->fileFactory->create(
+            $this->data->getExportFileName(),
+            $content,
+            \Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR
+        );
     }
 }
