@@ -85,7 +85,6 @@ define(
                         return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
                     }, quote.shippingMethod()));
 
-                    // TODO: implement selected address history
                     quote.shippingMethod.subscribe(createChangeSubscriber(createCallbackForShippingStep(resetPickedValidatedAddress), function(lastValue, value) {
                         return mixin.getShippingRateCode(lastValue) !== mixin.getShippingRateCode(value);
                     }, quote.shippingMethod()));
