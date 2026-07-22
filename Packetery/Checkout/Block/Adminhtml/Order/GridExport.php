@@ -55,12 +55,6 @@ class GridExport extends \Magento\Backend\Block\Widget\Grid\Extended
         return parent::_prepareCollection();
     }
 
-
-    public function massaction(array $items, $action, $acceptAlert = false, $massActionSelection = '')
-    {
-        die;
-    }
-
     /**
      * @param string $orderIds
      * @return string|null

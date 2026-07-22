@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Packetery\Checkout\Model\Label;
 
-final class LabelFormats
+class LabelFormats
 {
     public const DEFAULT_FORMAT = 'A6 on A4';
 
