@@ -9,7 +9,8 @@ define([
         packetaValidatedAddress: ko.observable(null),
         getPacketaPoint: function(defaultReturnValue) {
             if(window.localStorage.packetaPoint) {
-                return JSON.parse(window.localStorage.packetaPoint); // TODO: Store data in backend to avoid direct edit by unwanted actor. Issue was communicated with manager.
+                // pickup point is cached client-side in localStorage (server-side storage is a known limitation)
+                return JSON.parse(window.localStorage.packetaPoint);
             }
 
             return defaultReturnValue;
@@ -17,7 +18,8 @@ define([
 
         getPacketaValidatedAddress: function(defaultReturnValue) {
             if(this.packetaValidatedAddress() === null && window.localStorage.packetaValidatedAddress) {
-                this.packetaValidatedAddress(JSON.parse(window.localStorage.packetaValidatedAddress)); // TODO: Store data in backend to avoid direct edit by unwanted actor. Issue was communicated with manager.
+                // validated address is cached client-side in localStorage (server-side storage is a known limitation)
+                this.packetaValidatedAddress(JSON.parse(window.localStorage.packetaValidatedAddress));
             }
 
             if(this.packetaValidatedAddress() === null && !window.localStorage.packetaValidatedAddress) {
