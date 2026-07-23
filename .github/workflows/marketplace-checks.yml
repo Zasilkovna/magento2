@@ -1,0 +1,128 @@
+name: Marketplace checks
+
+on:
+    pull_request:
+    push:
+        branches: [master, 'v*']
+
+permissions:
+    contents: read
+
+concurrency:
+    group: marketplace-checks-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    package-verification:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 10
+        steps:
+            -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: '8.3'
+                    tools: composer
+                    coverage: none
+
+            -   name: Validate package manifest
+                run: composer validate Packetery/Checkout/composer.json
+
+            -   name: Verify composer.json and CHANGE_LOG.txt versions agree
+                run: |
+                    MANIFEST=$(php -r 'echo json_decode(file_get_contents("Packetery/Checkout/composer.json"))->version;')
+                    CHANGELOG=$(awk 'NR==1{print $1}' CHANGE_LOG.txt)
+                    echo "composer.json: $MANIFEST, CHANGE_LOG.txt: $CHANGELOG"
+                    [ -n "$MANIFEST" ] || { echo "FAIL: composer.json has no version"; exit 1; }
+                    [ "$MANIFEST" = "$CHANGELOG" ] || { echo "FAIL: composer.json ($MANIFEST) != CHANGE_LOG.txt top ($CHANGELOG)"; exit 1; }
+
+            -   name: Enforce package zip under 30 MB
+                run: |
+                    set -o pipefail
+                    SIZE=$(cd Packetery/Checkout && zip -rq - . -x '.git/*' | wc -c)
+                    echo "package zip: $((SIZE / 1024)) KB"
+                    if [ "$SIZE" -gt $((30 * 1024 * 1024)) ]; then
+                        echo "FAIL: package $((SIZE / 1024 / 1024)) MB > 30 MB"; exit 1
+                    fi
+
+            -   name: Forbid TODO and FIXME markers
+                run: |
+                    HITS=$(grep -rIniE 'TODO|FIXME' \
+                        --include='*.php' --include='*.phtml' --include='*.xml' --include='*.js' \
+                        Packetery/Checkout | grep -v '/Test/' || true)
+                    if [ -n "$HITS" ]; then
+                        echo "FAIL: TODO/FIXME found:"; echo "$HITS"; exit 1
+                    fi
+                    echo "OK: no TODO/FIXME"
+
+    coding-standard:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 15
+        steps:
+            -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: '8.4'
+                    tools: composer
+                    coverage: none
+
+            -   name: Install Magento coding standard and phpcpd
+                run: |
+                    mkdir -p .mp-tools
+                    composer --working-dir=.mp-tools init --no-interaction --name=packetery/mp-tools
+                    composer --working-dir=.mp-tools config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+                    composer --working-dir=.mp-tools require --no-interaction \
+                        "magento/magento-coding-standard:^40" "systemsdk/phpcpd:^9.0"
+
+            -   name: Code sniffer (Magento2, blocking errors only)
+                run: |
+                    .mp-tools/vendor/bin/phpcs --standard=Magento2 \
+                        --error-severity=10 --warning-severity=0 \
+                        --extensions=php,phtml --ignore-annotations Packetery/Checkout
+
+            -   name: Copy-paste detector (advisory)
+                continue-on-error: true
+                run: .mp-tools/vendor/bin/phpcpd --exclude Test Packetery/Checkout
+
+    php-lint:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 10
+        strategy:
+            fail-fast: false
+            matrix:
+                php-version: ['8.1', '8.2', '8.3', '8.4', '8.5']
+        steps:
+            -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: ${{ matrix.php-version }}
+                    coverage: none
+
+            -   name: Lint PHP sources
+                run: |
+                    find Packetery/Checkout -name '*.php' -not -path '*/vendor/*' -print0 \
+                        | xargs -0 -n1 -P4 php -l >/dev/null
+
+    php-compatibility:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 10
+        steps:
+            -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: '8.4'
+                    tools: composer
+                    coverage: none
+
+            -   name: Install dev tooling
+                run: composer install --no-interaction --no-progress
+
+            -   name: PHPCompatibility 8.1 to 8.5
+                run: |
+                    for v in 8.1 8.2 8.3 8.4 8.5; do
+                        echo "== testVersion $v =="
+                        bash bin/phpcs-compatibility "$v"
+                    done
