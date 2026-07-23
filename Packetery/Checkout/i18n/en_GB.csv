@@ -281,3 +281,8 @@
 "Packet value","Packet value"
 "Packeta – packet","Packeta – packet"
 "Pick-up point","Pick-up point"
+"No packets were queued.","No packets were queued."
+"No packets were queued. %1 packet(s) already submitted.","No packets were queued. %1 packet(s) already submitted."
+"No packets were queued. %1 packet(s) not queued — API password and sender not configured (%2).","No packets were queued. %1 packet(s) not queued — API password and sender not configured (%2)."
+"No packets were queued. %1 packet(s) already submitted; API password and sender not configured (%2).","No packets were queued. %1 packet(s) already submitted; API password and sender not configured (%2)."
+"%1 packet(s) not queued — API password and sender not configured (%2).","%1 packet(s) not queued — API password and sender not configured (%2)."

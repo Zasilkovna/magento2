@@ -8,65 +8,46 @@ use Magento\Sales\Model\Order as MagentoOrder;
 use Magento\Sales\Model\OrderFactory;
 use Packetery\Checkout\Logger\BulkPacketSubmitLogger;
 use Packetery\Checkout\Model\Api\PacketSubmissionException;
-use Packetery\Checkout\Model\Log;
-use Packetery\Checkout\Model\Log\LogWriter;
 use Packetery\Checkout\Model\Order;
+use Packetery\Checkout\Model\OrderRepository;
 use Packetery\Checkout\Model\Packet\BulkPacketSubmitConsumer;
 use Packetery\Checkout\Model\Packet\PacketSubmitLocalizedException;
 use Packetery\Checkout\Model\Packet\PacketSubmitter;
-use Packetery\Checkout\Model\ResourceModel\Order\Collection;
-use Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory;
 use Packetery\Checkout\Test\BaseTest;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[AllowMockObjectsWithoutExpectations]
 class BulkPacketSubmitConsumerTest extends BaseTest
 {
     private const ORDER_NUMBER = '100000123';
 
-    /**
-     * Pre-flight and unexpected failures are invisible in bulk (no flash message), so the consumer
-     * records a per-shipment grid error to let the merchant find them.
-     */
-    public function testPreflightFailureIsLoggedPerShipment(): void
+    /** @return array<string, array{\Throwable, bool}> */
+    public static function failureProvider(): array
     {
-        $logWriter = $this->createMockWithProps(LogWriter::class);
-        $logWriter->expects($this->once())
-            ->method('logError')
-            ->with(Log::ACTION_SUBMIT, self::ORDER_NUMBER, ['orderNumber' => self::ORDER_NUMBER], 'Already submitted.');
-
-        $this->processWithSubmitException(
-            new PacketSubmitLocalizedException(__('Already submitted.')),
-            $logWriter
-        );
+        return [
+            // Expected guard that slipped past the controller pre-flight (race safeguard) -> file log
+            'guard failure' => [new PacketSubmitLocalizedException(__('Already submitted.')), true],
+            // Genuinely unexpected runtime error -> file log
+            'unexpected error' => [new \RuntimeException('Boom.'), true],
+            // API fault is already recorded in the API log by PacketSubmitter -> not traced again
+            'api fault' => [new PacketSubmissionException('API rejected the packet.'), false],
+        ];
     }
 
     /**
-     * API submission faults are already recorded with full detail by PacketSubmitter, so the
-     * consumer must not create a duplicate grid record for them.
+     * The consumer never writes to the API log: the controller pre-flight handles the expected cases up
+     * front, and API faults are already recorded by PacketSubmitter. Only the guard safeguard and
+     * unexpected errors are traced to the file log; an API fault is left alone (it is already logged).
      */
-    public function testApiSubmissionFaultIsNotLoggedTwice(): void
-    {
-        $logWriter = $this->createMockWithProps(LogWriter::class);
-        $logWriter->expects($this->never())
-            ->method('logError');
-
-        $this->processWithSubmitException(
-            new PacketSubmissionException('API rejected the packet.'),
-            $logWriter
-        );
-    }
-
-    private function processWithSubmitException(\Throwable $submitException, LogWriter $logWriter): void
+    #[DataProvider('failureProvider')]
+    public function testFailureLoggingByType(\Throwable $submitException, bool $expectFileLog): void
     {
         $packeteryOrder = $this->createMockWithProps(Order::class);
         $packeteryOrder->method('getOrderNumber')->willReturn(self::ORDER_NUMBER);
 
-        $collection = $this->createMockWithProps(Collection::class);
-        $collection->method('getItems')->willReturn([$packeteryOrder]);
-
-        $collectionFactory = $this->createStub(CollectionFactory::class);
-        $collectionFactory->method('create')->willReturn($collection);
+        $orderRepository = $this->createStub(OrderRepository::class);
+        $orderRepository->method('findById')->willReturn($packeteryOrder);
 
         $magentoOrder = $this->createMockWithProps(MagentoOrder::class);
         $magentoOrder->method('loadByIncrementId')->willReturn($magentoOrder);
@@ -79,14 +60,13 @@ class BulkPacketSubmitConsumerTest extends BaseTest
         $packetSubmitter->method('submitPacket')->willThrowException($submitException);
 
         $logger = $this->createMockWithProps(BulkPacketSubmitLogger::class);
-        $logger->expects($this->once())->method('error');
+        $logger->expects($expectFileLog ? $this->once() : $this->never())->method('error');
 
         $consumer = new BulkPacketSubmitConsumer(
-            $collectionFactory,
+            $orderRepository,
             $magentoOrderFactory,
             $packetSubmitter,
-            $logger,
-            $logWriter
+            $logger
         );
 
         $consumer->process('5');

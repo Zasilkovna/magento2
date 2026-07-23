@@ -7,12 +7,12 @@ namespace Packetery\Checkout\Model\Packet;
 use Magento\Sales\Model\OrderFactory;
 use Packetery\Checkout\Logger\BulkPacketSubmitLogger;
 use Packetery\Checkout\Model\Order;
-use Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory as PacketeryOrderCollectionFactory;
+use Packetery\Checkout\Model\OrderRepository;
 
 class BulkPacketSubmitConsumer
 {
-    /** @var PacketeryOrderCollectionFactory */
-    private $packeteryOrderCollectionFactory;
+    /** @var OrderRepository */
+    private $orderRepository;
 
     /** @var OrderFactory */
     private $magentoOrderFactory;
@@ -23,21 +23,16 @@ class BulkPacketSubmitConsumer
     /** @var BulkPacketSubmitLogger */
     private $logger;
 
-    /** @var \Packetery\Checkout\Model\Log\LogWriter */
-    private $logWriter;
-
     public function __construct(
-        PacketeryOrderCollectionFactory $packeteryOrderCollectionFactory,
+        OrderRepository $orderRepository,
         OrderFactory $magentoOrderFactory,
         PacketSubmitter $packetSubmitter,
-        BulkPacketSubmitLogger $logger,
-        \Packetery\Checkout\Model\Log\LogWriter $logWriter
+        BulkPacketSubmitLogger $logger
     ) {
-        $this->packeteryOrderCollectionFactory = $packeteryOrderCollectionFactory;
+        $this->orderRepository = $orderRepository;
         $this->magentoOrderFactory = $magentoOrderFactory;
         $this->packetSubmitter = $packetSubmitter;
         $this->logger = $logger;
-        $this->logWriter = $logWriter;
     }
 
     public function process(string $packeteryOrderId): void
@@ -47,7 +42,7 @@ class BulkPacketSubmitConsumer
             return;
         }
 
-        $packeteryOrder = $this->loadPacketeryOrder((int) $packeteryOrderId);
+        $packeteryOrder = $this->orderRepository->findById((int) $packeteryOrderId);
         if (!$packeteryOrder instanceof Order) {
             return;
         }
@@ -59,16 +54,9 @@ class BulkPacketSubmitConsumer
 
         try {
             $this->packetSubmitter->submitPacket($packeteryOrder, $magentoOrder);
+        } catch (\Packetery\Checkout\Model\Api\PacketSubmissionException) {
+            return;
         } catch (\Throwable $exception) {
-            if (!$exception instanceof \Packetery\Checkout\Model\Api\PacketSubmissionException) {
-                $this->logWriter->logError(
-                    \Packetery\Checkout\Model\Log::ACTION_SUBMIT,
-                    $packeteryOrder->getOrderNumber(),
-                    ['orderNumber' => $packeteryOrder->getOrderNumber()],
-                    $exception->getMessage()
-                );
-            }
-
             $this->logger->error(
                 'Bulk shipment submission failed.',
                 [
@@ -78,23 +66,6 @@ class BulkPacketSubmitConsumer
                 ]
             );
         }
-    }
-
-    private function loadPacketeryOrder(int $packeteryOrderId): ?Order
-    {
-        if ($packeteryOrderId <= 0) {
-            return null;
-        }
-
-        $collection = $this->packeteryOrderCollectionFactory->create();
-        $collection->addFilter('id', $packeteryOrderId);
-        $items = $collection->getItems() ?: [];
-        $packeteryOrder = array_shift($items);
-        if (!$packeteryOrder instanceof Order) {
-            return null;
-        }
-
-        return $packeteryOrder;
     }
 }
 
