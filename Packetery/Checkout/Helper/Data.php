@@ -12,8 +12,8 @@ class Data extends AbstractHelper
     /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface */
     private $timezone;
 
-    /** @var \Magento\Framework\Module\ModuleListInterface */
-    private $moduleList;
+    /** @var \Magento\Framework\Module\PackageInfoFactory */
+    private $packageInfoFactory;
 
     /** @var \Magento\Framework\Locale\Resolver */
     private $localeResolver;
@@ -24,20 +24,20 @@ class Data extends AbstractHelper
     /**
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
-     * @param \Magento\Framework\Module\ModuleListInterface $moduleList
+     * @param \Magento\Framework\Module\PackageInfoFactory $packageInfoFactory
      * @param \Magento\Framework\Locale\Resolver $localeResolver
      * @param \Magento\Framework\App\ProductMetadataInterface $productMetadata
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
-        \Magento\Framework\Module\ModuleListInterface $moduleList,
+        \Magento\Framework\Module\PackageInfoFactory $packageInfoFactory,
         \Magento\Framework\Locale\Resolver $localeResolver,
         \Magento\Framework\App\ProductMetadataInterface $productMetadata
     ) {
         parent::__construct($context);
         $this->timezone = $timezone;
-        $this->moduleList = $moduleList;
+        $this->packageInfoFactory = $packageInfoFactory;
         $this->localeResolver = $localeResolver;
         $this->productMetadata = $productMetadata;
     }
@@ -56,8 +56,7 @@ class Data extends AbstractHelper
      * @return string
      */
     public function getModuleVersion(): string {
-
-        return $this->moduleList->getOne($this->_getModuleName())['setup_version'];
+        return (string) $this->packageInfoFactory->create()->getVersion($this->_getModuleName());
     }
 
     /**
