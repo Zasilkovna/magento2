@@ -281,3 +281,8 @@
 "Packet value","Hodnota zásielky"
 "Packeta – packet","Packeta – zásielka"
 "Pick-up point","Výdajné miesto"
+"No packets were queued.","Do fronty neboli zaradené žiadne zásielky."
+"No packets were queued. %1 packet(s) already submitted.","Do fronty neboli zaradené žiadne zásielky. %1 zásielok už bolo podaných."
+"No packets were queued. %1 packet(s) not queued — API password and sender not configured (%2).","Do fronty neboli zaradené žiadne zásielky. %1 zásielok nebolo zaradených — API heslo a odosielateľ nie sú vyplnené (%2)."
+"No packets were queued. %1 packet(s) already submitted; API password and sender not configured (%2).","Do fronty neboli zaradené žiadne zásielky. %1 zásielok už bolo podaných; API heslo a odosielateľ nie sú vyplnené (%2)."
+"%1 packet(s) not queued — API password and sender not configured (%2).","%1 zásielok nebolo zaradených — API heslo a odosielateľ nie sú vyplnené (%2)."

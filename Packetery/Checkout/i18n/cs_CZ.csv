@@ -281,3 +281,8 @@
 "Packet value","Hodnota zásilky"
 "Packeta – packet","Packeta – zásilka"
 "Pick-up point","Výdejní místo"
+"No packets were queued.","Do fronty nebyly zařazeny žádné zásilky."
+"No packets were queued. %1 packet(s) already submitted.","Do fronty nebyly zařazeny žádné zásilky. %1 zásilek již bylo podáno."
+"No packets were queued. %1 packet(s) not queued — API password and sender not configured (%2).","Do fronty nebyly zařazeny žádné zásilky. %1 zásilek nebylo zařazeno — API heslo a odesílatel nejsou vyplněni (%2)."
+"No packets were queued. %1 packet(s) already submitted; API password and sender not configured (%2).","Do fronty nebyly zařazeny žádné zásilky. %1 zásilek již bylo podáno; API heslo a odesílatel nejsou vyplněni (%2)."
+"%1 packet(s) not queued — API password and sender not configured (%2).","%1 zásilek nebylo zařazeno — API heslo a odesílatel nejsou vyplněni (%2)."

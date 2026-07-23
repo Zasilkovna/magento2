@@ -12,11 +12,10 @@ use Packetery\Checkout\Model\Carrier\Imp\Packetery\Config;
 use Packetery\Checkout\Model\OrderCurrencyResolver;
 use Packetery\Checkout\Model\Packet\PacketAttributes;
 use Packetery\Checkout\Model\Packet\PacketSubmitter;
+use Packetery\Checkout\Model\Packet\SubmitPreconditions;
 use Packetery\Checkout\Model\PacketFactory;
 use Packetery\Checkout\Model\ResourceModel\Order as OrderResource;
 use Packetery\Checkout\Model\ResourceModel\Packet as PacketResource;
-use Packetery\Checkout\Model\ResourceModel\Packet\Collection as PacketCollection;
-use Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory as PacketCollectionFactory;
 use Packetery\Checkout\Model\Weight\Calculator;
 use Packetery\Checkout\Test\BaseTest;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -478,19 +477,17 @@ class PacketSubmitterTest extends BaseTest
         ?object $packet = null,
         bool $showConsignPassword = false
     ): PacketSubmitter {
-        $scopeConfig = $this->createStub(\Magento\Framework\App\Config\ScopeConfigInterface::class);
-        $scopeConfig->method('getValue')->willReturn('configured');
-
-        $packetCollection = $this->createStub(PacketCollection::class);
-        $packetCollection->method('getSize')->willReturn(0);
-        $packetCollectionFactory = $this->createStub(PacketCollectionFactory::class);
-        $packetCollectionFactory->method('create')->willReturn($packetCollection);
+        $submitPreconditions = $this->createStub(SubmitPreconditions::class);
+        $submitPreconditions->method('hasRequiredConfig')->willReturn(true);
+        $submitPreconditions->method('isAlreadySubmitted')->willReturn(false);
 
         $packetFactory = $this->createStub(PacketFactory::class);
         $packetFactory->method('create')->willReturn($packet ?? $this->createStub(\Packetery\Checkout\Model\Packet::class));
 
         $config = $this->createStub(Config::class);
         $config->method('isShowConsignPassword')->willReturn($showConsignPassword);
+        $config->method('getApiPassword')->willReturn('configured');
+        $config->method('getSender')->willReturn('configured');
         $facade = $this->createStub(Facade::class);
         $facade->method('getPacketeryCarrierConfig')->willReturn($config);
 
@@ -508,10 +505,9 @@ class PacketSubmitterTest extends BaseTest
             PacketSubmitter::class,
             [
                 'soapApiClient' => $soapApiClient,
-                'scopeConfig' => $scopeConfig,
                 'weightCalculator' => $this->createStub(Calculator::class),
                 'packetFactory' => $packetFactory,
-                'packetCollectionFactory' => $packetCollectionFactory,
+                'submitPreconditions' => $submitPreconditions,
                 'packetResource' => $this->createStub(PacketResource::class),
                 'orderResource' => $orderResource,
                 'carrierFacade' => $facade,

@@ -13,17 +13,14 @@ class PacketSubmitter
     /** @var \Packetery\Checkout\Model\Api\SoapApiClient */
     private $soapApiClient;
 
-    /** @var \Magento\Framework\App\Config\ScopeConfigInterface */
-    private $scopeConfig;
-
     /** @var \Packetery\Checkout\Model\Weight\Calculator */
     private $weightCalculator;
 
     /** @var \Packetery\Checkout\Model\PacketFactory */
     private $packetFactory;
 
-    /** @var \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory */
-    private $packetCollectionFactory;
+    /** @var \Packetery\Checkout\Model\Packet\SubmitPreconditions */
+    private $submitPreconditions;
 
     /** @var \Packetery\Checkout\Model\ResourceModel\Packet */
     private $packetResource;
@@ -51,10 +48,9 @@ class PacketSubmitter
 
     public function __construct(
         \Packetery\Checkout\Model\Api\SoapApiClient $soapApiClient,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Packetery\Checkout\Model\Weight\Calculator $weightCalculator,
         \Packetery\Checkout\Model\PacketFactory $packetFactory,
-        \Packetery\Checkout\Model\ResourceModel\Packet\CollectionFactory $packetCollectionFactory,
+        \Packetery\Checkout\Model\Packet\SubmitPreconditions $submitPreconditions,
         \Packetery\Checkout\Model\ResourceModel\Packet $packetResource,
         \Packetery\Checkout\Model\ResourceModel\Order $orderResource,
         \Packetery\Checkout\Model\Carrier\Facade $carrierFacade,
@@ -65,10 +61,9 @@ class PacketSubmitter
         \Packetery\Checkout\Model\OrderCurrencyResolver $orderCurrencyResolver
     ) {
         $this->soapApiClient = $soapApiClient;
-        $this->scopeConfig = $scopeConfig;
         $this->weightCalculator = $weightCalculator;
         $this->packetFactory = $packetFactory;
-        $this->packetCollectionFactory = $packetCollectionFactory;
+        $this->submitPreconditions = $submitPreconditions;
         $this->packetResource = $packetResource;
         $this->orderResource = $orderResource;
         $this->carrierFacade = $carrierFacade;
@@ -86,19 +81,21 @@ class PacketSubmitter
     public function submitPacket(\Packetery\Checkout\Model\Order $packeteryOrder, \Magento\Sales\Model\Order $magentoOrder): void
     {
         $storeId = (int) $magentoOrder->getStoreId();
-        $apiPassword = (string) ($this->scopeConfig->getValue('carriers/packetery/api_password', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId) ?? '');
-        $sender = (string) ($this->scopeConfig->getValue('carriers/packetery/sender', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId) ?? '');
-        if ($apiPassword === '' || $sender === '') {
+        $packeteryConfig = $this->carrierFacade->getPacketeryCarrierConfig($storeId);
+        if ($packeteryConfig === null || !$this->submitPreconditions->hasRequiredConfig($packeteryConfig)) {
             throw new \Packetery\Checkout\Model\Packet\PacketSubmitLocalizedException(
                 __('API password and Sender must be configured.')
             );
         }
 
-        if ($this->isAlreadySubmitted($packeteryOrder->getOrderNumber())) {
+        if ($this->submitPreconditions->isAlreadySubmitted($packeteryOrder->getOrderNumber())) {
             throw new \Packetery\Checkout\Model\Packet\PacketSubmitLocalizedException(
                 __('This packet has already been submitted to Packeta.')
             );
         }
+
+        $apiPassword = (string) $packeteryConfig->getApiPassword();
+        $sender = (string) $packeteryConfig->getSender();
 
         $weight = $this->resolveWeight($packeteryOrder, $magentoOrder);
 
@@ -172,8 +169,7 @@ class PacketSubmitter
         }
 
         $consignPassword = null;
-        $packeteryConfig = $this->carrierFacade->getPacketeryCarrierConfig($storeId);
-        if ($packeteryConfig !== null && $packeteryConfig->isShowConsignPassword()) {
+        if ($packeteryConfig->isShowConsignPassword()) {
             $request = new \Packetery\Checkout\Model\Api\Request\PacketInfoRequest($apiPassword, $createResult->getPacketId());
             $consignPassword = $this->soapApiClient->packetInfo($request)->getConsignPassword();
         }
@@ -246,13 +242,6 @@ class PacketSubmitter
     private function convertToMm(float $cm): int
     {
         return (int) round($this->dimensionsConverter->convert($cm, Unit::CM, Unit::MM));
-    }
-
-    private function isAlreadySubmitted(string $orderNumber): bool
-    {
-        $collection = $this->packetCollectionFactory->create();
-        $collection->addFieldToFilter('order_number', $orderNumber);
-        return $collection->getSize() > 0;
     }
 
     /**

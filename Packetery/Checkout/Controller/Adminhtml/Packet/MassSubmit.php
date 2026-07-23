@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Packetery\Checkout\Controller\Adminhtml\Packet;
 
 use Magento\Backend\App\Action;
+use Magento\Framework\Message\MessageInterface;
 use Packetery\Checkout\Logger\BulkPacketSubmitLogger;
 use Packetery\Checkout\Model\Export\ConvertToCsvCustom;
 use Packetery\Checkout\Model\Packet\BulkPacketSubmitPublisher;
+use Packetery\Checkout\Model\Packet\BulkSubmitFeedback;
+use Packetery\Checkout\Model\Packet\BulkSubmitPlanner;
 
 class MassSubmit extends Action
 {
@@ -16,8 +19,14 @@ class MassSubmit extends Action
     /** @var ConvertToCsvCustom */
     private $converter;
 
+    /** @var BulkSubmitPlanner */
+    private $bulkSubmitPlanner;
+
     /** @var BulkPacketSubmitPublisher */
     private $bulkPacketSubmitPublisher;
+
+    /** @var BulkSubmitFeedback */
+    private $bulkSubmitFeedback;
 
     /** @var BulkPacketSubmitLogger */
     private $logger;
@@ -25,12 +34,16 @@ class MassSubmit extends Action
     public function __construct(
         Action\Context $context,
         ConvertToCsvCustom $converter,
+        BulkSubmitPlanner $bulkSubmitPlanner,
         BulkPacketSubmitPublisher $bulkPacketSubmitPublisher,
+        BulkSubmitFeedback $bulkSubmitFeedback,
         BulkPacketSubmitLogger $logger
     ) {
         parent::__construct($context);
         $this->converter = $converter;
+        $this->bulkSubmitPlanner = $bulkSubmitPlanner;
         $this->bulkPacketSubmitPublisher = $bulkPacketSubmitPublisher;
+        $this->bulkSubmitFeedback = $bulkSubmitFeedback;
         $this->logger = $logger;
     }
 
@@ -49,37 +62,45 @@ class MassSubmit extends Action
             return $resultRedirect;
         }
 
-        $publishedCount = 0;
+        $plan = $this->bulkSubmitPlanner->plan(array_map('intval', $orderIds));
+
+        $queuedCount = 0;
         $failedCount = 0;
-        foreach ($orderIds as $orderId) {
+        foreach ($plan->getQueueableOrderIds() as $orderId) {
             try {
-                $this->bulkPacketSubmitPublisher->publish((int) $orderId);
-                $publishedCount++;
+                $this->bulkPacketSubmitPublisher->publish($orderId);
+                $queuedCount++;
             } catch (\Exception $exception) {
                 $failedCount++;
                 $this->logger->error(
                     'Packet mass submit publish failed.',
                     [
-                        'packetery_order_id' => (int) $orderId,
+                        'packetery_order_id' => $orderId,
                         'exception' => $exception,
                     ]
                 );
             }
         }
 
-        if ($publishedCount > 0) {
-            $this->messageManager->addSuccessMessage(
-                __('Submission of %1 packet(s) was queued.', $publishedCount)
-            );
-        }
-
-        if ($failedCount > 0) {
-            $this->messageManager->addErrorMessage(
-                __('%1 packet(s) could not be queued for submission.', $failedCount)
-            );
+        foreach ($this->bulkSubmitFeedback->build($plan, $queuedCount, $failedCount) as $message) {
+            $this->addMessage($message['type'], $message['text']);
         }
 
         return $resultRedirect;
     }
-}
 
+    private function addMessage(string $type, \Magento\Framework\Phrase $text): void
+    {
+        if ($type === MessageInterface::TYPE_SUCCESS) {
+            $this->messageManager->addSuccessMessage($text);
+            return;
+        }
+
+        if ($type === MessageInterface::TYPE_ERROR) {
+            $this->messageManager->addErrorMessage($text);
+            return;
+        }
+
+        $this->messageManager->addNoticeMessage($text);
+    }
+}
