@@ -1,6 +1,6 @@
 {
     "name": "packetery/module-checkout",
-    "description": "module Packetery for Magento 2",
+    "description": "Packeta shipping module for Magento 2",
     "type": "magento2-module",
     "license": "AFL-3.0",
     "version": "2.5.0",
@@ -10,8 +10,23 @@
             "email": "support@packeta.com"
         }
     ],
-    "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+        "magento/framework": ">=103.0.4 <104",
+        "magento/framework-message-queue": ">=100.4.4 <101",
+        "magento/module-admin-notification": ">=100.4.4 <101",
+        "magento/module-backend": ">=102.0.4 <103",
+        "magento/module-catalog": ">=104.0.4 <105",
+        "magento/module-checkout": ">=100.4.4 <101",
+        "magento/module-config": ">=101.2.4 <102",
+        "magento/module-directory": ">=100.4.4 <101",
+        "magento/module-payment": ">=100.4.4 <101",
+        "magento/module-quote": ">=101.2.4 <102",
+        "magento/module-sales": ">=103.0.4 <104",
+        "magento/module-shipping": ">=100.4.4 <101",
+        "magento/module-store": ">=101.1.4 <102",
+        "magento/module-ui": ">=101.2.4 <102"
+    },
     "autoload": {
         "files": [
             "registration.php"
@@ -19,13 +34,5 @@
         "psr-4": {
             "Packetery\\Checkout\\": ""
         }
-    },
-    "extra": {
-      "map": [
-        [
-          "*",
-          "Packetery/Checkout"
-        ]
-      ]
     }
 }
