@@ -22,13 +22,15 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
         \Magento\Backend\App\Action\Context  $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Packetery\Checkout\Helper\Data $data,
-        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+        \Packetery\Checkout\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+        \Magento\Framework\App\Response\Http\FileFactory $fileFactory
     ) {
         parent::__construct($context);
 
         $this->resultPageFactory  = $resultPageFactory;
         $this->data = $data;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->_fileFactory = $fileFactory;
     }
     public function execute()
     {
@@ -57,21 +59,10 @@ class ExportPacketeryCsv extends \Magento\Backend\App\Action
         );
         $collection->save();
 
-        $this->_sendUploadResponse($this->data->getExportFileName(), $content);
-
-    }
-
-    protected function _sendUploadResponse($fileName, $content, $contentType='application/octet-stream')
-    {
-        $this->_response->setHttpResponseCode(200)
-            ->setHeader('Pragma', 'public', true)
-            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
-            ->setHeader('Content-type', $contentType, true)
-            ->setHeader('Content-Length', strlen($content), true)
-            ->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true)
-            ->setHeader('Last-Modified', date('r'), true)
-            ->setBody($content)
-            ->sendResponse();
-        die;
+        return $this->_fileFactory->create(
+            $this->data->getExportFileName(),
+            $content,
+            \Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR
+        );
     }
 }
