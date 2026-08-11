@@ -83,7 +83,7 @@ jobs:
 
             -   name: Copy-paste detector (advisory)
                 continue-on-error: true
-                run: .mp-tools/vendor/bin/phpcpd --exclude Test Packetery/Checkout
+                run: .mp-tools/vendor/bin/phpcpd --exclude Packetery/Checkout/Test Packetery/Checkout
 
     php-lint:
         runs-on: ubuntu-24.04
