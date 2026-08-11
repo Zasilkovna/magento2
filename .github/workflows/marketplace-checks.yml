@@ -118,7 +118,9 @@ jobs:
                     coverage: none
 
             -   name: Install dev tooling
-                run: composer install --no-interaction --no-progress
+                # --no-scripts: this job only needs the root PHPCompatibility ruleset, not the
+                # marketplace tools that the root post-install hook would pull into tools/.
+                run: composer install --no-interaction --no-progress --no-scripts
 
             -   name: PHPCompatibility 8.1 to 8.5
                 run: |

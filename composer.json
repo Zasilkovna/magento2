@@ -13,9 +13,14 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
     },
     "scripts": {
+        "post-install-cmd": "@marketplace-tools-install",
+        "post-update-cmd": "@marketplace-tools-install",
+        "marketplace-tools-install": "@composer install --working-dir=tools --no-interaction",
         "phpcs-compatibility:81": "bash bin/phpcs-compatibility 8.1",
         "phpcs-compatibility:84": "bash bin/phpcs-compatibility 8.4",
-        "phpcs-compatibility:85": "bash bin/phpcs-compatibility 8.5"
+        "phpcs-compatibility:85": "bash bin/phpcs-compatibility 8.5",
+        "phpcs-magento2": "@php tools/vendor/bin/phpcs --standard=Magento2 --error-severity=10 --warning-severity=0 --extensions=php,phtml --ignore-annotations Packetery/Checkout",
+        "phpcpd": "@php tools/vendor/bin/phpcpd --exclude Packetery/Checkout/Test Packetery/Checkout"
     },
     "config": {
         "allow-plugins": {
