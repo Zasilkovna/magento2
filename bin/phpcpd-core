@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# Copy-paste detector between the module and Magento core, the category the Marketplace blocks.
+# Usage: bin/phpcpd-core <path-to-core> [more-paths…]   (or set MAGENTO_CORE_PATH)
+#
+# Clones inside core and clones inside the module are ignored, only pairs crossing the boundary fail.
+set -euo pipefail
+
+MODULE="Packetery/Checkout"
+MARKER="/${MODULE}/"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PHPCPD="${ROOT}/tools/vendor/bin/phpcpd"
+
+CORE_PATHS=("$@")
+# MAGENTO_CORE_PATH carries one path and stays quoted, so a directory with a space still works,
+# several paths go in as arguments
+if [ ${#CORE_PATHS[@]} -eq 0 ] && [ -n "${MAGENTO_CORE_PATH:-}" ]; then
+    CORE_PATHS=("$MAGENTO_CORE_PATH")
+fi
+
+if [ ${#CORE_PATHS[@]} -eq 0 ]; then
+    echo "usage: bin/phpcpd-core <path-to-magento-core> [more-paths…]" >&2
+    echo "       point it at vendor/magento of a Magento install, or at app/code/Magento" >&2
+    echo "       and lib/internal/Magento of a magento/magento2 checkout" >&2
+    exit 2
+fi
+
+if [ ! -x "$PHPCPD" ]; then
+    echo "FAIL: $PHPCPD is missing, run composer install first" >&2
+    exit 2
+fi
+
+# Core paths are resolved while still in the caller's directory, phpcpd reads paths from the CWD
+for i in "${!CORE_PATHS[@]}"; do
+    path="${CORE_PATHS[$i]}"
+    if [ ! -d "$path" ]; then
+        echo "FAIL: not a directory: $path" >&2
+        exit 2
+    fi
+    CORE_PATHS[$i]="$(cd "$path" && pwd)"
+done
+
+# Run from the repository root, from anywhere else phpcpd would not find the module at all
+cd "$ROOT"
+
+if [ ! -d "$MODULE" ]; then
+    echo "FAIL: $MODULE not found in $ROOT" >&2
+    exit 2
+fi
+
+# The checks above run in the shell, the scan runs in PHP, and the two can disagree: Git Bash resolves
+# /c/… paths that a native Windows PHP cannot open. phpcpd then reads nothing from the core, keeps
+# going and prints a clean report, which reads as a pass. Only the scanning interpreter can confirm
+# that it sees the files, so it is asked before the scan, for the module and for every core path.
+if ! php -r '
+    foreach (array_slice($argv, 1) as $path) {
+        if (!is_dir($path)) {
+            fwrite(STDERR, "FAIL: PHP cannot open the directory: {$path}\n");
+            exit(2);
+        }
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $path,
+                FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS
+            ),
+            RecursiveIteratorIterator::LEAVES_ONLY,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+
+        $found = false;
+        foreach ($files as $file) {
+            if ($file->getExtension() === "php") {
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            fwrite(STDERR, "FAIL: PHP sees no PHP files under: {$path}\n");
+            exit(2);
+        }
+    }
+' "$MODULE" "${CORE_PATHS[@]}"; then
+    echo "      an incomplete core checkout, or a path the shell resolves and PHP does not" >&2
+    echo "      a native Windows PHP does not see the /c/… paths of Git Bash, run this check in WSL2" >&2
+    exit 2
+fi
+
+REPORT="$(mktemp)"
+trap 'rm -f "$REPORT"' EXIT
+
+# memory_limit=-1: the run peaks around 1.5 GB on the full core and the 128 MB default dies on it.
+set +e
+php -d memory_limit=-1 "$PHPCPD" --exclude "${MODULE}/Test" "$MODULE" "${CORE_PATHS[@]}" > "$REPORT"
+STATUS=$?
+set -e
+
+# phpcpd returns 1 both for clones found and for a run that scanned nothing,
+# so the verdict line decides whether the report can be trusted
+if [ "$STATUS" -gt 1 ] || ! grep -qE 'No code clones found|Found [0-9]+ code clones' "$REPORT"; then
+    echo "FAIL: phpcpd did not finish, exit ${STATUS}" >&2
+    cat "$REPORT" >&2
+    exit 2
+fi
+
+awk -v marker="$MARKER" '
+    BEGIN { RS = ""; found = 0 }
+    /^[[:space:]]*-/ {
+        lines = split($0, group, "\n")
+        module_side = 0
+        other_side = 0
+        for (i = 1; i <= lines; i++) {
+            if (group[i] !~ /:[0-9]+/) {
+                continue
+            }
+            # Windows realpath() returns backslashes, the marker is written with forward slashes,
+            # so the comparison runs on a normalized copy and the report keeps the real paths
+            normalized = group[i]
+            gsub(/\\/, "/", normalized)
+            if (index(normalized, marker)) {
+                module_side = 1
+            } else {
+                other_side = 1
+            }
+        }
+        if (module_side && other_side) {
+            found++
+            print $0 "\n"
+        }
+    }
+    END {
+        if (found) {
+            print "FAIL: " found " clone(s) shared between the module and core"
+            exit 1
+        }
+        print "OK: no code shared between the module and core"
+    }
+' "$REPORT"

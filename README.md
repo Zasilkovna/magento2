@@ -94,6 +94,20 @@ composer phpcpd
 
 It exits with a non-zero status on any finding, including a harmless one — the output is meant for review, not for a blocking gate.
 
+**Copy-paste detector against Magento core** (advisory for now — the CI job reports a finding without failing the run; this is the duplication EQP rejects, the check above compares the module only with itself):
+
+```bash
+composer phpcpd-core -- /path/to/magento/vendor/magento
+# without an installation at hand, a sparse clone of the PHP sources is enough (~17 s, 112 MB)
+git clone --depth 1 --branch 2.4.9 --filter=blob:none --sparse https://github.com/magento/magento2.git /tmp/magento-core
+git -C /tmp/magento-core sparse-checkout set app/code/Magento lib/internal/Magento
+composer phpcpd-core -- /tmp/magento-core/app/code/Magento /tmp/magento-core/lib/internal/Magento
+```
+
+⚠️ **Performance warning (Windows):** exclude the core checkout from the folders your antivirus scans (usually Windows Defender), otherwise the first run over a fresh checkout can take tens of minutes.
+
+Only clones crossing the module boundary are reported, so a finding always means shared code. Takes about 20 seconds against the clone and 35 seconds against `vendor/magento`; the script raises `memory_limit` itself, the run peaks around 1.5 GB.
+
 **Package verification** (valid manifest, manifest version equal to the version starting the first line of `CHANGE_LOG.txt`, package zip under 30 MB, no TODO/FIXME markers outside `/Test/`):
 
 ```bash
@@ -144,6 +158,7 @@ yara -w -r /tmp/php-malware-finder/data/php.yar Packetery/Checkout
 Notes:
 
 - All commands in this section expect bash or zsh (the package zip check uses `set -o pipefail`); on Windows run them in WSL2 (or Git Bash — the package zip check additionally needs the `zip` utility, which Git Bash does not bundle; in WSL2 install it via `apt install zip`).
+- The copy-paste detector against Magento core needs WSL2 on Windows, Git Bash is not enough: a native Windows PHP cannot open the `/c/…` paths Git Bash produces, and the shell rewrites a Windows path back to that form. The script asks the scanning PHP whether it sees the files, so this ends as a loud failure, not as a clean run.
 - Windows clones created before `bin/* text eol=lf` was added keep their CRLF copies — switching branches does not rewrite a file whose content did not change — and `composer phpcs-compatibility:*` then fails with `ERROR: The file "Packetery/Checkout" does not exist`. Refresh the helper once with `rm bin/phpcs-compatibility && git checkout -- bin/phpcs-compatibility`.
 - Debian/Ubuntu packages pull in the `clamav-freshclam` service, which keeps the signature database up to date on its own — running `freshclam` by hand is usually unnecessary there. If `freshclam` complains about a missing configuration (typical for Homebrew and the Windows builds), create `freshclam.conf` from the bundled `freshclam.conf.sample` and comment out the `Example` line.
 - Clone the YARA ruleset outside the repository (as above) — it carries a `samples/` directory with live webshells, which can also trip antivirus or endpoint protection on managed machines. To skip them entirely, fetch only the rules: `git clone --depth 1 --filter=blob:none --sparse https://github.com/jvoisin/php-malware-finder /tmp/php-malware-finder && git -C /tmp/php-malware-finder sparse-checkout set data`, then delete `data/samples`.
@@ -384,6 +399,20 @@ composer phpcpd
 
 Skončí nenulovým kódem při jakémkoli nálezu, i neškodném — výstup slouží k posouzení, ne jako blokující brána.
 
+**Copy-paste detector proti Magento core** (zatím informativní — CI job nález vypíše, ale run neshodí; tohle je duplicita, kterou EQP odmítá, kontrola výše porovnává modul jen sám se sebou):
+
+```bash
+composer phpcpd-core -- /cesta/k/magentu/vendor/magento
+# když instalace po ruce není, stačí sparse clone se zdrojáky (~17 s, 112 MB)
+git clone --depth 1 --branch 2.4.9 --filter=blob:none --sparse https://github.com/magento/magento2.git /tmp/magento-core
+git -C /tmp/magento-core sparse-checkout set app/code/Magento lib/internal/Magento
+composer phpcpd-core -- /tmp/magento-core/app/code/Magento /tmp/magento-core/lib/internal/Magento
+```
+
+⚠️ **Upozornění na výkon (Windows):** složku se staženým jádrem vylučte z testovaných složek v antiviru (zpravidla Windows Defenderu), jinak první běh nad čerstvým checkoutem může zabrat i desítky minut.
+
+Hlásí jen klony přes hranici modulu, takže nález vždy znamená přebraný kód. Trvá asi 20 sekund proti clonu a 35 sekund proti `vendor/magento`; `memory_limit` si skript zvedá sám, špička běhu je kolem 1,5 GB.
+
 **Package verification** (validní manifest, shoda verze manifestu s verzí na začátku prvního řádku `CHANGE_LOG.txt`, zip balíčku do 30 MB, žádné TODO/FIXME mimo `/Test/`):
 
 ```bash
@@ -434,6 +463,7 @@ yara -w -r /tmp/php-malware-finder/data/php.yar Packetery/Checkout
 Poznámky:
 
 - Všechny příkazy v této sekci předpokládají bash nebo zsh (kontrola velikosti zipu používá `set -o pipefail`); na Windows je spouštějte ve WSL2 (nebo v Git Bash — kontrola velikosti zipu navíc potřebuje utilitu `zip`, kterou Git Bash neobsahuje; ve WSL2 ji doinstalujete přes `apt install zip`).
+- Copy-paste detector proti Magento core potřebuje na Windows WSL2, Git Bash nestačí: nativní Windows PHP neumí otevřít cesty ve tvaru `/c/…`, které Git Bash vytváří, a shell si windowsový tvar cesty přepíše zpátky na něj. Skript se skenujícího PHP zeptá, jestli soubory vidí, takže to skončí hlasitou chybou, ne čistým během.
 - Windows klony vytvořené dříve, než přibylo `bin/* text eol=lf`, si CRLF kopie ponechají — přepnutí větve nepřepíše soubor, jehož obsah se nezměnil — a `composer phpcs-compatibility:*` pak padá na `ERROR: The file "Packetery/Checkout" does not exist`. Jednorázově pomůže `rm bin/phpcs-compatibility && git checkout -- bin/phpcs-compatibility`.
 - Balíčky na Debianu/Ubuntu s sebou nesou službu `clamav-freshclam`, která databázi signatur aktualizuje sama — ruční `freshclam` tam obvykle není potřeba. Pokud `freshclam` hlásí chybějící konfiguraci (typicky u Homebrew a Windows buildů), vytvořte `freshclam.conf` z přiloženého `freshclam.conf.sample` a zakomentujte řádek `Example`.
 - Sadu YARA pravidel klonujte mimo repozitář (jak je uvedeno výše) — obsahuje adresář `samples/` s živými webshelly, které navíc mohou na firemním stroji spustit antivirus nebo ochranu koncových stanic. Když je nechcete stahovat vůbec, vezměte jen pravidla: `git clone --depth 1 --filter=blob:none --sparse https://github.com/jvoisin/php-malware-finder /tmp/php-malware-finder && git -C /tmp/php-malware-finder sparse-checkout set data` a potom smažte `data/samples`.
