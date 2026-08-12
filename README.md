@@ -108,14 +108,17 @@ composer phpcpd-core -- /tmp/magento-core/app/code/Magento /tmp/magento-core/lib
 
 Only clones crossing the module boundary are reported, so a finding always means shared code. Takes about 20 seconds against the clone and 35 seconds against `vendor/magento`; the script raises `memory_limit` itself, the run peaks around 1.5 GB.
 
-**Package verification** (valid manifest, manifest version equal to the version starting the first line of `CHANGE_LOG.txt`, package zip under 30 MB, no TODO/FIXME markers outside `/Test/`):
+**Package verification** (valid manifest, the manifest rules Adobe lists for extension packages, manifest version equal to the version starting the first line of `CHANGE_LOG.txt`, package zip under 30 MB, no TODO/FIXME markers outside `/Test/`):
 
 ```bash
 composer validate Packetery/Checkout/composer.json
+composer verify-manifest
 php -r 'echo json_decode(file_get_contents("Packetery/Checkout/composer.json"))->version, PHP_EOL;' && head -1 CHANGE_LOG.txt
 (cd Packetery/Checkout && set -o pipefail && zip -rq - . -x '.git/*' | wc -c)   # bytes, limit 31457280
 grep -rIniE '\b(TODO|FIXME)\b' --include='*.php' --include='*.phtml' --include='*.xml' --include='*.js' Packetery/Checkout | grep -v '/Test/' || echo 'OK: no TODO/FIXME'
 ```
+
+`composer verify-manifest` reads the manifest and checks the rules from the Adobe technical review guidelines: declared name, type and version, allowed package type, no `extra.map` or `extra.magento-root-dir`, no dependency on the Magento base packages, no `*` constraint on `magento/*`, no require inline aliases, `registration.php` in `autoload.files` and a namespace in `autoload.psr-4`, plus `registration.php` and a parseable `etc/module.xml`. It also compares the `php` constraint with the version matrix in `.github/workflows/marketplace-checks.yml`, because Adobe rejects a package that narrows the PHP versions its supported Magento versions allow.
 
 **PHP lint**:
 
@@ -413,14 +416,17 @@ composer phpcpd-core -- /tmp/magento-core/app/code/Magento /tmp/magento-core/lib
 
 Hlásí jen klony přes hranici modulu, takže nález vždy znamená přebraný kód. Trvá asi 20 sekund proti clonu a 35 sekund proti `vendor/magento`; `memory_limit` si skript zvedá sám, špička běhu je kolem 1,5 GB.
 
-**Package verification** (validní manifest, shoda verze manifestu s verzí na začátku prvního řádku `CHANGE_LOG.txt`, zip balíčku do 30 MB, žádné TODO/FIXME mimo `/Test/`):
+**Package verification** (validní manifest, pravidla pro manifest rozšíření podle Adobe, shoda verze manifestu s verzí na začátku prvního řádku `CHANGE_LOG.txt`, zip balíčku do 30 MB, žádné TODO/FIXME mimo `/Test/`):
 
 ```bash
 composer validate Packetery/Checkout/composer.json
+composer verify-manifest
 php -r 'echo json_decode(file_get_contents("Packetery/Checkout/composer.json"))->version, PHP_EOL;' && head -1 CHANGE_LOG.txt
 (cd Packetery/Checkout && set -o pipefail && zip -rq - . -x '.git/*' | wc -c)   # bajty, limit 31457280
 grep -rIniE '\b(TODO|FIXME)\b' --include='*.php' --include='*.phtml' --include='*.xml' --include='*.js' Packetery/Checkout | grep -v '/Test/' || echo 'OK: no TODO/FIXME'
 ```
+
+`composer verify-manifest` přečte manifest a ověří pravidla z technical review guidelines Adobe: vyplněné `name`, `type` a `version`, povolený typ balíčku, žádné `extra.map` ani `extra.magento-root-dir`, žádná závislost na base balíčcích Magenta, žádná `*` u `magento/*`, žádné inline aliasy v require, `registration.php` v `autoload.files` a namespace v `autoload.psr-4`, a k tomu existující `registration.php` a parsovatelný `etc/module.xml`. Navíc porovná constraint `php` s maticí verzí v `.github/workflows/marketplace-checks.yml`, protože Adobe odmítá balíček, který zužuje rozsah PHP verzí daný podporovanými verzemi Magenta.
 
 **PHP lint**:
 

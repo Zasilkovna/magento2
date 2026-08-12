@@ -28,6 +28,9 @@ jobs:
             -   name: Validate package manifest
                 run: composer validate Packetery/Checkout/composer.json
 
+            -   name: Verify the manifest against the Marketplace rules
+                run: php bin/verify-manifest
+
             -   name: Verify composer.json and CHANGE_LOG.txt versions agree
                 run: |
                     MANIFEST=$(php -r 'echo json_decode(file_get_contents("Packetery/Checkout/composer.json"))->version;')
@@ -136,6 +139,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                # source of truth for the PHP versions we claim to support, bin/verify-manifest
+                # compares the manifest constraint against it
                 php-version: ['8.1', '8.2', '8.3', '8.4', '8.5']
         steps:
             -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
