@@ -28,6 +28,9 @@ jobs:
             -   name: Validate package manifest
                 run: composer validate Packetery/Checkout/composer.json
 
+            -   name: Verify the manifest against the Marketplace rules
+                run: php bin/verify-manifest
+
             -   name: Verify composer.json and CHANGE_LOG.txt versions agree
                 run: |
                     MANIFEST=$(php -r 'echo json_decode(file_get_contents("Packetery/Checkout/composer.json"))->version;')
@@ -83,7 +86,52 @@ jobs:
 
             -   name: Copy-paste detector (advisory)
                 continue-on-error: true
-                run: .mp-tools/vendor/bin/phpcpd --exclude Test Packetery/Checkout
+                run: .mp-tools/vendor/bin/phpcpd --exclude Packetery/Checkout/Test Packetery/Checkout
+
+    copy-paste-vs-core:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 10
+        # Advisory for now: findings are reported and assessed by hand.
+        # It turns blocking once we know they are not false positives.
+        continue-on-error: true
+        env:
+            MAGENTO_CORE_VERSION: '2.4.9'
+        steps:
+            -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+                with:
+                    php-version: '8.4'
+                    tools: composer
+                    coverage: none
+
+            -   name: Install the marketplace tools
+                # --no-dev: the job runs phpcpd from tools/, the root dev tools are only dead weight here.
+                run: composer install --no-dev --no-interaction --no-progress
+
+            -   name: Restore the Magento core checkout
+                id: core-cache
+                uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+                with:
+                    path: magento-core
+                    key: magento-core-${{ env.MAGENTO_CORE_VERSION }}-${{ hashFiles('.github/workflows/marketplace-checks.yml') }}
+
+            -   name: Clone the Magento core
+                if: steps.core-cache.outputs.cache-hit != 'true'
+                # Sparse checkout of the two source trees, then only the php files are kept:
+                # 364 MB of clone shrinks to 112 MB of cache and phpcpd reads nothing else.
+                run: |
+                    git clone --depth 1 --branch "$MAGENTO_CORE_VERSION" --filter=blob:none --sparse \
+                        https://github.com/magento/magento2.git magento-core
+                    git -C magento-core sparse-checkout set app/code/Magento lib/internal/Magento
+                    rm -rf magento-core/.git
+                    find magento-core -type f ! -name '*.php' -delete
+
+            -   name: Copy-paste detector against core
+                run: |
+                    bash bin/phpcpd-core \
+                        magento-core/app/code/Magento \
+                        magento-core/lib/internal/Magento
 
     php-lint:
         runs-on: ubuntu-24.04
@@ -91,6 +139,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                # source of truth for the PHP versions we claim to support, bin/verify-manifest
+                # compares the manifest constraint against it
                 php-version: ['8.1', '8.2', '8.3', '8.4', '8.5']
         steps:
             -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -118,7 +168,9 @@ jobs:
                     coverage: none
 
             -   name: Install dev tooling
-                run: composer install --no-interaction --no-progress
+                # --no-scripts: this job only needs the root PHPCompatibility ruleset, not the
+                # marketplace tools that the root post-install hook would pull into tools/.
+                run: composer install --no-interaction --no-progress --no-scripts
 
             -   name: PHPCompatibility 8.1 to 8.5
                 run: |

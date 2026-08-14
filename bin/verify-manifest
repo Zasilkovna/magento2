@@ -1,0 +1,177 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Package verification rules the Marketplace applies to the module manifest.
+ * Usage: bin/verify-manifest [path-to-module]   (default: Packetery/Checkout)
+ *
+ * The rules come from the Adobe technical review guidelines, section
+ * "Extension package verification". Zip size and the TODO/FIXME markers are
+ * separate steps, they read the whole package, not the manifest.
+ */
+
+declare(strict_types=1);
+
+const ALLOWED_TYPES = ['magento2-module', 'magento2-language', 'metapackage'];
+
+const FORBIDDEN_REQUIRES = [
+    'magento/magento-composer-installer',
+    'magento/magento2-base',
+    'magento/product-community-edition',
+    'magento/magento2-ee-base',
+    'magento/product-enterprise-edition',
+];
+
+$repositoryRoot = dirname(__DIR__);
+// The default is anchored to the script, the same way the workflow path below is, so the check does
+// not depend on the caller's directory
+$module = rtrim($argv[1] ?? "{$repositoryRoot}/Packetery/Checkout", '/');
+$manifestPath = "{$module}/composer.json";
+
+if (!is_file($manifestPath)) {
+    fwrite(STDERR, "FAIL: {$manifestPath} not found\n");
+    exit(2);
+}
+
+$manifest = json_decode((string) file_get_contents($manifestPath), true);
+if (!is_array($manifest) || array_is_list($manifest)) {
+    fwrite(STDERR, "FAIL: {$manifestPath} is not valid JSON\n");
+    exit(2);
+}
+
+$failures = [];
+
+function check(string $rule, bool $passed, string $detail = ''): void
+{
+    global $failures;
+
+    $status = $passed ? 'OK  ' : 'FAIL';
+    echo "{$status} {$rule}" . ($detail !== '' ? ": {$detail}" : '') . "\n";
+
+    if (!$passed) {
+        $failures[] = $rule;
+    }
+}
+
+foreach (['name', 'type', 'version'] as $key) {
+    $value = $manifest[$key] ?? '';
+    check("manifest declares {$key}", is_string($value) && $value !== '', is_string($value) ? $value : '');
+}
+
+$type = $manifest['type'] ?? '';
+check(
+    'package type is one of ' . implode(', ', ALLOWED_TYPES),
+    in_array($type, ALLOWED_TYPES, true),
+    is_string($type) ? $type : ''
+);
+
+$extra = is_array($manifest['extra'] ?? null) ? $manifest['extra'] : [];
+foreach (['map', 'magento-root-dir'] as $key) {
+    check("manifest does not declare extra.{$key}", !array_key_exists($key, $extra));
+}
+
+$require = is_array($manifest['require'] ?? null) ? $manifest['require'] : [];
+
+$forbidden = array_intersect(FORBIDDEN_REQUIRES, array_keys($require));
+check('no dependency on the Magento base packages', $forbidden === [], implode(', ', $forbidden));
+
+$wildcards = [];
+$aliases = [];
+foreach ($require as $package => $constraint) {
+    if (str_starts_with((string) $package, 'magento/') && str_contains((string) $constraint, '*')) {
+        $wildcards[] = "{$package}: {$constraint}";
+    }
+    if (str_contains((string) $constraint, ' as ')) {
+        $aliases[] = "{$package}: {$constraint}";
+    }
+}
+check('no "*" version constraint on magento/* packages', $wildcards === [], implode(', ', $wildcards));
+check('no require inline aliases', $aliases === [], implode(', ', $aliases));
+
+$autoloadFiles = $manifest['autoload']['files'] ?? [];
+$autoloadFiles = is_array($autoloadFiles) ? $autoloadFiles : [];
+$registrationListed = false;
+foreach ($autoloadFiles as $file) {
+    if (str_ends_with((string) $file, 'registration.php')) {
+        $registrationListed = true;
+    }
+}
+check('autoload.files includes registration.php', $registrationListed, implode(', ', $autoloadFiles));
+
+$psr4 = $manifest['autoload']['psr-4'] ?? [];
+$namespaces = is_array($psr4) ? array_keys($psr4) : [];
+check('autoload.psr-4 declares a namespace', $namespaces !== [], implode(', ', $namespaces));
+
+// Adobe forbids narrowing the PHP versions the supported Magento versions allow. The CI matrix is
+// the list we claim to support, so the manifest must accept exactly those versions, no more, no less.
+// Resolved from the script location, the check must not depend on the caller's directory
+// Reading only the first matrix would compare the wrong list once the workflow grows a second one,
+// so every php-version matrix is collected and they all have to agree
+$workflow = "{$repositoryRoot}/.github/workflows/marketplace-checks.yml";
+$matrix = [];
+$matricesDisagree = false;
+if (
+    is_file($workflow)
+    && preg_match_all("/php-version:\s*\[([^\]]+)\]/", (string) file_get_contents($workflow), $found)
+) {
+    $matrices = [];
+    foreach ($found[1] as $list) {
+        preg_match_all("/\d+\.\d+/", $list, $versions);
+        $candidate = $versions[0];
+        sort($candidate);
+        $matrices[implode(', ', $candidate)] = $candidate;
+    }
+
+    if (count($matrices) === 1) {
+        $matrix = reset($matrices);
+    } else {
+        $matricesDisagree = true;
+    }
+}
+
+$constraint = (string) ($require['php'] ?? '');
+$declared = [];
+$parsable = $constraint !== '' && preg_match('/^\s*~\d+\.\d+\.0(\s*\|\|\s*~\d+\.\d+\.0)*\s*$/', $constraint) === 1;
+if ($parsable) {
+    preg_match_all('/~(\d+\.\d+)\.0/', $constraint, $found);
+    $declared = $found[1];
+}
+
+if ($matrix === [] || !$parsable) {
+    if (!$parsable) {
+        $detail = "cannot read constraint \"{$constraint}\", check it by hand";
+    } elseif ($matricesDisagree) {
+        $detail = "php-version matrices in {$workflow} do not agree, check them by hand";
+    } else {
+        $detail = "no php-version matrix in {$workflow}";
+    }
+
+    check('php constraint matches the tested versions', false, $detail);
+} else {
+    sort($matrix);
+    sort($declared);
+    check(
+        'php constraint matches the tested versions',
+        $matrix === $declared,
+        'manifest ' . implode(', ', $declared) . ' vs CI ' . implode(', ', $matrix)
+    );
+}
+
+check('registration.php exists', is_file("{$module}/registration.php"));
+
+$moduleXmlPath = "{$module}/etc/module.xml";
+$moduleXmlValid = false;
+if (is_file($moduleXmlPath)) {
+    $previous = libxml_use_internal_errors(true);
+    $moduleXmlValid = simplexml_load_file($moduleXmlPath) !== false;
+    libxml_clear_errors();
+    libxml_use_internal_errors($previous);
+}
+check('etc/module.xml exists and parses', $moduleXmlValid);
+
+if ($failures !== []) {
+    echo "\nFAIL: " . count($failures) . " manifest rule(s) violated\n";
+    exit(1);
+}
+
+echo "\nOK: manifest meets the Marketplace package verification rules\n";

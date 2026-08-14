@@ -1,2 +1,6 @@
 .gitattributes export-ignore
 .gitignore export-ignore
+
+# Shell helpers must keep LF even on Windows checkouts (core.autocrlf), otherwise the
+# trailing CR ends up in the arguments and the composer scripts fail to find the paths.
+bin/* text eol=lf

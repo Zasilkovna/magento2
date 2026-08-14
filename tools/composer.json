@@ -1,0 +1,15 @@
+{
+    "name": "packetery/marketplace-tools",
+    "description": "Marketplace (EQP) check tools, kept out of the root dependency tree: the Magento coding standard requires PHP_CodeSniffer 3.x, while the root PHPCompatibility ruleset needs 4.x.",
+    "type": "project",
+    "require": {
+        "magento/magento-coding-standard": "^40",
+        "systemsdk/phpcpd": "^9.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "license": "proprietary"
+}
