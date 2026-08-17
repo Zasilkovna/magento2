@@ -182,10 +182,6 @@ jobs:
     malware-scan:
         runs-on: ubuntu-24.04
         timeout-minutes: 15
-        env:
-            # the YARA rules are pinned so the run is reproducible: updating them is a commit here,
-            # not whatever the ruleset happens to look like on the day the job runs
-            YARA_RULES_COMMIT: '87b6d7faa4829b1e1c7c8895ef33d2b84d00b11f'
         steps:
             -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -194,25 +190,6 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install --no-install-recommends -y yara clamav
 
-            -   name: Check out the pinned YARA rules
-                # only data/ is checked out; its samples come with it and are deleted right after,
-                # because they are live webshells and no step here needs them
-                run: |
-                    git clone --filter=blob:none --no-checkout --sparse \
-                        https://github.com/jvoisin/php-malware-finder.git /tmp/yara-rules
-                    git -C /tmp/yara-rules sparse-checkout set data
-                    git -C /tmp/yara-rules checkout "$YARA_RULES_COMMIT"
-                    rm -rf /tmp/yara-rules/data/samples
-
-            -   name: YARA scan of the module sources
-                # yara reports a match on standard output and still exits 0, so the output decides
-                run: |
-                    HITS=$(yara -w -r /tmp/yara-rules/data/php.yar Packetery/Checkout)
-                    if [ -n "$HITS" ]; then
-                        echo "FAIL: YARA findings:"; echo "$HITS"; exit 1
-                    fi
-                    echo "OK: no YARA findings"
-
             -   name: Update the ClamAV signature database
                 # the package brings the clamav-freshclam service along, which holds a lock
                 # on the database directory and makes a manual freshclam fail
@@ -220,6 +197,5 @@ jobs:
                     sudo systemctl stop clamav-freshclam || true
                     sudo freshclam
 
-            -   name: ClamAV scan of the module sources
-                # exit 1 means an infected file, exit 2 a scan error, and both have to fail the job
-                run: clamscan -r -i Packetery/Checkout
+            -   name: Malware scan of the module sources
+                run: bash bin/malware-scan
