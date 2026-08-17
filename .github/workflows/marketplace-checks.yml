@@ -178,3 +178,24 @@ jobs:
                         echo "== testVersion $v =="
                         bash bin/phpcs-compatibility "$v"
                     done
+
+    malware-scan:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 15
+        steps:
+            -   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   name: Install YARA and ClamAV
+                run: |
+                    sudo apt-get update
+                    sudo apt-get install --no-install-recommends -y yara clamav
+
+            -   name: Update the ClamAV signature database
+                # the package brings the clamav-freshclam service along, which holds a lock
+                # on the database directory and makes a manual freshclam fail
+                run: |
+                    sudo systemctl stop clamav-freshclam || true
+                    sudo freshclam
+
+            -   name: Malware scan of the module sources
+                run: bash bin/malware-scan

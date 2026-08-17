@@ -70,7 +70,7 @@ These commands use PHP_CodeSniffer with the PHPCompatibility standard to detect 
 
 #### Marketplace (EQP) checks
 
-The module must permanently pass the blocking checks of the Magento Marketplace Extension Quality Program (EQP). All checks below run locally from the repository root and need PHP 8.4 or newer and Composer 2.8.6 or newer, the same as the compatibility checks above; the code sniffer and copy-paste detector use the same version constraints and parameters as CI (`.github/workflows/marketplace-checks.yml`).
+The module must permanently pass the blocking checks of the Magento Marketplace Extension Quality Program (EQP). All checks below run locally from the repository root and need PHP 8.4 or newer and Composer 2.8.6 or newer, the same as the compatibility checks above — except the malware scan, which needs YARA and ClamAV instead; the code sniffer and copy-paste detector use the same version constraints and parameters as CI (`.github/workflows/marketplace-checks.yml`).
 
 First install the dev dependencies (this only installs the tools, it runs no checks):
 
@@ -128,9 +128,15 @@ find Packetery/Checkout -name '*.php' -not -path '*/vendor/*' -print0 | xargs -0
 
 **PHP compatibility** — see the PHP Compatibility Checks section above.
 
-**Malware scan** (the only check CI does not cover; Adobe runs the final scan within EQP, this is a best-effort pre-check). Two tools are used, mirroring Adobe: ClamAV antivirus and YARA with a community ruleset for PHP malware/webshells.
+**Malware scan** (CI covers it too, as the `malware-scan` job; Adobe runs the final scan within EQP, this is a best-effort pre-check). Two tools are used, mirroring Adobe: ClamAV antivirus and YARA with a community ruleset for PHP malware/webshells.
 
-For ClamAV the quickest way is Docker — identical on every OS, no local install, the image ships an up-to-date signature database:
+```bash
+composer malware-scan
+```
+
+`bin/malware-scan` is what the CI job runs as well: it fetches the YARA ruleset at the commit pinned at the top of the script, scans with it, then runs ClamAV, and fails on a finding as well as on a file it could not read. It only scans — both tools have to be installed first and the ClamAV signature database has to be current, because `freshclam` needs root and stays outside the script.
+
+For ClamAV alone the quickest way is Docker — identical on every OS, no local install, the image ships an up-to-date signature database:
 
 ```bash
 docker run --rm -v "$PWD/Packetery/Checkout:/scan:ro" clamav/clamav:stable clamscan -r /scan
@@ -138,7 +144,7 @@ docker run --rm -v "$PWD/Packetery/Checkout:/scan:ro" clamav/clamav:stable clams
 
 On ARM machines (Apple Silicon, ARM Linux) add `--platform linux/amd64` to the command — the image has no ARM build, so without it Docker fails on a missing manifest.
 
-Otherwise install the tools natively:
+The script needs both tools installed natively:
 
 - macOS: `brew install yara clamav`. ClamAV then needs its config file created, otherwise `freshclam` fails with `Can't open/parse the config file`: `cp "$(brew --prefix)/etc/clamav/freshclam.conf.sample" "$(brew --prefix)/etc/clamav/freshclam.conf"` and comment out the `Example` line in it. Use the Docker command above if you want to skip this setup.
 - Linux: `sudo apt install yara clamav` (Debian/Ubuntu), `sudo dnf install yara clamav clamav-update` (Fedora)
@@ -164,7 +170,9 @@ Notes:
 - The copy-paste detector against Magento core needs WSL2 on Windows, Git Bash is not enough: a native Windows PHP cannot open the `/c/…` paths Git Bash produces, and the shell rewrites a Windows path back to that form. The script asks the scanning PHP whether it sees the files, so this ends as a loud failure, not as a clean run.
 - Windows clones created before `bin/* text eol=lf` was added keep their CRLF copies — switching branches does not rewrite a file whose content did not change — and `composer phpcs-compatibility:*` then fails with `ERROR: The file "Packetery/Checkout" does not exist`. Refresh the helper once with `rm bin/phpcs-compatibility && git checkout -- bin/phpcs-compatibility`.
 - Debian/Ubuntu packages pull in the `clamav-freshclam` service, which keeps the signature database up to date on its own — running `freshclam` by hand is usually unnecessary there. If `freshclam` complains about a missing configuration (typical for Homebrew and the Windows builds), create `freshclam.conf` from the bundled `freshclam.conf.sample` and comment out the `Example` line.
-- Clone the YARA ruleset outside the repository (as above) — it carries a `samples/` directory with live webshells, which can also trip antivirus or endpoint protection on managed machines. To skip them entirely, fetch only the rules: `git clone --depth 1 --filter=blob:none --sparse https://github.com/jvoisin/php-malware-finder /tmp/php-malware-finder && git -C /tmp/php-malware-finder sparse-checkout set data`, then delete `data/samples`.
+- Clone the YARA ruleset outside the repository — it carries a `samples/` directory with live webshells, which can also trip antivirus or endpoint protection on managed machines. To skip them entirely, fetch only the rules: `git clone --filter=blob:none --sparse https://github.com/jvoisin/php-malware-finder /tmp/php-malware-finder && git -C /tmp/php-malware-finder sparse-checkout set data`, then delete `data/samples`. `composer malware-scan` does exactly this on its own, in a temporary directory.
+- `--depth 1` does not belong in that clone: a shallow clone carries only the tip of the default branch, so `git checkout` of the pinned commit fails in it with `fatal: reference is not a tree` as soon as the ruleset moves on past the pin.
+- CI and a local `composer malware-scan` scan with the same rules, because the pin lives in `YARA_RULES_COMMIT` at the top of `bin/malware-scan` — changing the rules is a commit visible in a pull request. ClamAV is deliberately not pinned and refreshes its database on every run, because a fresh database is what an antivirus is for. Running `yara` by hand against a fresh clone therefore uses newer rules than CI; to reproduce a CI finding, check out the commit named in the script.
 - `composer install` in the repository root also installs the marketplace tools into `tools/`, so it needs network access even when you only want the module dependencies. Behind a proxy or offline it fails on that step with the root `vendor/` already in place; rerun it with network, or use `composer install --no-scripts` and install the tools later with `composer install --working-dir=tools`.
 
 #### Message queue consumer (bulk packet submission)
@@ -378,7 +386,7 @@ Tyto příkazy používají PHP_CodeSniffer se standardem PHPCompatibility pro d
 
 #### Marketplace (EQP) kontroly
 
-Modul musí trvale splňovat blokující kontroly programu Magento Marketplace Extension Quality Program (EQP). Všechny kontroly níže se spouštějí lokálně z rootu repozitáře a vyžadují PHP 8.4 nebo novější a Composer 2.8.6 nebo novější, stejně jako kontroly kompatibility výše; code sniffer a copy-paste detector používají stejné version constrainty a parametry jako CI (`.github/workflows/marketplace-checks.yml`).
+Modul musí trvale splňovat blokující kontroly programu Magento Marketplace Extension Quality Program (EQP). Všechny kontroly níže se spouštějí lokálně z rootu repozitáře a vyžadují PHP 8.4 nebo novější a Composer 2.8.6 nebo novější, stejně jako kontroly kompatibility výše — kromě malware scanu, který místo toho potřebuje YARA a ClamAV; code sniffer a copy-paste detector používají stejné version constrainty a parametry jako CI (`.github/workflows/marketplace-checks.yml`).
 
 Nejprve nainstalujte dev závislosti (pouze instaluje nástroje, žádné kontroly nespouští):
 
@@ -436,9 +444,15 @@ find Packetery/Checkout -name '*.php' -not -path '*/vendor/*' -print0 | xargs -0
 
 **Kompatibilita PHP** — viz sekce Kontrola kompatibility PHP výše.
 
-**Malware scan** (jediná kontrola, kterou CI nepokrývá; finální scan provádí Adobe v rámci EQP, tohle je best-effort před-kontrola). Používají se dva nástroje po vzoru Adobe: antivirus ClamAV a YARA s komunitní sadou pravidel pro PHP malware/webshelly.
+**Malware scan** (pokrývá ho i CI, job `malware-scan`; finální scan provádí Adobe v rámci EQP, tohle je best-effort před-kontrola). Používají se dva nástroje po vzoru Adobe: antivirus ClamAV a YARA s komunitní sadou pravidel pro PHP malware/webshelly.
 
-U ClamAV je nejrychlejší cesta Docker — funguje stejně na všech OS, nic se neinstaluje a image má aktuální databázi signatur:
+```bash
+composer malware-scan
+```
+
+`bin/malware-scan` je totéž, co spouští CI job: stáhne sadu YARA pravidel na commitu zafixovaném v hlavičce skriptu, proskenuje s ní modul, pak spustí ClamAV a spadne jak na nálezu, tak na souboru, který se nepodařilo přečíst. Skript jen skenuje — oba nástroje musí být předem nainstalované a databáze signatur ClamAV aktuální, protože `freshclam` potřebuje roota a zůstává mimo skript.
+
+Pro samotný ClamAV je nejrychlejší cesta Docker — funguje stejně na všech OS, nic se neinstaluje a image má aktuální databázi signatur:
 
 ```bash
 docker run --rm -v "$PWD/Packetery/Checkout:/scan:ro" clamav/clamav:stable clamscan -r /scan
@@ -446,7 +460,7 @@ docker run --rm -v "$PWD/Packetery/Checkout:/scan:ro" clamav/clamav:stable clams
 
 Na ARM strojích (Apple Silicon, ARM Linux) přidejte do příkazu `--platform linux/amd64` — image nemá ARM variantu a Docker bez toho skončí chybou o chybějícím manifestu.
 
-Jinak nainstalujte nástroje nativně:
+Skript potřebuje oba nástroje nainstalované nativně:
 
 - macOS: `brew install yara clamav`. ClamAV si pak vyžádá vytvoření konfigurace, jinak `freshclam` skončí chybou `Can't open/parse the config file`: `cp "$(brew --prefix)/etc/clamav/freshclam.conf.sample" "$(brew --prefix)/etc/clamav/freshclam.conf"` a v souboru zakomentujte řádek `Example`. Pokud se tomuhle nastavování chcete vyhnout, použijte Docker příkaz výše.
 - Linux: `sudo apt install yara clamav` (Debian/Ubuntu), `sudo dnf install yara clamav clamav-update` (Fedora)
@@ -472,7 +486,9 @@ Poznámky:
 - Copy-paste detector proti Magento core potřebuje na Windows WSL2, Git Bash nestačí: nativní Windows PHP neumí otevřít cesty ve tvaru `/c/…`, které Git Bash vytváří, a shell si windowsový tvar cesty přepíše zpátky na něj. Skript se skenujícího PHP zeptá, jestli soubory vidí, takže to skončí hlasitou chybou, ne čistým během.
 - Windows klony vytvořené dříve, než přibylo `bin/* text eol=lf`, si CRLF kopie ponechají — přepnutí větve nepřepíše soubor, jehož obsah se nezměnil — a `composer phpcs-compatibility:*` pak padá na `ERROR: The file "Packetery/Checkout" does not exist`. Jednorázově pomůže `rm bin/phpcs-compatibility && git checkout -- bin/phpcs-compatibility`.
 - Balíčky na Debianu/Ubuntu s sebou nesou službu `clamav-freshclam`, která databázi signatur aktualizuje sama — ruční `freshclam` tam obvykle není potřeba. Pokud `freshclam` hlásí chybějící konfiguraci (typicky u Homebrew a Windows buildů), vytvořte `freshclam.conf` z přiloženého `freshclam.conf.sample` a zakomentujte řádek `Example`.
-- Sadu YARA pravidel klonujte mimo repozitář (jak je uvedeno výše) — obsahuje adresář `samples/` s živými webshelly, které navíc mohou na firemním stroji spustit antivirus nebo ochranu koncových stanic. Když je nechcete stahovat vůbec, vezměte jen pravidla: `git clone --depth 1 --filter=blob:none --sparse https://github.com/jvoisin/php-malware-finder /tmp/php-malware-finder && git -C /tmp/php-malware-finder sparse-checkout set data` a potom smažte `data/samples`.
+- Sadu YARA pravidel klonujte mimo repozitář — obsahuje adresář `samples/` s živými webshelly, které navíc mohou na firemním stroji spustit antivirus nebo ochranu koncových stanic. Když je nechcete stahovat vůbec, vezměte jen pravidla: `git clone --filter=blob:none --sparse https://github.com/jvoisin/php-malware-finder /tmp/php-malware-finder && git -C /tmp/php-malware-finder sparse-checkout set data` a potom smažte `data/samples`. `composer malware-scan` přesně tohle dělá sám, v dočasném adresáři.
+- `--depth 1` do toho klonu nepatří: shallow klon obsahuje jen tip výchozí větve, takže `git checkout` zafixovaného commitu v něm skončí na `fatal: reference is not a tree`, jakmile se sada pravidel posune za pin.
+- CI i lokální `composer malware-scan` skenují stejnými pravidly, protože pin je v `YARA_RULES_COMMIT` v hlavičce `bin/malware-scan` — změna pravidel je commit viditelný v pull requestu. ClamAV záměrně zafixovaný není a databázi si obnovuje při každém běhu, protože čerstvá databáze je u antiviru účel. Ruční `yara` nad čerstvým klonem tedy běží s novějšími pravidly než CI; pro reprodukci nálezu z CI si checkoutněte commit uvedený ve skriptu.
 - `composer install` v rootu repozitáře doinstaluje i marketplace nástroje do `tools/`, takže potřebuje síť i tehdy, když chcete jen závislosti modulu. Za proxy nebo offline spadne až na tomto kroku, root `vendor/` už přitom stojí; pusťte ho znovu se sítí, nebo použijte `composer install --no-scripts` a nástroje doinstalujte později přes `composer install --working-dir=tools`.
 
 #### Message queue consumer (hromadné podání zásilek)

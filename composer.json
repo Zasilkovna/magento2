@@ -22,7 +22,8 @@
         "phpcs-magento2": "@php tools/vendor/bin/phpcs --standard=Magento2 --error-severity=10 --warning-severity=0 --extensions=php,phtml --ignore-annotations Packetery/Checkout",
         "phpcpd": "@php tools/vendor/bin/phpcpd --exclude Packetery/Checkout/Test Packetery/Checkout",
         "phpcpd-core": "bash bin/phpcpd-core",
-        "verify-manifest": "@php bin/verify-manifest"
+        "verify-manifest": "@php bin/verify-manifest",
+        "malware-scan": "bash bin/malware-scan"
     },
     "config": {
         "allow-plugins": {
